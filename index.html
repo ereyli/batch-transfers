@@ -5,19 +5,7 @@
     <title>Sendwise</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js">      async function connectWallet() {
-        if (!window.ethereum) return alert("No wallet detected.");
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-          const address = await signer.getAddress();
-          document.getElementById("connectWalletBtn").textContent = `Connected: ${address.slice(0,6)}...${address.slice(-4)}`;
-        } catch (e) {
-          alert("Wallet connection failed.");
-        }
-      }
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
       body {
         background-color: #04111D;
@@ -344,5 +332,19 @@ ${options}`);
         detectNetwork();
       }
     </script>
-  </body>
+    <script>
+    async function connectWallet() {
+      if (!window.ethereum) return alert("No wallet detected.");
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
+        document.getElementById("connectWalletBtn").textContent = `Connected: ${address.slice(0,6)}...${address.slice(-4)}`;
+      } catch (e) {
+        alert("Wallet connection failed.");
+      }
+    }
+  </script>
+</body>
 </html>

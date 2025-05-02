@@ -22,16 +22,24 @@
           margin: 8px auto;
         }
       }
-    </style>
+          @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+</style>
     <title>Sendwise</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
       body {
-        font-family: 'Segoe UI', sans-serif;
-        text-align: center;
-        padding: 40px;
+        animation: fadeIn 1.2s ease-in;
+        backdrop-filter: blur(4px);
+
+        background-image: url('https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png');
+        background-repeat: no-repeat;
+        background-position: center top 40px;
+        background-size: 400px;
         background-color: #04111D;
         color: #ffffff;
       }
@@ -112,10 +120,8 @@
     </style>
   </head>
   <body>
-    <div style="margin-top: -20px; margin-bottom: 0;">
-      <img src="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width: 100px; display: block; margin: 0 auto;" />
-    </div>
-    <h1>🚀 Sendwise: Smart Batch Transfers</h1>
+    
+    <h1 style="margin-top: 320px; font-size: 2rem; text-shadow: 0 0 8px #00e1ff;">Sendwise: Smart Batch Transfers</h1>
 
     <div class="container">
       <div class="add-remove-wrapper">

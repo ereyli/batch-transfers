@@ -5,7 +5,51 @@
     <title>Sendwise</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js">async function detectNetwork() {
+        if (!window.ethereum) return;
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const network = await provider.getNetwork();
+        const chainId = network.chainId;
+        const names = {
+          8453: "Base",
+          10: "Optimism",
+          42161: "Arbitrum"
+        };
+        document.getElementById("currentNetwork").textContent = names[chainId] || "Unknown";
+      }
+
+      detectNetwork();
+
+      async function switchNetwork() {
+        if (!window.ethereum) return;
+        const chainIds = {
+          Base: '0x2105',       // Base Mainnet
+          Optimism: '0xa',      // Optimism
+          Arbitrum: '0xa4b1'    // Arbitrum One
+        };
+
+        const options = Object.entries(chainIds).map(([name, hex]) => `${name} (${hex})`).join('
+');
+        const selected = prompt(`Select a network to switch to:
+${options}`);
+        const entry = Object.entries(chainIds).find(([name]) => selected?.includes(name));
+
+        if (!entry) return;
+
+        const [name, chainIdHex] = entry;
+
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: chainIdHex }]
+          });
+        } catch (switchError) {
+          alert(`Failed to switch to ${name}: ${switchError.message}`);
+        }
+
+        detectNetwork();
+      }
+</script>
     <style>
       body {
         background-color: #04111D;
@@ -116,7 +160,6 @@
         text-decoration: underline;
       }
       
-      /* Fix for mobile responsiveness */
       @media (max-width: 768px) {
         .row {
           flex-direction: column;
@@ -142,11 +185,19 @@
           margin: 8px auto;
         }
       }
-    </style>
+    #networkInfo {
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #ccc;
+      }
+</style>
   </head>
   <body>
     <img src="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width: 120px; margin-bottom: 10px;" />
     <h1>Sendwise: Smart Batch Transfers</h1>
+    <div id="networkInfo">⛓️ Network: <span id="currentNetwork">Detecting...</span>
+      <button onclick="switchNetwork()" style="margin-left: 10px; font-size: 12px; padding: 5px 10px;">Switch Network</button>
+    </div>
 
     <div class="container">
       <div class="add-remove-wrapper">
@@ -172,7 +223,11 @@
     </div>
 
     <script>
-      const CONTRACT_ADDRESS = "0xb38aa493451fd24beea17e3b4398c6557ff7c1d6";
+      const CONTRACTS = {
+        8453: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0", // Base
+        10: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",   // Optimism
+        42161: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0"  // Arbitrum
+      };
       const CONTRACT_ABI = [
         "function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"
       ];
@@ -238,6 +293,7 @@
           const recipients = [];
           const amounts = [];
           let totalAmount = ethers.BigNumber.from("0");
+const feeAmount = ethers.utils.parseEther("0.001");
 
           for (let i = 0; i < addresses.length; i++) {
             const addr = addresses[i].value.trim();
@@ -251,8 +307,15 @@
             totalAmount = totalAmount.add(amt);
           }
 
-          const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-          const tx = await contract.batchSend(recipients, amounts, { value: totalAmount });
+          const network = await provider.getNetwork();
+          const chainId = network.chainId;
+          const contractAddress = CONTRACTS[chainId];
+          if (!contractAddress) {
+            status.innerText = "Unsupported network.";
+            return;
+          }
+          const contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
+          const tx = await contract.batchSend(recipients, amounts, { value: totalAmount.add(feeAmount) });
           await tx.wait();
 
           status.innerText = "✅ Batch transfer complete!";

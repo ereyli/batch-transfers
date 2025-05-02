@@ -2,51 +2,35 @@
 <html>
   <head>
     <link rel="icon" href="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" type="image/png" />
-    <style>
-      @media (max-width: 768px) {
-        .row {
-          flex-direction: column;
-        }
-        .row input {
-          width: 90%;
-          margin: 5px 0;
-        }
-        .add-remove-wrapper {
-          flex-direction: column;
-        }
-        .container {
-          width: 95%;
-        }
-        button {
-          width: 90%;
-          margin: 8px auto;
-        }
-      }
-          
-        to { opacity: 1; transform: translateY(0); }
-      }
-</style>
     <title>Sendwise</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
       body {
-        
-
-        
         background-color: #04111D;
         color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
       }
+      
       h1 {
         color: #72f3ff;
+        text-align: center;
       }
+      
       .row {
         display: flex;
         justify-content: center;
         align-items: center;
         margin-bottom: 10px;
+        width: 100%;
       }
+      
       .row input {
         width: 45%;
         margin: 0 5px;
@@ -57,21 +41,32 @@
         background-color: #ffffff;
         color: #000000;
       }
+      
       .add-remove-wrapper {
         display: flex;
         justify-content: center;
         gap: 10px;
         margin-bottom: 20px;
+        width: 100%;
       }
+      
       .container {
-        display: inline-block;
-        text-align: left;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         width: 80%;
+        max-width: 800px;
         background: #0b1f2a;
         padding: 20px;
         border-radius: 16px;
         box-shadow: 0 0 16px rgba(0, 255, 255, 0.2);
+        margin: 0 auto;
       }
+      
+      #inputContainer {
+        width: 100%;
+      }
+      
       button {
         margin: 10px;
         padding: 10px 20px;
@@ -83,21 +78,27 @@
         color: #000;
         font-weight: bold;
       }
+      
       button:hover {
         background: #00e1ff;
       }
+      
       input[type="file"] {
         margin-top: 10px;
         color: #ffffff;
       }
+      
       #status {
         margin-top: 20px;
         color: #00ffcc;
+        text-align: center;
       }
+      
       #history {
         margin-top: 30px;
         text-align: left;
         width: 80%;
+        max-width: 800px;
         margin-left: auto;
         margin-right: auto;
         background: #0b1f2a;
@@ -105,20 +106,47 @@
         border-radius: 12px;
         box-shadow: 0 0 8px rgba(0, 255, 255, 0.15);
       }
+      
       #historyList a {
         color: #00e0ff;
         text-decoration: none;
       }
+      
       #historyList a:hover {
         text-decoration: underline;
+      }
+      
+      /* Fix for mobile responsiveness */
+      @media (max-width: 768px) {
+        .row {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .row input {
+          width: 90%;
+          margin: 5px 0;
+        }
+        
+        .add-remove-wrapper {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .container {
+          width: 95%;
+        }
+        
+        button {
+          width: 90%;
+          margin: 8px auto;
+        }
       }
     </style>
   </head>
   <body>
-    
-    
-    <img src="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width: 120px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;" />
-<h1 style="text-align: center;">Sendwise: Smart Batch Transfers</h1>
+    <img src="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width: 120px; margin-bottom: 10px;" />
+    <h1>Sendwise: Smart Batch Transfers</h1>
 
     <div class="container">
       <div class="add-remove-wrapper">
@@ -238,5 +266,5 @@
         }
       }
     </script>
-      </body>
+  </body>
 </html>

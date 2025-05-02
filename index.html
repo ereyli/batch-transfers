@@ -10,7 +10,7 @@
         font-family: sans-serif;
         text-align: center;
         padding: 40px;
-        background-color: #f7f7f7;
+        background-color: #f0f4f8;
       }
       .row {
         display: flex;
@@ -19,25 +19,44 @@
         margin-bottom: 10px;
       }
       .row input {
-        width: 40%;
+        width: 45%;
         margin: 0 5px;
+        padding: 10px;
+        font-size: 16px;
       }
       .remove-btn {
         background: red;
         color: white;
         border: none;
-        padding: 5px 10px;
+        padding: 6px 10px;
         cursor: pointer;
+        font-size: 18px;
+      }
+      .add-remove-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
       }
       .container {
         display: inline-block;
         text-align: left;
         width: 80%;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0,0,0,0.1);
       }
       button {
         margin: 10px;
-        padding: 10px;
+        padding: 10px 20px;
         font-size: 16px;
+        cursor: pointer;
+        border-radius: 8px;
+        border: none;
+      }
+      button:hover {
+        opacity: 0.9;
       }
       #history {
         margin-top: 30px;
@@ -48,25 +67,30 @@
         background: #fff;
         padding: 10px;
         border: 1px solid #ccc;
+        border-radius: 10px;
       }
     </style>
   </head>
   <body>
     <h1>🚀 Batch Transfer on Base</h1>
 
-    <div class="container" id="inputContainer">
-      <div class="row">
-        <input type="text" placeholder="Recipient Address" class="address" />
-        <input type="text" placeholder="Amount in ETH" class="amount" />
-        <button class="remove-btn" onclick="removeRow(this)">❌</button>
+    <div class="container">
+      <div class="add-remove-wrapper">
+        <button onclick="addInput()">➕</button>
+        <button onclick="removeLast()">❌</button>
       </div>
-    </div>
+      <div id="inputContainer">
+        <div class="row">
+          <input type="text" placeholder="Recipient Address" class="address" />
+          <input type="text" placeholder="Amount in ETH" class="amount" />
+        </div>
+      </div>
 
-    <input type="file" id="csvInput" accept=".csv" />
-    <button onclick="importCSV()">📄 Import CSV</button>
-    <button onclick="addInput()">➕ Add More</button>
-    <button onclick="sendBatch()">🔄 Send Tokens</button>
-    <p id="status"></p>
+      <input type="file" id="csvInput" accept=".csv" />
+      <button onclick="importCSV()">📄 Import CSV</button>
+      <button onclick="sendBatch()">🔄 Send Tokens</button>
+      <p id="status"></p>
+    </div>
 
     <div id="history">
       <h3>🧾 Transaction History</h3>
@@ -86,14 +110,16 @@
         row.innerHTML = `
           <input type="text" placeholder="Recipient Address" class="address" />
           <input type="text" placeholder="Amount in ETH" class="amount" />
-          <button class="remove-btn" onclick="removeRow(this)">❌</button>
         `;
         container.appendChild(row);
       }
 
-      function removeRow(button) {
-        const row = button.parentNode;
-        row.parentNode.removeChild(row);
+      function removeLast() {
+        const container = document.getElementById("inputContainer");
+        const rows = container.getElementsByClassName("row");
+        if (rows.length > 1) {
+          container.removeChild(rows[rows.length - 1]);
+        }
       }
 
       function importCSV() {
@@ -112,7 +138,6 @@
               row.innerHTML = `
                 <input type="text" value="${address}" class="address" />
                 <input type="text" value="${amount}" class="amount" />
-                <button class="remove-btn" onclick="removeRow(this)">❌</button>
               `;
               document.getElementById("inputContainer").appendChild(row);
             }

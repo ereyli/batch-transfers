@@ -139,6 +139,69 @@
         z-index: 100;
       }
       
+      .network-dropdown {
+        position: relative;
+        display: inline-block;
+        margin-left: 10px;
+      }
+      
+      .network-dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #0b1f2a;
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+        z-index: 1;
+        top: 100%;
+        left: 0;
+      }
+      
+      .network-dropdown-content a {
+        color: #00e0ff;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        border-radius: 4px;
+      }
+      
+      .network-dropdown-content a:hover {
+        background-color: #1c3340;
+      }
+      
+      .network-dropdown:hover .network-dropdown-content {
+        display: block;
+      }
+      
+      .network-btn {
+        background-color: #00c7ff;
+        color: #000;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+      
+      .network-btn:hover {
+        background-color: #00e1ff;
+      }
+      
+      .network-icon {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+      
+      .active-network {
+        font-weight: bold;
+        border-left: 3px solid #00e1ff;
+      }
+      
       @media (max-width: 768px) {
         .row {
           flex-direction: column;
@@ -171,6 +234,15 @@
           margin-bottom: 20px;
           width: auto;
         }
+        
+        #networkInfo {
+          flex-direction: column;
+        }
+        
+        .network-dropdown {
+          margin-top: 10px;
+          margin-left: 0;
+        }
       }
     </style>
   </head>
@@ -182,7 +254,22 @@
     
     <div id="networkInfo">
       ⛓️ Network: <span id="currentNetwork">Detecting...</span>
-      <button onclick="switchNetwork()" style="margin-left: 10px; font-size: 12px; padding: 5px 10px;">Switch Network</button>
+      <div class="network-dropdown">
+        <button class="network-btn">
+          <span id="networkBtnText">Switch Network</span> ▼
+        </button>
+        <div class="network-dropdown-content" id="networkDropdown">
+          <a href="#" onclick="switchToNetwork('0x2105', 'Base')">
+            <span class="network-icon" style="background-color: #0052FF;"></span>Base
+          </a>
+          <a href="#" onclick="switchToNetwork('0xa', 'Optimism')">
+            <span class="network-icon" style="background-color: #FF0420;"></span>Optimism
+          </a>
+          <a href="#" onclick="switchToNetwork('0xa4b1', 'Arbitrum')">
+            <span class="network-icon" style="background-color: #28A0F0;"></span>Arbitrum
+          </a>
+        </div>
+      </div>
     </div>
 
     <div class="container">
@@ -220,6 +307,18 @@
         8453: "Base",
         10: "Optimism", 
         42161: "Arbitrum"
+      };
+      
+      const NETWORK_HEX_IDS = {
+        "0x2105": 8453,   // Base
+        "0xa": 10,        // Optimism
+        "0xa4b1": 42161   // Arbitrum
+      };
+      
+      const NETWORK_COLORS = {
+        "Base": "#0052FF",
+        "Optimism": "#FF0420",
+        "Arbitrum": "#28A0F0"
       };
       
       const EXPLORERS = {
@@ -285,13 +384,27 @@
           currentChainId = network.chainId;
           
           const networkSpan = document.getElementById("currentNetwork");
-          networkSpan.textContent = NETWORKS[currentChainId] || `Unknown (${currentChainId})`;
+          const networkName = NETWORKS[currentChainId] || `Unknown (${currentChainId})`;
+          networkSpan.textContent = networkName;
           
           // Update status color based on supported networks
           if (CONTRACTS[currentChainId]) {
             networkSpan.style.color = "#72f3ff";
+            
+            // Update network button text
+            document.getElementById("networkBtnText").textContent = networkName;
+            
+            // Highlight active network in dropdown
+            const links = document.querySelectorAll('.network-dropdown-content a');
+            links.forEach(link => {
+              link.classList.remove('active-network');
+              if (link.textContent.trim() === networkName) {
+                link.classList.add('active-network');
+              }
+            });
           } else {
             networkSpan.style.color = "#ff7272";
+            document.getElementById("networkBtnText").textContent = "Switch Network";
           }
         } catch (error) {
           console.error("Error detecting network:", error);
@@ -299,47 +412,92 @@
         }
       }
 
-      // Switch network function
-      async function switchNetwork() {
+      // Switch to a specific network
+      async function switchToNetwork(chainIdHex, networkName) {
         if (!window.ethereum) {
           alert("No wallet detected. Please install MetaMask or another compatible wallet.");
           return;
         }
         
-        const chainIds = {
-          Base: '0x2105',       // Base Mainnet (8453)
-          Optimism: '0xa',      // Optimism (10)
-          Arbitrum: '0xa4b1'    // Arbitrum One (42161)
-        };
-
-        // Create network selection options
-        const options = Object.entries(chainIds)
-          .map(([name, hex]) => `${name} (${hex})`)
-          .join('\n');
-          
-        const selected = prompt(`Select a network to switch to:\n${options}`);
-        
-        // If user cancels or doesn't select any network
-        if (!selected) return;
-        
-        // Find the selected network
-        const entry = Object.entries(chainIds).find(([name]) => selected.includes(name));
-        if (!entry) return;
-        
-        const [name, chainIdHex] = entry;
-
         try {
+          document.getElementById("status").innerText = `Switching to ${networkName}...`;
+          
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: chainIdHex }]
           });
           
           // After switching, detect the network again
-          setTimeout(detectNetwork, 1000);
+          setTimeout(() => {
+            detectNetwork();
+            document.getElementById("status").innerText = `Switched to ${networkName} successfully!`;
+          }, 1000);
         } catch (switchError) {
           console.error(switchError);
-          alert(`Failed to switch to ${name}: ${switchError.message}`);
+          
+          // This error code indicates that the chain has not been added to MetaMask.
+          if (switchError.code === 4902) {
+            try {
+              // Add the network
+              await addNetwork(chainIdHex, networkName);
+            } catch (addError) {
+              console.error(addError);
+              document.getElementById("status").innerText = `Failed to add ${networkName}: ${addError.message}`;
+            }
+          } else {
+            document.getElementById("status").innerText = `Failed to switch to ${networkName}: ${switchError.message}`;
+          }
         }
+      }
+      
+      // Add a network to MetaMask if it doesn't exist
+      async function addNetwork(chainIdHex, networkName) {
+        // Network parameters
+        const networkParams = {
+          Base: {
+            chainId: '0x2105',
+            chainName: 'Base',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
+              decimals: 18
+            },
+            rpcUrls: ['https://mainnet.base.org'],
+            blockExplorerUrls: ['https://basescan.org']
+          },
+          Optimism: {
+            chainId: '0xa',
+            chainName: 'Optimism',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
+              decimals: 18
+            },
+            rpcUrls: ['https://mainnet.optimism.io'],
+            blockExplorerUrls: ['https://optimistic.etherscan.io']
+          },
+          Arbitrum: {
+            chainId: '0xa4b1',
+            chainName: 'Arbitrum One',
+            nativeCurrency: {
+              name: 'Ether',
+              symbol: 'ETH',
+              decimals: 18
+            },
+            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+            blockExplorerUrls: ['https://arbiscan.io']
+          }
+        };
+        
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [networkParams[networkName]]
+        });
+        
+        // Try switching again after adding
+        setTimeout(() => {
+          detectNetwork();
+        }, 1000);
       }
 
       // Add a new input row

@@ -12,24 +12,38 @@
         padding: 40px;
         background-color: #f7f7f7;
       }
-      input, textarea, button {
+      .row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .row input {
+        width: 40%;
+        margin: 0 5px;
+      }
+      .container {
+        display: inline-block;
+        text-align: left;
+        width: 80%;
+      }
+      button {
         margin: 10px;
         padding: 10px;
-        width: 80%;
         font-size: 16px;
-      }
-      textarea {
-        height: 100px;
       }
     </style>
   </head>
   <body>
     <h1>🚀 Batch Transfer on Base</h1>
-    <p>Enter each recipient address and amount (in ETH) on a new line, like this:</p>
-    <pre>0xabc123... 0.01
-0xdef456... 0.05</pre>
 
-    <textarea id="recipientList" placeholder="0x123... 0.01\n0x456... 0.02"></textarea><br />
+    <div class="container" id="inputContainer">
+      <div class="row">
+        <input type="text" placeholder="Recipient Address" class="address" />
+        <input type="text" placeholder="Amount in ETH" class="amount" />
+      </div>
+    </div>
+
+    <button onclick="addInput()">➕ Add More</button>
     <button onclick="sendBatch()">🔄 Send Tokens</button>
     <p id="status"></p>
 
@@ -39,10 +53,21 @@
         "function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"
       ];
 
+      function addInput() {
+        const container = document.getElementById("inputContainer");
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+          <input type="text" placeholder="Recipient Address" class="address" />
+          <input type="text" placeholder="Amount in ETH" class="amount" />
+        `;
+        container.appendChild(row);
+      }
+
       async function sendBatch() {
-        const textarea = document.getElementById("recipientList");
         const status = document.getElementById("status");
-        const lines = textarea.value.trim().split("\n");
+        const addresses = Array.from(document.getElementsByClassName("address"));
+        const amountsInputs = Array.from(document.getElementsByClassName("amount"));
 
         if (!window.ethereum) {
           status.innerText = "Please install MetaMask or another wallet.";
@@ -56,14 +81,18 @@
 
           const recipients = [];
           const amounts = [];
-          let totalAmount = ethers.BigNumber.from(0);
+          let totalAmount = ethers.BigNumber.from("0");
 
-          for (const line of lines) {
-            const [address, amountStr] = line.trim().split(/\s+/);
-            const amount = ethers.utils.parseEther(amountStr);
-            recipients.push(address);
-            amounts.push(amount);
-            totalAmount = totalAmount.add(amount);
+          for (let i = 0; i < addresses.length; i++) {
+            const addr = addresses[i].value.trim();
+            const amtStr = amountsInputs[i].value.trim();
+            if (!ethers.utils.isAddress(addr) || isNaN(amtStr)) {
+              throw new Error(`Invalid input at row ${i + 1}`);
+            }
+            const amt = ethers.utils.parseEther(amtStr);
+            recipients.push(addr);
+            amounts.push(amt);
+            totalAmount = totalAmount.add(amt);
           }
 
           const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);

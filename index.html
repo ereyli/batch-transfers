@@ -15,11 +15,19 @@
       .row {
         display: flex;
         justify-content: center;
+        align-items: center;
         margin-bottom: 10px;
       }
       .row input {
         width: 40%;
         margin: 0 5px;
+      }
+      .remove-btn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
       }
       .container {
         display: inline-block;
@@ -31,6 +39,16 @@
         padding: 10px;
         font-size: 16px;
       }
+      #history {
+        margin-top: 30px;
+        text-align: left;
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ccc;
+      }
     </style>
   </head>
   <body>
@@ -40,12 +58,20 @@
       <div class="row">
         <input type="text" placeholder="Recipient Address" class="address" />
         <input type="text" placeholder="Amount in ETH" class="amount" />
+        <button class="remove-btn" onclick="removeRow(this)">❌</button>
       </div>
     </div>
 
+    <input type="file" id="csvInput" accept=".csv" />
+    <button onclick="importCSV()">📄 Import CSV</button>
     <button onclick="addInput()">➕ Add More</button>
     <button onclick="sendBatch()">🔄 Send Tokens</button>
     <p id="status"></p>
+
+    <div id="history">
+      <h3>🧾 Transaction History</h3>
+      <ul id="historyList"></ul>
+    </div>
 
     <script>
       const CONTRACT_ADDRESS = "0xb38aa493451fd24beea17e3b4398c6557ff7c1d6";
@@ -60,8 +86,39 @@
         row.innerHTML = `
           <input type="text" placeholder="Recipient Address" class="address" />
           <input type="text" placeholder="Amount in ETH" class="amount" />
+          <button class="remove-btn" onclick="removeRow(this)">❌</button>
         `;
         container.appendChild(row);
+      }
+
+      function removeRow(button) {
+        const row = button.parentNode;
+        row.parentNode.removeChild(row);
+      }
+
+      function importCSV() {
+        const fileInput = document.getElementById("csvInput");
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const lines = e.target.result.split("\n");
+          lines.forEach(line => {
+            const [address, amount] = line.split(',').map(x => x.trim());
+            if (ethers.utils.isAddress(address) && !isNaN(amount)) {
+              const row = document.createElement("div");
+              row.className = "row";
+              row.innerHTML = `
+                <input type="text" value="${address}" class="address" />
+                <input type="text" value="${amount}" class="amount" />
+                <button class="remove-btn" onclick="removeRow(this)">❌</button>
+              `;
+              document.getElementById("inputContainer").appendChild(row);
+            }
+          });
+        };
+        reader.readAsText(file);
       }
 
       async function sendBatch() {
@@ -100,6 +157,10 @@
           await tx.wait();
 
           status.innerText = "✅ Batch transfer complete!";
+          const historyList = document.getElementById("historyList");
+          const li = document.createElement("li");
+          li.innerHTML = `✅ <a href="https://basescan.org/tx/${tx.hash}" target="_blank">${tx.hash}</a>`;
+          historyList.prepend(li);
         } catch (err) {
           console.error(err);
           status.innerText = "Error: " + err.message;

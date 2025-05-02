@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Batch Token Sender</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        padding: 40px;
+        background-color: #f7f7f7;
+      }
+      input, textarea, button {
+        margin: 10px;
+        padding: 10px;
+        width: 80%;
+        font-size: 16px;
+      }
+      textarea {
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🚀 Batch Transfer on Base</h1>
+    <p>Enter each recipient address and amount (in ETH) on a new line, like this:</p>
+    <pre>0xabc123... 0.01
+0xdef456... 0.05</pre>
+
+    <textarea id="recipientList" placeholder="0x123... 0.01\n0x456... 0.02"></textarea><br />
+    <button onclick="sendBatch()">🔄 Send Tokens</button>
+    <p id="status"></p>
+
+    <script>
+      const CONTRACT_ADDRESS = "0xb38aa493451fd24beea17e3b4398c6557ff7c1d6";
+      const CONTRACT_ABI = [
+        "function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"
+      ];
+
+      async function sendBatch() {
+        const textarea = document.getElementById("recipientList");
+        const status = document.getElementById("status");
+        const lines = textarea.value.trim().split("\n");
+
+        if (!window.ethereum) {
+          status.innerText = "Please install MetaMask or another wallet.";
+          return;
+        }
+
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          const signer = provider.getSigner();
+
+          const recipients = [];
+          const amounts = [];
+          let totalAmount = ethers.BigNumber.from(0);
+
+          for (const line of lines) {
+            const [address, amountStr] = line.trim().split(/\s+/);
+            const amount = ethers.utils.parseEther(amountStr);
+            recipients.push(address);
+            amounts.push(amount);
+            totalAmount = totalAmount.add(amount);
+          }
+
+          const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+          const tx = await contract.batchSend(recipients, amounts, { value: totalAmount });
+          await tx.wait();
+
+          status.innerText = "✅ Batch transfer complete!";
+        } catch (err) {
+          console.error(err);
+          status.innerText = "Error: " + err.message;
+        }
+      }
+    </script>
+  </body>
+</html>

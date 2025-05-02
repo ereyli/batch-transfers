@@ -5,49 +5,17 @@
     <title>Sendwise</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js">async function detectNetwork() {
-        if (!window.ethereum) return;
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const network = await provider.getNetwork();
-        const chainId = network.chainId;
-        const names = {
-          8453: "Base",
-          10: "Optimism",
-          42161: "Arbitrum"
-        };
-        document.getElementById("currentNetwork").textContent = names[chainId] || "Unknown";
-      }
-
-      detectNetwork();
-
-      async function switchNetwork() {
-        if (!window.ethereum) return;
-        const chainIds = {
-          Base: '0x2105',       // Base Mainnet
-          Optimism: '0xa',      // Optimism
-          Arbitrum: '0xa4b1'    // Arbitrum One
-        };
-
-        const options = Object.entries(chainIds).map(([name, hex]) => `${name} (${hex})`).join('
-');
-        const selected = prompt(`Select a network to switch to:
-${options}`);
-        const entry = Object.entries(chainIds).find(([name]) => selected?.includes(name));
-
-        if (!entry) return;
-
-        const [name, chainIdHex] = entry;
-
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js">      async function connectWallet() {
+        if (!window.ethereum) return alert("No wallet detected.");
         try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: chainIdHex }]
-          });
-        } catch (switchError) {
-          alert(`Failed to switch to ${name}: ${switchError.message}`);
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
+          document.getElementById("connectWalletBtn").textContent = `Connected: ${address.slice(0,6)}...${address.slice(-4)}`;
+        } catch (e) {
+          alert("Wallet connection failed.");
         }
-
-        detectNetwork();
       }
 </script>
     <style>
@@ -193,6 +161,7 @@ ${options}`);
 </style>
   </head>
   <body>
+    <button id="connectWalletBtn" onclick="connectWallet()" style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: #00c7ff; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Connect Wallet</button>
     <img src="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width: 120px; margin-bottom: 10px;" />
     <h1>Sendwise: Smart Batch Transfers</h1>
     <div id="networkInfo">⛓️ Network: <span id="currentNetwork">Detecting...</span>
@@ -327,6 +296,52 @@ const feeAmount = ethers.utils.parseEther("0.001");
           console.error(err);
           status.innerText = "Error: " + err.message;
         }
+      }
+    </script>
+      <script>
+      async function detectNetwork() {
+        if (!window.ethereum) return;
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const network = await provider.getNetwork();
+        const chainId = network.chainId;
+        const names = {
+          8453: "Base",
+          10: "Optimism",
+          42161: "Arbitrum"
+        };
+        document.getElementById("currentNetwork").textContent = names[chainId] || "Unknown";
+      }
+
+      detectNetwork();
+
+      async function switchNetwork() {
+        if (!window.ethereum) return;
+        const chainIds = {
+          Base: '0x2105',       // Base Mainnet
+          Optimism: '0xa',      // Optimism
+          Arbitrum: '0xa4b1'    // Arbitrum One
+        };
+
+        const options = Object.entries(chainIds).map(([name, hex]) => `${name} (${hex})`).join('
+');
+        const selected = prompt(`Select a network to switch to:
+${options}`);
+        const entry = Object.entries(chainIds).find(([name]) => selected?.includes(name));
+
+        if (!entry) return;
+
+        const [name, chainIdHex] = entry;
+
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: chainIdHex }]
+          });
+        } catch (switchError) {
+          alert(`Failed to switch to ${name}: ${switchError.message}`);
+        }
+
+        detectNetwork();
       }
     </script>
   </body>

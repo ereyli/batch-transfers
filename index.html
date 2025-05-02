@@ -116,6 +116,29 @@
         text-decoration: underline;
       }
       
+      #networkInfo {
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      #connectWalletBtn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        background: #00c7ff;
+        color: #000;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 100;
+      }
+      
       @media (max-width: 768px) {
         .row {
           flex-direction: column;
@@ -140,19 +163,25 @@
           width: 90%;
           margin: 8px auto;
         }
+        
+        #connectWalletBtn {
+          position: relative;
+          top: 0;
+          right: 0;
+          margin-bottom: 20px;
+          width: auto;
+        }
       }
-    #networkInfo {
-        margin-bottom: 20px;
-        font-size: 14px;
-        color: #ccc;
-      }
-</style>
+    </style>
   </head>
   <body>
-    <button id="connectWalletBtn" onclick="connectWallet()" style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: #00c7ff; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Connect Wallet</button>
+    <button id="connectWalletBtn" onclick="connectWallet()">Connect Wallet</button>
+    
     <img src="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width: 120px; margin-bottom: 10px;" />
     <h1>Sendwise: Smart Batch Transfers</h1>
-    <div id="networkInfo">⛓️ Network: <span id="currentNetwork">Detecting...</span>
+    
+    <div id="networkInfo">
+      ⛓️ Network: <span id="currentNetwork">Detecting...</span>
       <button onclick="switchNetwork()" style="margin-left: 10px; font-size: 12px; padding: 5px 10px;">Switch Network</button>
     </div>
 
@@ -180,15 +209,140 @@
     </div>
 
     <script>
+      // Define all global variables and constants
       const CONTRACTS = {
         8453: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0", // Base
         10: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",   // Optimism
         42161: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0"  // Arbitrum
       };
+      
+      const NETWORKS = {
+        8453: "Base",
+        10: "Optimism", 
+        42161: "Arbitrum"
+      };
+      
+      const EXPLORERS = {
+        8453: "https://basescan.org",
+        10: "https://optimistic.etherscan.io",
+        42161: "https://arbiscan.io"
+      };
+      
       const CONTRACT_ABI = [
         "function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"
       ];
+      
+      let currentChainId = null;
 
+      // Connect wallet function
+      async function connectWallet() {
+        const connectBtn = document.getElementById("connectWalletBtn");
+        
+        if (!window.ethereum) {
+          alert("No wallet detected. Please install MetaMask or another compatible wallet.");
+          return;
+        }
+        
+        try {
+          connectBtn.textContent = "Connecting...";
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
+          connectBtn.textContent = `${address.slice(0,6)}...${address.slice(-4)}`;
+          
+          // After successful connection, detect the network
+          await detectNetwork();
+          
+          // Listen for account changes
+          window.ethereum.on('accountsChanged', async (accounts) => {
+            if (accounts.length === 0) {
+              connectBtn.textContent = "Connect Wallet";
+            } else {
+              connectBtn.textContent = `${accounts[0].slice(0,6)}...${accounts[0].slice(-4)}`;
+            }
+          });
+          
+          // Listen for chain changes
+          window.ethereum.on('chainChanged', (chainId) => {
+            detectNetwork();
+          });
+          
+        } catch (e) {
+          console.error(e);
+          connectBtn.textContent = "Connect Wallet";
+          alert("Wallet connection failed: " + e.message);
+        }
+      }
+
+      // Detect the current network
+      async function detectNetwork() {
+        if (!window.ethereum) return;
+        
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const network = await provider.getNetwork();
+          currentChainId = network.chainId;
+          
+          const networkSpan = document.getElementById("currentNetwork");
+          networkSpan.textContent = NETWORKS[currentChainId] || `Unknown (${currentChainId})`;
+          
+          // Update status color based on supported networks
+          if (CONTRACTS[currentChainId]) {
+            networkSpan.style.color = "#72f3ff";
+          } else {
+            networkSpan.style.color = "#ff7272";
+          }
+        } catch (error) {
+          console.error("Error detecting network:", error);
+          document.getElementById("currentNetwork").textContent = "Detection Failed";
+        }
+      }
+
+      // Switch network function
+      async function switchNetwork() {
+        if (!window.ethereum) {
+          alert("No wallet detected. Please install MetaMask or another compatible wallet.");
+          return;
+        }
+        
+        const chainIds = {
+          Base: '0x2105',       // Base Mainnet (8453)
+          Optimism: '0xa',      // Optimism (10)
+          Arbitrum: '0xa4b1'    // Arbitrum One (42161)
+        };
+
+        // Create network selection options
+        const options = Object.entries(chainIds)
+          .map(([name, hex]) => `${name} (${hex})`)
+          .join('\n');
+          
+        const selected = prompt(`Select a network to switch to:\n${options}`);
+        
+        // If user cancels or doesn't select any network
+        if (!selected) return;
+        
+        // Find the selected network
+        const entry = Object.entries(chainIds).find(([name]) => selected.includes(name));
+        if (!entry) return;
+        
+        const [name, chainIdHex] = entry;
+
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: chainIdHex }]
+          });
+          
+          // After switching, detect the network again
+          setTimeout(detectNetwork, 1000);
+        } catch (switchError) {
+          console.error(switchError);
+          alert(`Failed to switch to ${name}: ${switchError.message}`);
+        }
+      }
+
+      // Add a new input row
       function addInput() {
         const container = document.getElementById("inputContainer");
         const row = document.createElement("div");
@@ -200,6 +354,7 @@
         container.appendChild(row);
       }
 
+      // Remove the last input row
       function removeLast() {
         const container = document.getElementById("inputContainer");
         const rows = container.getElementsByClassName("row");
@@ -208,15 +363,23 @@
         }
       }
 
+      // Import CSV file
       function importCSV() {
         const fileInput = document.getElementById("csvInput");
         const file = fileInput.files[0];
-        if (!file) return;
+        if (!file) {
+          alert("Please select a CSV file first.");
+          return;
+        }
 
         const reader = new FileReader();
         reader.onload = function (e) {
           const lines = e.target.result.split("\n");
+          let validLines = 0;
+          
           lines.forEach(line => {
+            if (!line.trim()) return; // Skip empty lines
+            
             const [address, amount] = line.split(',').map(x => x.trim());
             if (ethers.utils.isAddress(address) && !isNaN(amount)) {
               const row = document.createElement("div");
@@ -226,12 +389,16 @@
                 <input type="text" value="${amount}" class="amount" />
               `;
               document.getElementById("inputContainer").appendChild(row);
+              validLines++;
             }
           });
+          
+          document.getElementById("status").innerText = `Imported ${validLines} valid address-amount pairs.`;
         };
         reader.readAsText(file);
       }
 
+      // Send batch transaction
       async function sendBatch() {
         const status = document.getElementById("status");
         const addresses = Array.from(document.getElementsByClassName("address"));
@@ -241,8 +408,15 @@
           status.innerText = "Please install MetaMask or another wallet.";
           return;
         }
+        
+        // Validate inputs first
+        if (addresses.length === 0) {
+          status.innerText = "Please add at least one recipient.";
+          return;
+        }
 
         try {
+          status.innerText = "Preparing transaction...";
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           await provider.send("eth_requestAccounts", []);
           const signer = provider.getSigner();
@@ -250,13 +424,13 @@
           const recipients = [];
           const amounts = [];
           let totalAmount = ethers.BigNumber.from("0");
-const feeAmount = ethers.utils.parseEther("0.001");
+          const feeAmount = ethers.utils.parseEther("0.001"); // 0.001 ETH fee
 
           for (let i = 0; i < addresses.length; i++) {
             const addr = addresses[i].value.trim();
             const amtStr = amountsInputs[i].value.trim();
             if (!ethers.utils.isAddress(addr) || isNaN(amtStr)) {
-              throw new Error(`Invalid input at row ${i + 1}`);
+              throw new Error(`Invalid input at row ${i + 1}. Please check address and amount.`);
             }
             const amt = ethers.utils.parseEther(amtStr);
             recipients.push(addr);
@@ -264,87 +438,57 @@ const feeAmount = ethers.utils.parseEther("0.001");
             totalAmount = totalAmount.add(amt);
           }
 
+          // Get current network
           const network = await provider.getNetwork();
           const chainId = network.chainId;
           const contractAddress = CONTRACTS[chainId];
+          
           if (!contractAddress) {
-            status.innerText = "Unsupported network.";
+            status.innerText = "Unsupported network. Please switch to Base, Optimism, or Arbitrum.";
             return;
           }
+          
+          // Create contract instance
           const contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
-          const tx = await contract.batchSend(recipients, amounts, { value: totalAmount.add(feeAmount) });
-          await tx.wait();
-
+          
+          status.innerText = "Requesting wallet approval...";
+          
+          // Send transaction
+          const tx = await contract.batchSend(recipients, amounts, { 
+            value: totalAmount.add(feeAmount)
+          });
+          
+          status.innerText = "Transaction submitted. Waiting for confirmation...";
+          
+          // Wait for transaction to be confirmed
+          const receipt = await tx.wait();
+          
+          // Update status and history
           status.innerText = "✅ Batch transfer complete!";
           const historyList = document.getElementById("historyList");
           const li = document.createElement("li");
-          li.innerHTML = `✅ <a href="https://basescan.org/tx/${tx.hash}" target="_blank">${tx.hash}</a>`;
+          
+          // Use the correct explorer URL based on the network
+          const explorerUrl = EXPLORERS[chainId] || "https://etherscan.io";
+          li.innerHTML = `✅ <a href="${explorerUrl}/tx/${tx.hash}" target="_blank">${tx.hash}</a>`;
           historyList.prepend(li);
         } catch (err) {
           console.error(err);
           status.innerText = "Error: " + err.message;
         }
       }
-    </script>
-      <script>
-      async function detectNetwork() {
-        if (!window.ethereum) return;
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const network = await provider.getNetwork();
-        const chainId = network.chainId;
-        const names = {
-          8453: "Base",
-          10: "Optimism",
-          42161: "Arbitrum"
-        };
-        document.getElementById("currentNetwork").textContent = names[chainId] || "Unknown";
-      }
 
-      detectNetwork();
-
-      async function switchNetwork() {
-        if (!window.ethereum) return;
-        const chainIds = {
-          Base: '0x2105',       // Base Mainnet
-          Optimism: '0xa',      // Optimism
-          Arbitrum: '0xa4b1'    // Arbitrum One
-        };
-
-        const options = Object.entries(chainIds).map(([name, hex]) => `${name} (${hex})`).join('
-');
-        const selected = prompt(`Select a network to switch to:
-${options}`);
-        const entry = Object.entries(chainIds).find(([name]) => selected?.includes(name));
-
-        if (!entry) return;
-
-        const [name, chainIdHex] = entry;
-
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: chainIdHex }]
-          });
-        } catch (switchError) {
-          alert(`Failed to switch to ${name}: ${switchError.message}`);
-        }
-
+      // Run initial network detection when page loads
+      window.addEventListener('DOMContentLoaded', () => {
         detectNetwork();
-      }
+        
+        // Check if wallet is already connected (e.g., MetaMask is unlocked)
+        if (window.ethereum && window.ethereum.selectedAddress) {
+          const addr = window.ethereum.selectedAddress;
+          document.getElementById("connectWalletBtn").textContent = 
+            `${addr.slice(0,6)}...${addr.slice(-4)}`;
+        }
+      });
     </script>
-    <script>
-    async function connectWallet() {
-      if (!window.ethereum) return alert("No wallet detected.");
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        document.getElementById("connectWalletBtn").textContent = `Connected: ${address.slice(0,6)}...${address.slice(-4)}`;
-      } catch (e) {
-        alert("Wallet connection failed.");
-      }
-    }
-  </script>
-</body>
+  </body>
 </html>

@@ -1,652 +1,228 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <link rel="icon" href="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" type="image/png" />
-    <title>Sendwise</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <style>
-      body {
-        background-color: #04111D;
-        color: #ffffff;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 0;
-        padding: 20px;
-        font-family: Arial, sans-serif;
-      }
-      
-      h1 {
-        color: #72f3ff;
-        text-align: center;
-      }
-      
-      .row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 10px;
-        width: 100%;
-      }
-      
-      .row input {
-        width: 45%;
-        margin: 0 5px;
-        padding: 12px;
-        font-size: 16px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        background-color: #ffffff;
-        color: #000000;
-      }
-      
-      .add-remove-wrapper {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 20px;
-        width: 100%;
-      }
-      
-      .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 80%;
-        max-width: 800px;
-        background: #0b1f2a;
-        padding: 20px;
-        border-radius: 16px;
-        box-shadow: 0 0 16px rgba(0, 255, 255, 0.2);
-        margin: 0 auto;
-      }
-      
-      #inputContainer {
-        width: 100%;
-      }
-      
-      button {
-        margin: 10px;
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        border-radius: 8px;
-        border: none;
-        background: #00c7ff;
-        color: #000;
-        font-weight: bold;
-      }
-      
-      button:hover {
-        background: #00e1ff;
-      }
-      
-      input[type="file"] {
-        margin-top: 10px;
-        color: #ffffff;
-      }
-      
-      #status {
-        margin-top: 20px;
-        color: #00ffcc;
-        text-align: center;
-      }
-      
-      #history {
-        margin-top: 30px;
-        text-align: left;
-        width: 80%;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-        background: #0b1f2a;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 0 8px rgba(0, 255, 255, 0.15);
-      }
-      
-      #historyList a {
-        color: #00e0ff;
-        text-decoration: none;
-      }
-      
-      #historyList a:hover {
-        text-decoration: underline;
-      }
-      
-      #networkInfo {
-        margin-bottom: 20px;
-        font-size: 14px;
-        color: #ccc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      #connectWalletBtn {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        padding: 8px 16px;
-        background: #00c7ff;
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 100;
-      }
-      
-      .network-dropdown {
-        position: relative;
-        display: inline-block;
-        margin-left: 10px;
-      }
-      
-      .network-dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #0b1f2a;
-        min-width: 160px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-        border-radius: 8px;
-        z-index: 1;
-        top: 100%;
-        left: 0;
-      }
-      
-      .network-dropdown-content a {
-        color: #00e0ff;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-        border-radius: 4px;
-      }
-      
-      .network-dropdown-content a:hover {
-        background-color: #1c3340;
-      }
-      
-      .network-dropdown:hover .network-dropdown-content {
-        display: block;
-      }
-      
-      .network-btn {
-        background-color: #00c7ff;
-        color: #000;
-        padding: 8px 12px;
-        font-size: 14px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-      }
-      
-      .network-btn:hover {
-        background-color: #00e1ff;
-      }
-      
-      .network-icon {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 8px;
-      }
-      
-      .active-network {
-        font-weight: bold;
-        border-left: 3px solid #00e1ff;
-      }
-      
-      @media (max-width: 768px) {
-        .row {
-          flex-direction: column;
-          align-items: center;
-        }
-        
-        .row input {
-          width: 90%;
-          margin: 5px 0;
-        }
-        
-        .add-remove-wrapper {
-          flex-direction: column;
-          align-items: center;
-        }
-        
-        .container {
-          width: 95%;
-        }
-        
-        button {
-          width: 90%;
-          margin: 8px auto;
-        }
-        
-        #connectWalletBtn {
-          position: relative;
-          top: 0;
-          right: 0;
-          margin-bottom: 20px;
-          width: auto;
-        }
-        
-        #networkInfo {
-          flex-direction: column;
-        }
-        
-        .network-dropdown {
-          margin-top: 10px;
-          margin-left: 0;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <button id="connectWalletBtn" onclick="connectWallet()">Connect Wallet</button>
-    
-    <img src="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width: 120px; margin-bottom: 10px;" />
-    <h1>Sendwise: Smart Batch Transfers</h1>
-    
-    <div id="networkInfo">
-      ⛓️ Network: <span id="currentNetwork">Detecting...</span>
-      <div class="network-dropdown">
-        <button class="network-btn">
-          <span id="networkBtnText">Switch Network</span> ▼
-        </button>
-        <div class="network-dropdown-content" id="networkDropdown">
-          <a href="#" onclick="switchToNetwork('0x2105', 'Base')">
-            <span class="network-icon" style="background-color: #0052FF;"></span>Base
-          </a>
-          <a href="#" onclick="switchToNetwork('0xa', 'Optimism')">
-            <span class="network-icon" style="background-color: #FF0420;"></span>Optimism
-          </a>
-          <a href="#" onclick="switchToNetwork('0xa4b1', 'Arbitrum')">
-            <span class="network-icon" style="background-color: #28A0F0;"></span>Arbitrum
-          </a>
-        </div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sendwise: Smart Batch Transfers</title>
+  <link rel="icon" href="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" type="image/png" />
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body { background-color: #04111D; color: #ffffff; font-family: Arial, sans-serif; margin: 0; padding: 20px; position: relative; }
+    h1 { color: #72f3ff; text-align: center; margin-top: 20px; }
+    .supported-networks { text-align: center; background: rgba(114, 243, 255, 0.1); border: 1px solid #72f3ff; color: #72f3ff; padding: 8px 16px; border-radius: 20px; font-size: 14px; margin: 10px auto; display: inline-block; }
+    .row { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+    .row input, .row select { width: 45%; margin: 0 5px; padding: 12px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; background: #ffffff; color: #000; }
+    .container { background: #0b1f2a; padding: 20px; border-radius: 16px; width: 80%; max-width: 800px; box-shadow: 0 0 16px rgba(0,255,255,0.2); margin: 20px auto; }
+    .add-remove-wrapper { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; border: none; border-radius: 8px; background: #00c7ff; color: #000; cursor: pointer; }
+    button:hover { background: #00e1ff; }
+    #status { margin-top: 20px; color: #00ffcc; text-align: center; }
+    #tokenInfo { margin-top: 10px; color: #ccc; font-size: 14px; text-align: center; }
+    #actionButtons { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+    #connectWalletBtn { position: absolute; top: 20px; right: 20px; }
+    .wallet-csv-section { background: #0b1f2a; padding: 20px; border-radius: 16px; width: 80%; max-width: 800px; box-shadow: 0 0 16px rgba(0,255,255,0.2); margin: 30px auto; text-align: center; }
+    .wallet-csv-section h3 { color: #72f3ff; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <button id="connectWalletBtn" onclick="connectWallet()">Connect Wallet</button>
+  <div style="text-align:center; margin-top:60px;">
+    <img src="https://bafybeigujz5iveiqwuqx3ojtsyxy4y4v32an3thw56r5mi56lgy7qzh2rm.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width:120px;" />
+  </div>
+  <h1>Sendwise: Smart Batch Transfers</h1>
+  <div class="supported-networks">Supported Networks: Base, Optimism, Arbitrum, Soneium, Unichain, Ink</div>
+
+  <div class="container">
+    <div class="row">
+      <label style="margin-right:10px;">Transfer Type:</label>
+      <select id="transferType" onchange="onTransferTypeChange()">
+        <option value="eth">ETH</option>
+        <option value="erc20">ERC20</option>
+      </select>
+    </div>
+    <div class="row" id="tokenAddressRow" style="display:none;">
+      <input type="text" id="tokenAddressInput" placeholder="ERC20 Contract Address" onblur="fetchTokenInfo()" />
+    </div>
+    <div id="tokenInfo"></div>
+
+    <div class="add-remove-wrapper">
+      <button onclick="addInput()">➕ Add Recipient</button>
+      <button onclick="removeLast()">❌ Remove Recipient</button>
+    </div>
+
+    <div id="inputContainer">
+      <div class="row">
+        <input type="text" placeholder="Recipient Address" class="address" />
+        <input type="text" placeholder="Amount" class="amount" />
       </div>
     </div>
 
-    <div class="container">
-      <div class="add-remove-wrapper">
-        <button onclick="addInput()">➕</button>
-        <button onclick="removeLast()">❌</button>
-      </div>
-      <div id="inputContainer">
-        <div class="row">
-          <input type="text" placeholder="Recipient Address" class="address" />
-          <input type="text" placeholder="Amount in ETH" class="amount" />
-        </div>
-      </div>
-
-      <input type="file" id="csvInput" accept=".csv" />
-      <button onclick="importCSV()">📄 Import CSV</button>
-      <button onclick="sendBatch()">🔄 Send Tokens</button>
-      <p id="status"></p>
+    <div id="actionButtons">
+      <button id="approveBtn" style="display:none;" onclick="approveToken()">✅ Approve Token</button>
+      <button id="sendBtn" style="display:none;" onclick="sendBatch()">🔄 Send</button>
     </div>
+    <p id="status"></p>
+  </div>
 
-    <div id="history">
-      <h3>Transaction History</h3>
-      <ul id="historyList"></ul>
-    </div>
+  <div class="wallet-csv-section">
+    <h3>Import Wallets via CSV</h3>
+    <input type="file" id="walletCsvInput" accept=".csv" />
+    <button onclick="importWallets()">➕ Add Wallets</button>
+  </div>
 
-    <script>
-      // Define all global variables and constants
-      const CONTRACTS = {
-        8453: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0", // Base
-        10: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",   // Optimism
-        42161: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0"  // Arbitrum
+  <script>
+    const CONTRACTS = {
+      8453: "0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784",
+      10:   "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",
+      42161:"0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",
+      1868: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",
+      130:  "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",
+      57073:"0x84e4dd821c8f848470fc49def3b14fc870fa97f0"
+    };
+    const CONTRACTS_ERC20 = {...CONTRACTS};
+
+    const ABI_TOKEN = [
+      "function name() view returns(string)",
+      "function symbol() view returns(string)",
+      "function decimals() view returns(uint8)",
+      "function balanceOf(address) view returns(uint256)",
+      "function allowance(address,address) view returns(uint256)"
+    ];
+    const ABI_APPROVE = ["function approve(address,uint256) external returns(bool)"];
+    const ABI_BATCH_ETH = ["function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"];
+    const ABI_BATCH_ERC20 = ["function batchSendERC20(address token, address[] calldata recipients, uint256[] calldata amounts) external payable"];
+
+    let signer;
+
+    async function connectWallet() {
+      if (!window.ethereum) { alert('Install MetaMask'); return; }
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      signer = provider.getSigner();
+      const addr = await signer.getAddress();
+      document.getElementById('connectWalletBtn').textContent = `${addr.slice(0,6)}...${addr.slice(-4)}`;
+    }
+
+    function onTransferTypeChange() {
+      const type = document.getElementById('transferType').value;
+      document.getElementById('tokenAddressRow').style.display = type==='erc20'? 'flex':'none';
+      document.getElementById('approveBtn').style.display     = type==='erc20'? 'inline-block':'none';
+      document.getElementById('sendBtn').style.display        = type==='eth'?  'inline-block':'none';
+      document.getElementById('tokenInfo').innerText         = '';
+      document.getElementById('status').innerText            = '';
+    }
+
+    function addInput() {
+      const container = document.getElementById('inputContainer');
+      const row = document.createElement('div'); row.className='row';
+      row.innerHTML = `<input type="text" placeholder="Recipient Address" class="address" />
+                       <input type="text" placeholder="Amount" class="amount" />`;
+      container.appendChild(row);
+    }
+
+    function removeLast() {
+      const container = document.getElementById('inputContainer');
+      const rows = container.getElementsByClassName('row');
+      if (rows.length > 1) container.removeChild(rows[rows.length - 1]);
+    }
+
+    function importWallets() {
+      const file = document.getElementById('walletCsvInput').files[0];
+      if (!file) { alert('Please select a CSV file'); return; }
+      const reader = new FileReader();
+      reader.onload = e => {
+        const wallets = e.target.result.split('\n')
+          .map(line => line.trim())
+          .filter(line => ethers.utils.isAddress(line));
+        console.log('Imported wallets:', wallets);
+        alert(wallets.length + ' wallets added');
       };
-      
-      const NETWORKS = {
-        8453: "Base",
-        10: "Optimism", 
-        42161: "Arbitrum"
-      };
-      
-      const NETWORK_HEX_IDS = {
-        "0x2105": 8453,   // Base
-        "0xa": 10,        // Optimism
-        "0xa4b1": 42161   // Arbitrum
-      };
-      
-      const NETWORK_COLORS = {
-        "Base": "#0052FF",
-        "Optimism": "#FF0420",
-        "Arbitrum": "#28A0F0"
-      };
-      
-      const EXPLORERS = {
-        8453: "https://basescan.org",
-        10: "https://optimistic.etherscan.io",
-        42161: "https://arbiscan.io"
-      };
-      
-      const CONTRACT_ABI = [
-        "function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"
-      ];
-      
-      let currentChainId = null;
+      reader.readAsText(file);
+    }
 
-      // Connect wallet function
-      async function connectWallet() {
-        const connectBtn = document.getElementById("connectWalletBtn");
-        
-        if (!window.ethereum) {
-          alert("No wallet detected. Please install MetaMask or another compatible wallet.");
-          return;
-        }
-        
-        try {
-          connectBtn.textContent = "Connecting...";
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-          const address = await signer.getAddress();
-          connectBtn.textContent = `${address.slice(0,6)}...${address.slice(-4)}`;
-          
-          // After successful connection, detect the network
-          await detectNetwork();
-          
-          // Listen for account changes
-          window.ethereum.on('accountsChanged', async (accounts) => {
-            if (accounts.length === 0) {
-              connectBtn.textContent = "Connect Wallet";
-            } else {
-              connectBtn.textContent = `${accounts[0].slice(0,6)}...${accounts[0].slice(-4)}`;
-            }
-          });
-          
-          // Listen for chain changes
-          window.ethereum.on('chainChanged', (chainId) => {
-            detectNetwork();
-          });
-          
-        } catch (e) {
-          console.error(e);
-          connectBtn.textContent = "Connect Wallet";
-          alert("Wallet connection failed: " + e.message);
-        }
+    async function fetchTokenInfo() {
+      const addr = document.getElementById('tokenAddressInput').value.trim();
+      if (!ethers.utils.isAddress(addr)) return;
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      const net = await provider.getNetwork();
+      const token = new ethers.Contract(addr, ABI_TOKEN, signer);
+      const user = await signer.getAddress();
+      const spender = CONTRACTS_ERC20[net.chainId];
+      try {
+        const [name, symbol, decimals, balance, allowance] = await Promise.all([
+          token.name(), token.symbol(), token.decimals(),
+          token.balanceOf(user), token.allowance(user, spender)
+        ]);
+        document.getElementById('tokenInfo').innerText = `${name} (${symbol}) | Balance: ${ethers.utils.formatUnits(balance, decimals)}`;
+        document.getElementById('approveBtn').style.display = allowance.gt(0) ? 'none' : 'inline-block';
+        document.getElementById('sendBtn').style.display    = allowance.gt(0) ? 'inline-block' : 'none';
+      } catch {
+        document.getElementById('tokenInfo').innerText = 'Failed to fetch token info';
+      }
+    }
+
+    async function approveToken() {
+      const addr = document.getElementById('tokenAddressInput').value.trim();
+      const token = new ethers.Contract(addr, ABI_APPROVE, signer);
+      try {
+        const bal = await new ethers.Contract(addr, ABI_TOKEN, signer).balanceOf(await signer.getAddress());
+        if (bal.isZero()) { document.getElementById('status').innerText = 'No tokens to approve'; return; }
+        const tx = await token.approve(CONTRACTS_ERC20[(await signer.provider.getNetwork()).chainId], bal);
+        document.getElementById('status').innerText = 'Approval sent: ' + tx.hash;
+        await tx.wait();
+        document.getElementById('status').innerText = '✅ Approved';
+        document.getElementById('approveBtn').style.display = 'none';
+        document.getElementById('sendBtn').style.display    = 'inline-block';
+      } catch (e) {
+        document.getElementById('status').innerText = 'Approve error: ' + e.message;
+      }
+    }
+
+    async function sendBatch() {
+      const status = document.getElementById('status'); status.innerText = 'Sending...';
+      if (!window.ethereum) { status.innerText = 'Install MetaMask'; return; }
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      signer = provider.getSigner();
+      const type = document.getElementById('transferType').value;
+      const cid = (await provider.getNetwork()).chainId;
+
+      const addrEls = document.getElementsByClassName('address');
+      const amtEls = document.getElementsByClassName('amount');
+      const recs = [], amts = [];
+      for (let i = 0; i < addrEls.length; i++) {
+        const r = addrEls[i].value.trim(), a = amtEls[i].value.trim();
+        if (!r || !a) { status.innerText = `Fill fields row ${i+1}`; return; }
+        if (!ethers.utils.isAddress(r)) { status.innerText = `Invalid address row ${i+1}`; return; }
+        let bn;
+        try { bn = type==='eth'?ethers.utils.parseEther(a):ethers.utils.parseUnits(a,18); } catch { status.innerText = `Invalid amount row ${i+1}`; return; }
+        recs.push(r); amts.push(bn);
       }
 
-      // Detect the current network
-      async function detectNetwork() {
-        if (!window.ethereum) return;
-        
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const network = await provider.getNetwork();
-          currentChainId = network.chainId;
-          
-          const networkSpan = document.getElementById("currentNetwork");
-          const networkName = NETWORKS[currentChainId] || `Unknown (${currentChainId})`;
-          networkSpan.textContent = networkName;
-          
-          // Update status color based on supported networks
-          if (CONTRACTS[currentChainId]) {
-            networkSpan.style.color = "#72f3ff";
-            
-            // Update network button text
-            document.getElementById("networkBtnText").textContent = networkName;
-            
-            // Highlight active network in dropdown
-            const links = document.querySelectorAll('.network-dropdown-content a');
-            links.forEach(link => {
-              link.classList.remove('active-network');
-              if (link.textContent.trim() === networkName) {
-                link.classList.add('active-network');
-              }
-            });
-          } else {
-            networkSpan.style.color = "#ff7272";
-            document.getElementById("networkBtnText").textContent = "Switch Network";
-          }
-        } catch (error) {
-          console.error("Error detecting network:", error);
-          document.getElementById("currentNetwork").textContent = "Detection Failed";
-        }
+      const fee = ethers.utils.parseEther('0.001');
+      let addr, abi, args, overrides = { gasLimit: 500000 };
+      if (type === 'eth') {
+        addr = CONTRACTS[cid]; abi = ABI_BATCH_ETH;
+        const total = amts.reduce((s,v)=>s.add(v), ethers.BigNumber.from(0));
+        overrides.value = total.add(fee);
+        args = [recs, amts];
+      } else {
+        addr = CONTRACTS_ERC20[cid]; abi = ABI_BATCH_ERC20;
+        const tokenAddr = document.getElementById('tokenAddressInput').value.trim();
+        overrides.value = fee;
+        args = [tokenAddr, recs, amts];
       }
+      if (!addr) { status.innerText='Unsupported network'; return; }
+      try {
+        const contract = new ethers.Contract(addr, abi, signer);
+        const tx = await contract[type==='eth'?'batchSend':'batchSendERC20'](...args, overrides);
+        status.innerText = 'Tx sent: '+tx.hash;
+        await tx.wait(); status.innerText='✅ Transaction confirmed';
+      } catch(e) { status.innerText='Error: '+e.message; }
+    }
 
-      // Switch to a specific network
-      async function switchToNetwork(chainIdHex, networkName) {
-        if (!window.ethereum) {
-          alert("No wallet detected. Please install MetaMask or another compatible wallet.");
-          return;
-        }
-        
-        try {
-          document.getElementById("status").innerText = `Switching to ${networkName}...`;
-          
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: chainIdHex }]
-          });
-          
-          // After switching, detect the network again
-          setTimeout(() => {
-            detectNetwork();
-            document.getElementById("status").innerText = `Switched to ${networkName} successfully!`;
-          }, 1000);
-        } catch (switchError) {
-          console.error(switchError);
-          
-          // This error code indicates that the chain has not been added to MetaMask.
-          if (switchError.code === 4902) {
-            try {
-              // Add the network
-              await addNetwork(chainIdHex, networkName);
-            } catch (addError) {
-              console.error(addError);
-              document.getElementById("status").innerText = `Failed to add ${networkName}: ${addError.message}`;
-            }
-          } else {
-            document.getElementById("status").innerText = `Failed to switch to ${networkName}: ${switchError.message}`;
-          }
-        }
-      }
-      
-      // Add a network to MetaMask if it doesn't exist
-      async function addNetwork(chainIdHex, networkName) {
-        // Network parameters
-        const networkParams = {
-          Base: {
-            chainId: '0x2105',
-            chainName: 'Base',
-            nativeCurrency: {
-              name: 'Ether',
-              symbol: 'ETH',
-              decimals: 18
-            },
-            rpcUrls: ['https://mainnet.base.org'],
-            blockExplorerUrls: ['https://basescan.org']
-          },
-          Optimism: {
-            chainId: '0xa',
-            chainName: 'Optimism',
-            nativeCurrency: {
-              name: 'Ether',
-              symbol: 'ETH',
-              decimals: 18
-            },
-            rpcUrls: ['https://mainnet.optimism.io'],
-            blockExplorerUrls: ['https://optimistic.etherscan.io']
-          },
-          Arbitrum: {
-            chainId: '0xa4b1',
-            chainName: 'Arbitrum One',
-            nativeCurrency: {
-              name: 'Ether',
-              symbol: 'ETH',
-              decimals: 18
-            },
-            rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-            blockExplorerUrls: ['https://arbiscan.io']
-          }
-        };
-        
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [networkParams[networkName]]
-        });
-        
-        // Try switching again after adding
-        setTimeout(() => {
-          detectNetwork();
-        }, 1000);
-      }
-
-      // Add a new input row
-      function addInput() {
-        const container = document.getElementById("inputContainer");
-        const row = document.createElement("div");
-        row.className = "row";
-        row.innerHTML = `
-          <input type="text" placeholder="Recipient Address" class="address" />
-          <input type="text" placeholder="Amount in ETH" class="amount" />
-        `;
-        container.appendChild(row);
-      }
-
-      // Remove the last input row
-      function removeLast() {
-        const container = document.getElementById("inputContainer");
-        const rows = container.getElementsByClassName("row");
-        if (rows.length > 1) {
-          container.removeChild(rows[rows.length - 1]);
-        }
-      }
-
-      // Import CSV file
-      function importCSV() {
-        const fileInput = document.getElementById("csvInput");
-        const file = fileInput.files[0];
-        if (!file) {
-          alert("Please select a CSV file first.");
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const lines = e.target.result.split("\n");
-          let validLines = 0;
-          
-          lines.forEach(line => {
-            if (!line.trim()) return; // Skip empty lines
-            
-            const [address, amount] = line.split(',').map(x => x.trim());
-            if (ethers.utils.isAddress(address) && !isNaN(amount)) {
-              const row = document.createElement("div");
-              row.className = "row";
-              row.innerHTML = `
-                <input type="text" value="${address}" class="address" />
-                <input type="text" value="${amount}" class="amount" />
-              `;
-              document.getElementById("inputContainer").appendChild(row);
-              validLines++;
-            }
-          });
-          
-          document.getElementById("status").innerText = `Imported ${validLines} valid address-amount pairs.`;
-        };
-        reader.readAsText(file);
-      }
-
-      // Send batch transaction
-      async function sendBatch() {
-        const status = document.getElementById("status");
-        const addresses = Array.from(document.getElementsByClassName("address"));
-        const amountsInputs = Array.from(document.getElementsByClassName("amount"));
-
-        if (!window.ethereum) {
-          status.innerText = "Please install MetaMask or another wallet.";
-          return;
-        }
-        
-        // Validate inputs first
-        if (addresses.length === 0) {
-          status.innerText = "Please add at least one recipient.";
-          return;
-        }
-
-        try {
-          status.innerText = "Preparing transaction...";
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-
-          const recipients = [];
-          const amounts = [];
-          let totalAmount = ethers.BigNumber.from("0");
-          const feeAmount = ethers.utils.parseEther("0.001"); // 0.001 ETH fee
-
-          for (let i = 0; i < addresses.length; i++) {
-            const addr = addresses[i].value.trim();
-            const amtStr = amountsInputs[i].value.trim();
-            if (!ethers.utils.isAddress(addr) || isNaN(amtStr)) {
-              throw new Error(`Invalid input at row ${i + 1}. Please check address and amount.`);
-            }
-            const amt = ethers.utils.parseEther(amtStr);
-            recipients.push(addr);
-            amounts.push(amt);
-            totalAmount = totalAmount.add(amt);
-          }
-
-          // Get current network
-          const network = await provider.getNetwork();
-          const chainId = network.chainId;
-          const contractAddress = CONTRACTS[chainId];
-          
-          if (!contractAddress) {
-            status.innerText = "Unsupported network. Please switch to Base, Optimism, or Arbitrum.";
-            return;
-          }
-          
-          // Create contract instance
-          const contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
-          
-          status.innerText = "Requesting wallet approval...";
-          
-          // Send transaction
-          const tx = await contract.batchSend(recipients, amounts, { 
-            value: totalAmount.add(feeAmount)
-          });
-          
-          status.innerText = "Transaction submitted. Waiting for confirmation...";
-          
-          // Wait for transaction to be confirmed
-          const receipt = await tx.wait();
-          
-          // Update status and history
-          status.innerText = "✅ Batch transfer complete!";
-          const historyList = document.getElementById("historyList");
-          const li = document.createElement("li");
-          
-          // Use the correct explorer URL based on the network
-          const explorerUrl = EXPLORERS[chainId] || "https://etherscan.io";
-          li.innerHTML = `✅ <a href="${explorerUrl}/tx/${tx.hash}" target="_blank">${tx.hash}</a>`;
-          historyList.prepend(li);
-        } catch (err) {
-          console.error(err);
-          status.innerText = "Error: " + err.message;
-        }
-      }
-
-      // Run initial network detection when page loads
-      window.addEventListener('DOMContentLoaded', () => {
-        detectNetwork();
-        
-        // Check if wallet is already connected (e.g., MetaMask is unlocked)
-        if (window.ethereum && window.ethereum.selectedAddress) {
-          const addr = window.ethereum.selectedAddress;
-          document.getElementById("connectWalletBtn").textContent = 
-            `${addr.slice(0,6)}...${addr.slice(-4)}`;
-        }
-      });
-    </script>
-  </body>
+    window.addEventListener('DOMContentLoaded', onTransferTypeChange);
+  </script>
+</body>
 </html>

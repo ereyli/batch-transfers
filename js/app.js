@@ -1,0 +1,141 @@
+import { WalletManager } from './wallet.js';
+import { UIManager } from './ui.js';
+import { BlockchainManager } from './blockchain.js';
+
+export class SendwiseApp {
+  constructor() {
+    this.walletManager = new WalletManager();
+    this.uiManager = new UIManager();
+    this.blockchainManager = new BlockchainManager(this.walletManager, this.uiManager);
+    
+    // Global references for HTML onclick handlers
+    window.uiManager = this.uiManager;
+    window.walletManager = this.walletManager;
+    window.blockchainManager = this.blockchainManager;
+    
+    // Setup global handlers immediately
+    this.setupGlobalHandlers();
+    
+    // Initialize after a short delay to ensure DOM is ready
+    setTimeout(() => {
+      this.initialize();
+    }, 100);
+  }
+
+  async initialize() {
+    try {
+      // Show loading screen
+      this.uiManager.showLoading();
+      
+      // Initialize wallet manager (includes Farcaster)
+      await this.walletManager.initialize();
+      
+      // Initialize UI
+      this.uiManager.onTransferTypeChange();
+      this.uiManager.updateRemoveButtons();
+      
+      // Hide loading screen immediately after initialization
+      this.uiManager.hideLoading();
+      
+    } catch (error) {
+      console.error('Error initializing app:', error);
+      this.uiManager.hideLoading();
+    }
+  }
+
+  setupGlobalHandlers() {
+    // Global wallet modal function
+    window.openWalletModal = () => {
+      if (this.walletManager) {
+        this.walletManager.showModernWalletModal();
+      } else {
+        console.error('Wallet manager not initialized');
+      }
+    };
+
+
+
+    // Global blockchain functions
+    window.fetchTokenInfo = async () => {
+      try {
+        await this.blockchainManager.fetchTokenInfo();
+      } catch (error) {
+        console.error('Error fetching token info:', error);
+      }
+    };
+
+    window.approveToken = async () => {
+      try {
+        await this.blockchainManager.approveToken();
+      } catch (error) {
+        console.error('Error approving token:', error);
+      }
+    };
+
+    window.sendBatch = async () => {
+      try {
+        await this.blockchainManager.sendBatch();
+      } catch (error) {
+        console.error('Error sending batch:', error);
+      }
+    };
+
+    // Global UI functions
+    window.addInput = () => {
+      try {
+        this.uiManager.addInput();
+      } catch (error) {
+        console.error('Error adding input:', error);
+      }
+    };
+
+    window.removeLast = () => {
+      try {
+        this.uiManager.removeLast();
+      } catch (error) {
+        console.error('Error removing last:', error);
+      }
+    };
+
+    window.importWallets = () => {
+      try {
+        this.uiManager.importWallets();
+      } catch (error) {
+        console.error('Error importing wallets:', error);
+      }
+    };
+
+    // Enhanced status update with Farcaster notifications
+    const originalUpdateStatus = this.uiManager.updateStatus.bind(this.uiManager);
+    this.uiManager.updateStatus = (message, isSuccess = false, isError = false) => {
+      originalUpdateStatus(message, isSuccess, isError);
+      
+      // Send Farcaster notification on success
+      if (isSuccess && this.walletManager.getFarcasterManager().getIsFarcasterMode()) {
+        this.walletManager.getFarcasterManager().sendNotification(message);
+      }
+    };
+
+    // Farcaster event listeners
+    window.addEventListener('farcasterWalletConnected', (event) => {
+      this.uiManager.updateStatus('Farcaster wallet connected successfully', true, false);
+    });
+
+    window.addEventListener('farcasterWalletDisconnected', () => {
+      this.uiManager.updateStatus('Farcaster wallet disconnected', false, false);
+    });
+  }
+
+  // Get managers for external access
+  getWalletManager() {
+    return this.walletManager;
+  }
+
+  getUIManager() {
+    return this.uiManager;
+  }
+
+  getBlockchainManager() {
+    return this.blockchainManager;
+  }
+}

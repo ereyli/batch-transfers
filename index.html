@@ -6,70 +6,737 @@
   <title>Sendwise: Smart Batch Transfers</title>
   <link rel="icon" href="https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png" type="image/png" />
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { background-color: #061224; color: #ffffff; font-family: Arial, sans-serif; margin: 0; padding: 20px; position: relative; }
-    h1 { color: #72f3ff; text-align: center; margin-top: 10px; }
-    .supported-networks { display: block; width: fit-content; margin: 40px auto; text-align: center; background: rgba(114, 243, 255, 0.1); border: 1px solid #72f3ff; color: #72f3ff; padding: 8px 16px; border-radius: 20px; font-size: 14px; }
-    .row { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
-    .row input, .row select { width: 45%; margin: 0 5px; padding: 12px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; background: #ffffff; color: #000; }
-    .container { background: #0b1f2a; padding: 20px; border-radius: 16px; width: 80%; max-width: 800px; box-shadow: 0 0 16px rgba(0,255,255,0.2); margin: 20px auto; }
-    .add-remove-wrapper { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-    button { margin: 10px; padding: 10px 20px; font-size: 16px; border: none; border-radius: 8px; background: #00c7ff; color: #000; cursor: pointer; }
-    button:hover { background: #00e1ff; }
-    #status { margin-top: 20px; color: #00ffcc; text-align: center; }
-    #tokenInfo { margin-top: 10px; color: #ccc; font-size: 14px; text-align: center; }
-    #actionButtons { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-    #connectWalletBtn { position: absolute; top: 20px; right: 20px; }
-    .wallet-csv-section { background: #0b1f2a; padding: 20px; border-radius: 16px; width: 80%; max-width: 800px; box-shadow: 0 0 16px rgba(0,255,255,0.2); margin: 30px auto; text-align: center; }
-    .wallet-csv-section h3 { color: #72f3ff; margin-bottom: 10px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 50%, #0a0e1a 100%);
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: white;
+    }
+
+    .logo img {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #a0aec0;
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+
+    /* Network Badge */
+    .supported-networks {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+      padding: 12px 20px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin: 0 auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .network-icon {
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+    }
+
+    /* Wallet Connection */
+    .wallet-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .wallet-selector {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .wallet-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .wallet-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .wallet-btn.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .farcaster-info {
+      background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05));
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      color: #ffc107;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 16px 0;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Main Form */
+    .main-form {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+    }
+
+         .form-select, .form-input {
+       width: 100%;
+       padding: 16px;
+       background: rgba(255, 255, 255, 0.1);
+       border: 1px solid rgba(255, 255, 255, 0.2);
+       border-radius: 12px;
+       color: #ffffff;
+       font-size: 1rem;
+       transition: all 0.3s ease;
+       backdrop-filter: blur(10px);
+     }
+
+     .form-input::placeholder {
+       color: rgba(255, 255, 255, 0.6);
+       opacity: 1;
+     }
+
+     .form-input:focus::placeholder {
+       color: rgba(255, 255, 255, 0.4);
+     }
+
+    .form-select:focus, .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .form-select option {
+      background: #1a1f2e;
+      color: #ffffff;
+    }
+
+    /* Recipients Section */
+    .recipients-section {
+      margin: 32px 0;
+    }
+
+    .recipients-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .recipients-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .recipients-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+
+         /* Recipient Rows */
+     .recipient-row {
+       display: grid;
+       grid-template-columns: 1fr 1fr auto;
+       gap: 16px;
+       margin-bottom: 16px;
+       padding: 20px;
+       background: rgba(255, 255, 255, 0.03);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+       border-radius: 16px;
+       transition: all 0.3s ease;
+       align-items: center;
+     }
+
+     .recipient-row:hover {
+       background: rgba(255, 255, 255, 0.05);
+       border-color: rgba(255, 255, 255, 0.2);
+     }
+
+     .recipient-row .form-input {
+       margin: 0;
+     }
+
+     .recipient-actions {
+       display: flex;
+       flex-direction: column;
+       gap: 8px;
+     }
+
+     .recipient-action-btn {
+       padding: 8px 12px;
+       border: none;
+       border-radius: 8px;
+       cursor: pointer;
+       transition: all 0.3s ease;
+       font-size: 0.8rem;
+       font-weight: 500;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       min-width: 40px;
+       height: 40px;
+       backdrop-filter: blur(10px);
+     }
+
+     .add-recipient-btn {
+       background: rgba(72, 187, 120, 0.2);
+       border: 1px solid rgba(72, 187, 120, 0.3);
+       color: #48bb78;
+     }
+
+     .add-recipient-btn:hover {
+       background: rgba(72, 187, 120, 0.3);
+       transform: translateY(-1px);
+     }
+
+     .remove-recipient-btn {
+       background: rgba(245, 101, 101, 0.2);
+       border: 1px solid rgba(245, 101, 101, 0.3);
+       color: #f56565;
+     }
+
+     .remove-recipient-btn:hover {
+       background: rgba(245, 101, 101, 0.3);
+       transform: translateY(-1px);
+     }
+
+     .remove-recipient-btn:disabled {
+       opacity: 0.5;
+       cursor: not-allowed;
+       transform: none;
+     }
+
+    /* Token Info */
+    .token-info {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      color: #667eea;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 16px 0;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    /* Status */
+    .status {
+      text-align: center;
+      margin: 24px 0;
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .status.success {
+      background: rgba(72, 187, 120, 0.1);
+      border: 1px solid rgba(72, 187, 120, 0.3);
+      color: #48bb78;
+    }
+
+    .status.error {
+      background: rgba(245, 101, 101, 0.1);
+      border: 1px solid rgba(245, 101, 101, 0.3);
+      color: #f56565;
+    }
+
+    .status.info {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      color: #667eea;
+    }
+
+    /* CSV Import Section */
+    .csv-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .csv-section h3 {
+      color: #e2e8f0;
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .file-input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .file-input-label:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* Loading */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 24px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading h3 {
+      color: #e2e8f0;
+      margin-bottom: 12px;
+      font-size: 1.3rem;
+    }
+
+    .loading p {
+      color: #a0aec0;
+      font-size: 1rem;
+    }
+
+         /* Mobile Responsiveness */
+     @media (max-width: 768px) {
+       .container {
+         padding: 16px;
+       }
+
+       .main-form {
+         padding: 24px 20px;
+       }
+
+       .recipient-row {
+         grid-template-columns: 1fr 1fr auto;
+         gap: 12px;
+       }
+
+       .wallet-selector {
+         flex-direction: column;
+       }
+
+       .action-buttons {
+         flex-direction: column;
+       }
+
+       .btn {
+         width: 100%;
+         justify-content: center;
+       }
+
+       .recipients-header {
+         flex-direction: column;
+         align-items: stretch;
+       }
+
+       .recipients-actions {
+         justify-content: center;
+       }
+
+       h1 {
+         font-size: 2rem;
+       }
+
+       .logo {
+         width: 100px;
+         height: 100px;
+       }
+     }
+
+    @media (max-width: 480px) {
+      .main-form {
+        padding: 20px 16px;
+      }
+
+      .form-input, .form-select {
+        padding: 14px;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+
+      .btn {
+        padding: 14px 20px;
+      }
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-up {
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
-  <button id="connectWalletBtn" onclick="connectWallet()">Connect Wallet</button>
-  <div style="text-align:center; margin-top:0px;">
-    <img src="https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png" alt="Sendwise Logo" style="width:300px; display:block; margin:0 auto;" />
+  <div id="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <h3>🚀 Initializing Sendwise...</h3>
+    <p>Connecting to Farcaster and Web3 networks...</p>
   </div>
-  <h1>Sendwise: Smart Batch Transfers</h1>
-  <div class="supported-networks">Supported Networks: Base, Optimism, Arbitrum, Soneium, Unichain, Ink</div>
 
   <div class="container">
-    <div class="row">
-      <label style="margin-right:10px;">Transfer Type:</label>
-      <select id="transferType" onchange="onTransferTypeChange()">
-        <option value="eth">ETH</option>
-        <option value="erc20">ERC20</option>
+    <!-- Header -->
+    <div class="header fade-in">
+      <div class="logo">
+        <img src="https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png" alt="Sendwise Logo" />
+      </div>
+      <h1>Sendwise</h1>
+      <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
+      <div class="supported-networks">
+        <div class="network-icon"></div>
+        <span>Base • Optimism • Arbitrum • Soneium • Unichain • Ink</span>
+      </div>
+  </div>
+
+    <!-- Farcaster Info -->
+  <div id="farcasterInfo" class="farcaster-info" style="display:none;">
+    <strong>🚀 Farcaster Mini App Mode</strong><br>
+    Connected to Farcaster ecosystem with enhanced wallet integration
+  </div>
+
+    <!-- Wallet Section -->
+    <div class="wallet-section slide-up">
+  <div class="wallet-selector" id="walletSelector" style="display:none;">
+        <button onclick="switchToFarcasterWallet()" id="farcasterWalletBtn" class="wallet-btn">
+          🔗 Farcaster Wallet
+        </button>
+        <button onclick="switchToMetaMask()" id="metamaskWalletBtn" class="wallet-btn active">
+          🦊 MetaMask
+        </button>
+      </div>
+      <div style="text-align: center; margin-top: 16px;">
+        <button id="connectWalletBtn" onclick="connectWallet()" class="btn btn-primary">
+          Connect Wallet
+        </button>
+      </div>
+  </div>
+
+    <!-- Main Form -->
+    <div class="main-form slide-up">
+      <div class="form-group">
+        <label class="form-label">Transfer Type</label>
+        <select id="transferType" class="form-select" onchange="onTransferTypeChange()">
+          <option value="eth">ETH Transfer</option>
+          <option value="erc20">ERC20 Token Transfer</option>
       </select>
     </div>
-    <div class="row" id="tokenAddressRow" style="display:none;">
-      <input type="text" id="tokenAddressInput" placeholder="ERC20 Contract Address" onblur="fetchTokenInfo()" />
-    </div>
-    <div id="tokenInfo"></div>
 
-    <div class="add-remove-wrapper">
-      <button onclick="addInput()">➕ Add Recipient</button>
-      <button onclick="removeLast()">❌ Remove Recipient</button>
+      <div class="form-group" id="tokenAddressRow" style="display:none;">
+        <label class="form-label">Token Contract Address</label>
+        <input type="text" id="tokenAddressInput" class="form-input" placeholder="0x..." onblur="fetchTokenInfo()" />
     </div>
+
+      <div id="tokenInfo" class="token-info" style="display:none;"></div>
+
+             <!-- Recipients Section -->
+       <div class="recipients-section">
+         <div class="recipients-header">
+           <h3 class="recipients-title">Recipients</h3>
+    </div>
+
     <div id="inputContainer">
-      <div class="row">
-        <input type="text" placeholder="Recipient Address" class="address" />
-        <input type="text" placeholder="Amount" class="amount" />
+           <div class="recipient-row">
+             <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
+             <input type="text" placeholder="Amount" class="form-input amount" />
+             <div class="recipient-actions">
+               <button onclick="addInput()" class="recipient-action-btn add-recipient-btn" title="Add Recipient">
+                 ➕
+               </button>
+               <button onclick="removeLast()" class="recipient-action-btn remove-recipient-btn" title="Remove Last" disabled>
+                 ❌
+               </button>
+             </div>
+           </div>
       </div>
     </div>
 
-    <div id="actionButtons">
-      <button id="approveBtn" style="display:none;" onclick="approveToken()">✅ Approve Token</button>
-      <button id="sendBtn" style="display:none;" onclick="sendBatch()">🔄 Send</button>
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button id="approveBtn" style="display:none;" onclick="approveToken()" class="btn btn-primary">
+          ✅ Approve Token
+        </button>
+        <button id="sendBtn" style="display:none;" onclick="sendBatch()" class="btn btn-primary">
+          🚀 Send Batch Transfer
+        </button>
     </div>
-    <p id="status"></p>
+
+      <div id="status" class="status" style="display:none;"></div>
   </div>
 
-  <div class="wallet-csv-section">
-    <h3>Import Wallets via CSV</h3>
-    <input type="file" id="walletCsvInput" accept=".csv" />
-    <button onclick="importWallets()">➕ Add Wallets</button>
+    <!-- CSV Import Section -->
+    <div class="csv-section slide-up">
+      <h3>📁 Import Wallets via CSV</h3>
+      <div class="file-input-wrapper">
+        <input type="file" id="walletCsvInput" accept=".csv" class="file-input" />
+        <label for="walletCsvInput" class="file-input-label">
+          📄 Choose CSV File
+        </label>
+      </div>
+      <button onclick="importWallets()" class="btn btn-secondary">
+        ➕ Import Wallets
+      </button>
+    </div>
   </div>
 
-  <script>
+  <script type="module">
+    // Farcaster Mini App SDK Integration
+    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk';
+
+    // Global variables
+    let signer;
+    let isFarcasterMode = false;
+    let currentWalletType = 'metamask';
+
     const CONTRACTS = {
       8453: "0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784",
       10:   "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",
@@ -90,85 +757,366 @@
     const ABI_BATCH_ETH = ["function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"];
     const ABI_BATCH_ERC20 = ["function batchSendERC20(address token, address[] calldata recipients, uint256[] calldata amounts) external payable"];
 
-    let signer;
-    async function connectWallet() {
-      if (!window.ethereum) { alert('Install MetaMask'); return; }
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      signer = provider.getSigner();
-      const addr = await signer.getAddress();
-      document.getElementById('connectWalletBtn').textContent = `${addr.slice(0,6)}...${addr.slice(-4)}`;
+    // Initialize Farcaster Mini App
+    async function initializeFarcaster() {
+      try {
+        // Check if running in Farcaster environment
+        const isInFarcaster = await sdk.isInFarcaster();
+        
+        if (isInFarcaster) {
+          isFarcasterMode = true;
+          document.getElementById('farcasterInfo').style.display = 'block';
+          document.getElementById('walletSelector').style.display = 'flex';
+          
+          // Initialize Farcaster SDK
+          await sdk.initialize();
+          
+          // Set up Farcaster wallet integration
+          setupFarcasterWallet();
+          
+          console.log('Farcaster Mini App initialized successfully');
+        } else {
+          console.log('Running in web mode');
+        }
+        
+        // Hide loading screen and show app
+        document.getElementById('loading').classList.remove('show');
+        await sdk.actions.ready();
+        
+      } catch (error) {
+        console.error('Error initializing Farcaster:', error);
+        // Fallback to web mode
+        document.getElementById('loading').classList.remove('show');
+        await sdk.actions.ready();
+      }
     }
-    function onTransferTypeChange() {
+
+    // Setup Farcaster wallet integration
+    async function setupFarcasterWallet() {
+      try {
+        // Check if Farcaster wallet is available
+        const hasFarcasterWallet = await sdk.wallet.hasFarcasterWallet();
+        
+        if (hasFarcasterWallet) {
+          console.log('Farcaster wallet available');
+        } else {
+          console.log('Farcaster wallet not available');
+        }
+      } catch (error) {
+        console.error('Error setting up Farcaster wallet:', error);
+      }
+    }
+
+    // Switch to Farcaster wallet
+    async function switchToFarcasterWallet() {
+      try {
+        if (!isFarcasterMode) {
+          alert('Farcaster wallet only available in Farcaster Mini App mode');
+          return;
+        }
+
+        const hasWallet = await sdk.wallet.hasFarcasterWallet();
+        if (!hasWallet) {
+          alert('Farcaster wallet not available');
+          return;
+        }
+
+        // Connect to Farcaster wallet
+        const account = await sdk.wallet.connectFarcasterWallet();
+        if (account) {
+          signer = account;
+          currentWalletType = 'farcaster';
+          updateWalletButtons();
+          updateWalletDisplay(account.address);
+          console.log('Connected to Farcaster wallet:', account.address);
+        }
+      } catch (error) {
+        console.error('Error connecting to Farcaster wallet:', error);
+        alert('Failed to connect to Farcaster wallet: ' + error.message);
+      }
+    }
+
+    // Switch to MetaMask
+    async function switchToMetaMask() {
+      try {
+        if (!window.ethereum) {
+          alert('MetaMask not installed');
+          return;
+        }
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send('eth_requestAccounts', []);
+        signer = provider.getSigner();
+        currentWalletType = 'metamask';
+        updateWalletButtons();
+        
+        const addr = await signer.getAddress();
+        updateWalletDisplay(addr);
+        console.log('Connected to MetaMask:', addr);
+      } catch (error) {
+        console.error('Error connecting to MetaMask:', error);
+        alert('Failed to connect to MetaMask: ' + error.message);
+      }
+    }
+
+    // Update wallet selector buttons
+    function updateWalletButtons() {
+      document.getElementById('farcasterWalletBtn').classList.toggle('active', currentWalletType === 'farcaster');
+      document.getElementById('metamaskWalletBtn').classList.toggle('active', currentWalletType === 'metamask');
+    }
+
+    // Update wallet display
+    function updateWalletDisplay(address) {
+      const displayText = `${address.slice(0,6)}...${address.slice(-4)}`;
+      document.getElementById('connectWalletBtn').textContent = displayText;
+    }
+
+    // Global wallet connection function
+    window.connectWallet = async function() {
+      if (isFarcasterMode) {
+        await switchToFarcasterWallet();
+      } else {
+        await switchToMetaMask();
+      }
+    };
+
+    // Global wallet switching functions
+    window.switchToFarcasterWallet = switchToFarcasterWallet;
+    window.switchToMetaMask = switchToMetaMask;
+
+    // Farcaster notification system
+    async function sendFarcasterNotification(message) {
+      if (isFarcasterMode) {
+        try {
+          await sdk.notifications.sendNotification({
+            title: 'Sendwise Batch Transfer',
+            body: message,
+            url: window.location.href
+          });
+        } catch (error) {
+          console.error('Error sending Farcaster notification:', error);
+        }
+      }
+    }
+
+    // Enhanced status update with Farcaster notifications
+    function updateStatus(message, isSuccess = false, isError = false) {
+      const statusElement = document.getElementById('status');
+      statusElement.innerText = message;
+      statusElement.style.display = 'block';
+      
+      // Remove existing classes
+      statusElement.classList.remove('success', 'error', 'info');
+      
+      // Add appropriate class
+      if (isSuccess) {
+        statusElement.classList.add('success');
+      } else if (isError) {
+        statusElement.classList.add('error');
+      } else {
+        statusElement.classList.add('info');
+      }
+      
+      if (isSuccess && isFarcasterMode) {
+        sendFarcasterNotification(message);
+      }
+      
+      // Auto-hide success messages after 5 seconds
+      if (isSuccess) {
+        setTimeout(() => {
+          statusElement.style.display = 'none';
+        }, 5000);
+      }
+    }
+
+    // Farcaster sharing functionality
+    async function shareToFarcaster() {
+      if (isFarcasterMode) {
+        try {
+          await sdk.actions.share({
+            text: 'Just completed a batch transfer with Sendwise! 🚀',
+            url: window.location.href
+          });
+        } catch (error) {
+          console.error('Error sharing to Farcaster:', error);
+        }
+      }
+    }
+
+    // Original functions with Farcaster enhancements
+    window.onTransferTypeChange = function() {
       const type = document.getElementById('transferType').value;
       document.getElementById('tokenAddressRow').style.display = type==='erc20' ? 'flex' : 'none';
       document.getElementById('approveBtn').style.display     = type==='erc20' ? 'inline-block' : 'none';
       document.getElementById('sendBtn').style.display        = type==='eth'  ? 'inline-block' : 'none';
       document.getElementById('tokenInfo').innerText         = '';
-      document.getElementById('status').innerText            = '';
-    }
-    function addInput() { const c = document.getElementById('inputContainer'); const r = document.createElement('div'); r.className = 'row'; r.innerHTML = '<input type="text" placeholder="Recipient Address" class="address" /><input type="text" placeholder="Amount" class="amount" />'; c.appendChild(r); }
-    function removeLast() { const c = document.getElementById('inputContainer'); const rows = c.getElementsByClassName('row'); if (rows.length > 1) c.removeChild(rows[rows.length-1]); }
-    function importWallets() { const file = document.getElementById('walletCsvInput').files[0]; if (!file) { alert('Please select a CSV file'); return; } const reader = new FileReader(); reader.onload = e => { const wallets = e.target.result.split('\n').map(l => l.trim()).filter(l => ethers.utils.isAddress(l)); alert(wallets.length + ' wallets added'); }; reader.readAsText(file); }
-    async function fetchTokenInfo() {
+      updateStatus('');
+    };
+
+    window.addInput = function() { 
+      const c = document.getElementById('inputContainer'); 
+      const r = document.createElement('div'); 
+       r.className = 'recipient-row'; 
+       r.innerHTML = `
+         <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
+         <input type="text" placeholder="Amount" class="form-input amount" />
+         <div class="recipient-actions">
+           <button onclick="addInput()" class="recipient-action-btn add-recipient-btn" title="Add Recipient">
+             ➕
+           </button>
+           <button onclick="removeLast()" class="recipient-action-btn remove-recipient-btn" title="Remove Last">
+             ❌
+           </button>
+         </div>
+       `; 
+      c.appendChild(r); 
+       r.classList.add('slide-up');
+       
+       // Update remove buttons state
+       updateRemoveButtons();
+    };
+
+    window.removeLast = function() { 
+      const c = document.getElementById('inputContainer'); 
+       const rows = c.getElementsByClassName('recipient-row'); 
+       if (rows.length > 1) {
+         const lastRow = rows[rows.length-1];
+         lastRow.style.opacity = '0';
+         lastRow.style.transform = 'translateY(-10px)';
+         setTimeout(() => {
+           c.removeChild(lastRow);
+           updateRemoveButtons();
+         }, 300);
+       }
+     };
+
+     // Update remove buttons state
+     function updateRemoveButtons() {
+       const rows = document.getElementsByClassName('recipient-row');
+       const removeButtons = document.querySelectorAll('.remove-recipient-btn');
+       
+       removeButtons.forEach(btn => {
+         btn.disabled = rows.length <= 1;
+       });
+     }
+
+    window.importWallets = function() { 
+      const file = document.getElementById('walletCsvInput').files[0]; 
+      if (!file) { 
+        updateStatus('Please select a CSV file first', false, true); 
+        return; 
+      } 
+      const reader = new FileReader(); 
+      reader.onload = e => { 
+        const wallets = e.target.result.split('\n').map(l => l.trim()).filter(l => ethers.utils.isAddress(l)); 
+        if (wallets.length > 0) {
+          updateStatus(`✅ Successfully imported ${wallets.length} valid wallet addresses`, true, false);
+        } else {
+          updateStatus('No valid wallet addresses found in CSV file', false, true);
+        }
+      }; 
+      reader.readAsText(file); 
+    };
+
+    window.fetchTokenInfo = async function() {
       const addr = document.getElementById('tokenAddressInput').value.trim();
       if (!ethers.utils.isAddress(addr)) return;
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      signer = provider.getSigner();
-      const net = await provider.getNetwork();
-      const spender = CONTRACTS_ERC20[net.chainId];
-      const token = new ethers.Contract(addr, ABI_TOKEN, signer);
-      const user = await signer.getAddress();
+      
+      if (!signer) {
+        updateStatus('Please connect wallet first', false, true);
+        return;
+      }
+
       try {
+        const provider = signer.provider || new ethers.providers.Web3Provider(window.ethereum);
+        const net = await provider.getNetwork();
+        const spender = CONTRACTS_ERC20[net.chainId];
+        const token = new ethers.Contract(addr, ABI_TOKEN, signer);
+        const user = await signer.getAddress();
+        
         const [name, symbol, decimals, balance, allowance] = await Promise.all([
           token.name(), token.symbol(), token.decimals(),
           token.balanceOf(user), token.allowance(user, spender)
         ]);
-        document.getElementById('tokenInfo').innerText = `${name} (${symbol}) | Balance: ${ethers.utils.formatUnits(balance, decimals)}`;
+        
+        const tokenInfoElement = document.getElementById('tokenInfo');
+        tokenInfoElement.innerHTML = `
+          <strong>${name} (${symbol})</strong><br>
+          Balance: ${ethers.utils.formatUnits(balance, decimals)} ${symbol}
+        `;
+        tokenInfoElement.style.display = 'block';
+        
         document.getElementById('approveBtn').style.display = allowance.gt(0) ? 'none' : 'inline-block';
         document.getElementById('sendBtn').style.display    = allowance.gt(0) ? 'inline-block' : 'none';
-      } catch {
-        document.getElementById('tokenInfo').innerText = 'Failed to fetch token info';
+      } catch (error) {
+        const tokenInfoElement = document.getElementById('tokenInfo');
+        tokenInfoElement.innerHTML = `<strong>Error:</strong> Failed to fetch token info: ${error.message}`;
+        tokenInfoElement.style.display = 'block';
+        tokenInfoElement.classList.add('error');
       }
-    }
-    async function approveToken() {
+    };
+
+    window.approveToken = async function() {
       const addr = document.getElementById('tokenAddressInput').value.trim();
       const tokenContract = new ethers.Contract(addr, ABI_TOKEN, signer);
       const ap = new ethers.Contract(addr, ABI_APPROVE, signer);
+      
       try {
         const bal = await tokenContract.balanceOf(await signer.getAddress());
-        if (bal.isZero()) { document.getElementById('status').innerText = 'No tokens to approve'; return; }
+        if (bal.isZero()) { 
+          updateStatus('No tokens to approve', false, true); 
+          return; 
+        }
+        
+        updateStatus('Approving tokens...', false, false);
         const tx = await ap.approve(CONTRACTS_ERC20[(await signer.provider.getNetwork()).chainId], bal);
-        document.getElementById('status').innerText = 'Approval sent: ' + tx.hash;
+        updateStatus('Approval transaction sent: ' + tx.hash, false, false);
         await tx.wait();
-        document.getElementById('status').innerText = '✅ Approved';
+        updateStatus('✅ Token approval successful!', true, false);
         document.getElementById('approveBtn').style.display = 'none';
         document.getElementById('sendBtn').style.display    = 'inline-block';
       } catch (e) {
-        document.getElementById('status').innerText = 'Approve error: ' + e.message;
+        updateStatus('Approval error: ' + e.message, false, true);
       }
-    }
-    async function sendBatch() {
-      const status = document.getElementById('status'); status.innerText = 'Sending...';
-      if (!window.ethereum) { status.innerText = 'Install MetaMask'; return; }
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      signer = provider.getSigner();
+    };
+
+    window.sendBatch = async function() {
+      updateStatus('🚀 Initiating batch transfer...', false, false);
+      
+      if (!signer) {
+        updateStatus('Please connect wallet first', false, true);
+        return;
+      }
+
       const type = document.getElementById('transferType').value;
-      const cid = (await provider.getNetwork()).chainId;
+      const cid = (await signer.provider.getNetwork()).chainId;
       const addrEls = document.getElementsByClassName('address');
       const amtEls = document.getElementsByClassName('amount');
       const recs = [], amts = [];
+      
       for (let i = 0; i < addrEls.length; i++) {
         const r = addrEls[i].value.trim(), a = amtEls[i].value.trim();
-        if (!r || !a) { status.innerText = `Fill fields row ${i+1}`; return; }
-        if (!ethers.utils.isAddress(r)) { status.innerText = `Invalid address row ${i+1}`; return; }
+        if (!r || !a) { 
+          updateStatus(`Please fill all fields in row ${i+1}`, false, true); 
+          return; 
+        }
+        if (!ethers.utils.isAddress(r)) { 
+          updateStatus(`Invalid address in row ${i+1}`, false, true); 
+          return; 
+        }
         let bn;
-        try { bn = type==='eth' ? ethers.utils.parseEther(a) : ethers.utils.parseUnits(a, 18); } catch { status.innerText = `Invalid amount row ${i+1}`; return; }
+        try { 
+          bn = type==='eth' ? ethers.utils.parseEther(a) : ethers.utils.parseUnits(a, 18); 
+        } catch { 
+          updateStatus(`Invalid amount in row ${i+1}`, false, true); 
+          return; 
+        }
         recs.push(r); amts.push(bn);
       }
+      
       const fee = ethers.utils.parseEther('0.001');
       let addr, abi, args, overrides = { gasLimit: 500000 };
+      
       if (type === 'eth') {
         addr = CONTRACTS[cid]; abi = ABI_BATCH_ETH;
         const total = amts.reduce((s, v) => s.add(v), ethers.BigNumber.from(0));
@@ -180,17 +1128,56 @@
         overrides.value = fee;
         args = [tokenAddr, recs, amts];
       }
-      if (!addr) { status.innerText = 'Unsupported network'; return; }
+      
+      if (!addr) { 
+        updateStatus('Unsupported network', false, true); 
+        return; 
+      }
+      
       try {
+        updateStatus('📝 Creating transaction...', false, false);
         const contract = new ethers.Contract(addr, abi, signer);
         const tx = await contract[type==='eth'?'batchSend':'batchSendERC20'](...args, overrides);
-        status.innerText = 'Tx sent: ' + tx.hash;
-        await tx.wait(); status.innerText = '✅ Transaction confirmed';
+        updateStatus('⏳ Transaction sent: ' + tx.hash, false, false);
+        await tx.wait(); 
+        updateStatus('✅ Batch transfer completed successfully!', true, false);
+        
+        // Share to Farcaster on success
+        if (isFarcasterMode) {
+          setTimeout(shareToFarcaster, 1000);
+        }
       } catch (e) {
-        status.innerText = 'Error: ' + e.message;
+        updateStatus('❌ Transaction failed: ' + e.message, false, true);
       }
+    };
+
+    // Initialize app when DOM is loaded
+    window.addEventListener('DOMContentLoaded', async function() {
+      document.getElementById('loading').classList.add('show');
+      window.onTransferTypeChange();
+      await initializeFarcaster();
+       
+       // Initialize remove buttons state
+       updateRemoveButtons();
+       
+       // Hide loading screen after initialization
+       setTimeout(() => {
+         document.getElementById('loading').classList.add('hidden');
+       }, 1000);
+    });
+
+    // Farcaster event listeners
+    if (typeof sdk !== 'undefined') {
+      sdk.events.on('walletConnected', (account) => {
+        console.log('Wallet connected:', account);
+        updateStatus('Wallet connected successfully');
+      });
+
+      sdk.events.on('walletDisconnected', () => {
+        console.log('Wallet disconnected');
+        updateStatus('Wallet disconnected');
+      });
     }
-    window.addEventListener('DOMContentLoaded', onTransferTypeChange);
   </script>
 </body>
 </html>

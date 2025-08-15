@@ -284,13 +284,16 @@ h1 {
 .form-select, .form-input {
   width: 100%;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  color: #ffffff;
+  color: #ffffff !important;
   font-size: 1rem;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .form-input::placeholder {
@@ -306,7 +309,36 @@ h1 {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+/* Mobile browser autocomplete/autofill override */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus,
+.form-input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: inset 0 0 20px 20px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Firefox autofill override */
+.form-input:-moz-autofill {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* Selection color override */
+.form-input::selection {
+  background: rgba(102, 126, 234, 0.3);
+  color: #ffffff;
+}
+
+.form-input::-moz-selection {
+  background: rgba(102, 126, 234, 0.3);
+  color: #ffffff;
 }
 
 .form-select option {
@@ -408,6 +440,19 @@ h1 {
 
 .recipient-row .form-input {
   margin: 0;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Extra enforcement for recipient inputs */
+.recipient-row .form-input:focus,
+.recipient-row .form-input:active,
+.recipient-row .form-input:-webkit-autofill {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: inset 0 0 20px 20px rgba(255, 255, 255, 0.15) !important;
 }
 
 .recipient-actions {
@@ -693,6 +738,38 @@ h1 {
   .form-input, .form-select {
     padding: 14px;
     font-size: 16px; /* Prevents zoom on iOS */
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  
+  /* Mobile specific input overrides */
+  .form-input:focus,
+  .form-input:active,
+  .form-input:-webkit-autofill,
+  .form-input:-webkit-autofill:hover,
+  .form-input:-webkit-autofill:focus,
+  .form-input:-webkit-autofill:active {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    box-shadow: inset 0 0 20px 20px rgba(255, 255, 255, 0.15) !important;
+  }
+  
+  /* Recipient row mobile fixes */
+  .recipient-row .form-input {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+  
+  .recipient-row .form-input:focus,
+  .recipient-row .form-input:active,
+  .recipient-row .form-input:-webkit-autofill {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    box-shadow: inset 0 0 20px 20px rgba(255, 255, 255, 0.15) !important;
   }
 
   .btn {

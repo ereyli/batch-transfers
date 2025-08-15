@@ -69,6 +69,27 @@ export class UIManager {
     container.appendChild(row);
     row.classList.add('slide-up');
     
+    // Force style enforcement on mobile
+    const inputs = row.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+      input.style.background = 'rgba(255, 255, 255, 0.1)';
+      input.style.color = '#ffffff';
+      input.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
+      
+      // Add event listeners to maintain styling
+      input.addEventListener('focus', () => {
+        input.style.background = 'rgba(255, 255, 255, 0.15)';
+        input.style.color = '#ffffff';
+        input.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
+      });
+      
+      input.addEventListener('blur', () => {
+        input.style.background = 'rgba(255, 255, 255, 0.1)';
+        input.style.color = '#ffffff';
+        input.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
+      });
+    });
+    
     // Update remove buttons state
     this.updateRemoveButtons();
   }

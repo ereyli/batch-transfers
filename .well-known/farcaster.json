@@ -7,7 +7,7 @@
     "splashImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "splashBackgroundColor": "#1a1a1a",
     "subtitle": "Smart Batch Transfers",
-    "description": "Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers. Perfect for airdrops, payroll, and bulk payments.",
+    "description": "Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers. Perfect for airdrops, payroll, and bulk payments.",
     "screenshotUrls": [
       "https://www.sendwise.xyz/.well-known/screenshot1.png",
       "https://www.sendwise.xyz/.well-known/screenshot2.png",
@@ -25,9 +25,9 @@
       "bulk-payments"
     ],
     "heroImageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
-    "tagline": "Smart Batch Transfers for ETH & ERC20",
-    "ogTitle": "Sendwise - Smart Batch Transfers",
-    "ogDescription": "Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time!",
+    "tagline": "Smart Batch Transfers",
+    "ogTitle": "Sendwise - Batch Transfers",
+    "ogDescription": "Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time!",
     "ogImageUrl": "https://www.sendwise.xyz/.well-known/share-image.png",
     "requiredChains": [
       "eip155:8453",

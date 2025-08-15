@@ -24,10 +24,8 @@ export class SendwiseApp {
 
   async initialize() {
     try {
-      // Show loading screen only for web browser
-      if (!window.isFarcasterMiniApp) {
-        this.uiManager.showLoading();
-      }
+      // Show loading screen for all environments
+      this.uiManager.showLoading();
       
       // Initialize wallet manager (includes Farcaster)
       await this.walletManager.initialize();
@@ -108,8 +106,13 @@ export class SendwiseApp {
         }
       }
       
-      // Hide loading screen immediately after initialization
-      if (!window.isFarcasterMiniApp) {
+      // Hide loading screen after a short delay for Farcaster Mini App
+      if (window.isFarcasterMiniApp) {
+        // Keep loading screen visible for a bit longer in Farcaster
+        setTimeout(() => {
+          this.uiManager.hideLoading();
+        }, 2000);
+      } else {
         this.uiManager.hideLoading();
       }
       

@@ -25,6 +25,8 @@
     "requiredCapabilities": [
       "actions.signIn",
       "wallet.getEthereumProvider"
-    ]
+    ],
+    "webhookUrl": "https://www.sendwise.xyz/api/webhook",
+    "castShareUrl": "https://www.sendwise.xyz/share"
   }
 }

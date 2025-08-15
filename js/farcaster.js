@@ -14,9 +14,9 @@ export class FarcasterManager {
       let isInFarcaster = false;
       
       // Method 1: Check for Farcaster SDK
-      if (window.FarcasterMiniAppSDK) {
+      if (window.farcasterSDK) {
         try {
-          const sdk = window.FarcasterMiniAppSDK;
+          const sdk = window.farcasterSDK;
           const isInFarcasterEnv = await sdk.isInFarcaster();
           if (isInFarcasterEnv) {
             isInFarcaster = true;

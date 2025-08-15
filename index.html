@@ -59,7 +59,12 @@
   <script src="https://cdn.jsdelivr.net/npm/viem@2.23.15/dist/viem.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/wagmi@2.5.7/dist/wagmi.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-wagmi-connector@0.1.0/dist/index.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@0.1.0/dist/index.umd.js"></script>
+  
+  <!-- Farcaster Mini App SDK -->
+  <script type="module">
+    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
+    window.farcasterSDK = sdk;
+  </script>
   
   <!-- Fonts and Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -252,13 +257,12 @@
         let isInFarcaster = false;
         
         // Method 1: Check for Farcaster SDK
-        if (window.FarcasterMiniAppSDK) {
+        if (window.farcasterSDK) {
           try {
-            const sdk = window.FarcasterMiniAppSDK;
+            const sdk = window.farcasterSDK;
             const isInFarcasterEnv = await sdk.isInFarcaster();
             if (isInFarcasterEnv) {
               isInFarcaster = true;
-              window.farcasterSDK = sdk;
               console.log('Farcaster SDK detected and environment confirmed');
             }
           } catch (error) {

@@ -1,18 +1,36 @@
 {
   "name": "Sendwise",
-  "description": "Smart Batch Transfers for ETH & ERC20 Tokens",
+  "description": "Smart Batch Transfers for ETH & ERC20 Tokens. Send multiple transactions in one go, save gas fees, and streamline your crypto payments.",
   "icon": "https://www.sendwise.xyz/.well-known/logo.png",
-  "url": "https://sendwise.app",
+  "url": "https://www.sendwise.xyz",
   "developer": {
     "name": "Sendwise Team",
-    "url": "https://sendwise.app"
+    "url": "https://www.sendwise.xyz",
+    "email": "hello@sendwise.xyz"
   },
   "categories": ["Finance", "DeFi", "Tools"],
-  "tags": ["batch-transfer", "ethereum", "defi", "wallet"],
+  "tags": [
+    "batch-transfer",
+    "ethereum", 
+    "defi",
+    "wallet",
+    "gas-savings",
+    "airdrop",
+    "payroll",
+    "bulk-payments"
+  ],
   "screenshots": [
     {
-      "url": "https://www.sendwise.xyz/.well-known/logo.png",
-      "alt": "Sendwise App Screenshot"
+      "url": "https://www.sendwise.xyz/.well-known/screenshot1.png",
+      "alt": "Sendwise Batch Transfer Interface"
+    },
+    {
+      "url": "https://www.sendwise.xyz/.well-known/screenshot2.png", 
+      "alt": "Sendwise CSV Import Feature"
+    },
+    {
+      "url": "https://www.sendwise.xyz/.well-known/screenshot3.png",
+      "alt": "Sendwise Transaction History"
     }
   ],
   "permissions": [
@@ -22,11 +40,9 @@
   ],
   "supportedNetworks": [
     "base",
-    "optimism", 
+    "optimism",
     "arbitrum",
-    "soneium",
-    "unichain",
-    "ink"
+    "ethereum"
   ],
   "version": "1.0.0",
   "minFarcasterVersion": "1.0.0",
@@ -36,5 +52,16 @@
     "imageWidth": 120,
     "imageHeight": 120
   },
-  "disableNativeGestures": true
+  "disableNativeGestures": true,
+  "features": [
+    "batch-transfers",
+    "gas-optimization", 
+    "csv-import",
+    "multi-token-support",
+    "transaction-history"
+  ],
+  "social": {
+    "twitter": "@sendwise_xyz",
+    "discord": "https://discord.gg/sendwise"
+  }
 }

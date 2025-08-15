@@ -126,13 +126,29 @@ export class WalletManager {
               }
             }
             
+            // Create proper ethers signer from provider
+            let signer = null;
+            if (provider) {
+              try {
+                // Get the signer from the provider
+                signer = provider.getSigner();
+                console.log('Created ethers signer from provider');
+              } catch (error) {
+                console.error('Could not create signer from provider:', error);
+              }
+            }
+            
             this.farcasterSigner = {
               address: wallet.address,
               provider: provider,
+              signer: signer,
               getAddress: () => Promise.resolve(wallet.address),
+              getSigner: () => signer,
               signMessage: async (message) => {
                 try {
-                  if (window.wagmiClient) {
+                  if (signer) {
+                    return await signer.signMessage(message);
+                  } else if (window.wagmiClient) {
                     const { data: signature } = await window.wagmiClient.signMessage({ message });
                     return signature;
                   } else {
@@ -145,7 +161,9 @@ export class WalletManager {
               },
               signTransaction: async (transaction) => {
                 try {
-                  if (window.wagmiClient) {
+                  if (signer) {
+                    return await signer.signTransaction(transaction);
+                  } else if (window.wagmiClient) {
                     const { data: signature } = await window.wagmiClient.signTransaction(transaction);
                     return signature;
                   } else {
@@ -158,7 +176,9 @@ export class WalletManager {
               },
               sendTransaction: async (transaction) => {
                 try {
-                  if (window.wagmiClient) {
+                  if (signer) {
+                    return await signer.sendTransaction(transaction);
+                  } else if (window.wagmiClient) {
                     const { data: hash } = await window.wagmiClient.sendTransaction(transaction);
                     return hash;
                   } else {

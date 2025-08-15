@@ -110,6 +110,12 @@ export class BlockchainManager {
       await this.walletManager.sendFarcasterNotification('Starting batch transfer... 🚀');
     }
     
+    // Check if we're using Farcaster wallet
+    if (this.walletManager.getCurrentWalletType() === 'farcaster') {
+      await this.sendBatchWithEthers();
+      return;
+    }
+    
     // Check if we're in Farcaster Mini App with Wagmi support
     if (window.isFarcasterMiniApp && window.wagmiClient) {
       await this.sendBatchWithWagmi();
@@ -522,7 +528,104 @@ export class BlockchainManager {
     }
   }
 
-  // Send batch transfer using Wagmi (for Farcaster Mini App)
+  // Send batch transfer using ethers.js (for Farcaster wallet)
+  async sendBatchWithEthers() {
+    try {
+      const transferType = this.uiManager.getTransferType();
+      const { recipients, amounts } = this.uiManager.getRecipientData();
+      
+      // Get wallet manager and signer
+      const walletManager = window.app ? window.app.getWalletManager() : null;
+      if (!walletManager || !walletManager.getSigner()) {
+        throw new Error('No wallet connected');
+      }
+      
+      const signer = walletManager.getSigner();
+      console.log('Using signer:', signer);
+      
+      // Validate and parse amounts
+      const parsedAmounts = [];
+      for (let i = 0; i < amounts.length; i++) {
+        let parsedAmount;
+        try {
+          parsedAmount = transferType === 'eth' 
+            ? window.ethers.utils.parseEther(amounts[i])
+            : window.ethers.utils.parseUnits(amounts[i], 18);
+        } catch {
+          throw new Error(`Invalid amount in row ${i + 1}`);
+        }
+        parsedAmounts.push(parsedAmount);
+      }
+      
+      // Determine target chain: user-selected if available, else Base
+      let chainId = window.selectedChainId ? Number(window.selectedChainId) : 8453;
+      
+      // Get contract addresses
+      const contractAddress = transferType === 'eth' ? CONTRACTS[chainId] : CONTRACTS_ERC20[chainId];
+      if (!contractAddress) {
+        this.uiManager.updateStatus('Unsupported network', false, true);
+        return;
+      }
+      
+      this.uiManager.updateStatus('📝 Creating batch transaction...', false, false);
+      
+      // Create contract instance
+      const contract = new window.ethers.Contract(
+        contractAddress,
+        transferType === 'eth' ? ABI_BATCH_ETH : ABI_BATCH_ERC20,
+        signer
+      );
+      
+      console.log('Contract created:', contract);
+      
+      if (transferType === 'eth') {
+        // For ETH transfers
+        const total = parsedAmounts.reduce((sum, amount) => sum.add(amount), window.ethers.BigNumber.from(0));
+        const fee = window.ethers.utils.parseEther(APP_CONFIG.fee);
+        
+        const tx = await contract.batchSend(recipients, parsedAmounts, {
+          value: total.add(fee)
+        });
+        
+        this.uiManager.updateStatus('⏳ Transaction sent! Hash: ' + tx.hash, true, false);
+        
+        const receipt = await tx.wait();
+        this.uiManager.updateStatus('✅ Transaction confirmed! Block: ' + receipt.blockNumber, true, false);
+        
+      } else {
+        // For ERC20 transfers
+        const tokenAddress = this.uiManager.getTokenAddress();
+        const fee = window.ethers.utils.parseEther(APP_CONFIG.fee);
+        
+        // First approve the contract to spend tokens
+        const tokenContract = new window.ethers.Contract(
+          tokenAddress,
+          ['function approve(address spender, uint256 amount) returns (bool)'],
+          signer
+        );
+        
+        const approveTx = await tokenContract.approve(contractAddress, window.ethers.constants.MaxUint256);
+        this.uiManager.updateStatus('⏳ Approving tokens...', false, false);
+        await approveTx.wait();
+        
+        // Then batch send
+        const tx = await contract.batchSendERC20(tokenAddress, recipients, parsedAmounts, {
+          value: fee
+        });
+        
+        this.uiManager.updateStatus('⏳ Transaction sent! Hash: ' + tx.hash, true, false);
+        
+        const receipt = await tx.wait();
+        this.uiManager.updateStatus('✅ Transaction confirmed! Block: ' + receipt.blockNumber, true, false);
+      }
+      
+    } catch (error) {
+      console.error('Error sending batch with ethers:', error);
+      this.uiManager.updateStatus('❌ Transaction failed: ' + error.message, false, true);
+    }
+  }
+
+  // Send batch transfer using Wagmi (for other wallets)
   async sendBatchWithWagmi() {
     try {
       const transferType = this.uiManager.getTransferType();

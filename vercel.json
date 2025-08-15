@@ -1,0 +1,108 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/**/*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "styles/**/*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.json",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/.well-known/(.*)",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/.well-known/farcaster/(.*)",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/(.*\\.png)",
+      "headers": {
+        "Content-Type": "image/png"
+      }
+    },
+    {
+      "src": "/(.*\\.jpg|.*\\.jpeg)",
+      "headers": {
+        "Content-Type": "image/jpeg"
+      }
+    },
+    {
+      "src": "/(.*\\.gif)",
+      "headers": {
+        "Content-Type": "image/gif"
+      }
+    },
+    {
+      "src": "/(.*\\.svg)",
+      "headers": {
+        "Content-Type": "image/svg+xml"
+      }
+    },
+    {
+      "src": "/(.*\\.ico)",
+      "headers": {
+        "Content-Type": "image/x-icon"
+      }
+    },
+    {
+      "src": "/(.*\\.css)",
+      "headers": {
+        "Content-Type": "text/css"
+      }
+    },
+    {
+      "src": "/(.*\\.js)",
+      "headers": {
+        "Content-Type": "application/javascript"
+      }
+    },
+    {
+      "src": "/(.*\\.json)",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "src": "/(.*\\.html)",
+      "headers": {
+        "Content-Type": "text/html"
+      }
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}

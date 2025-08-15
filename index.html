@@ -550,29 +550,40 @@
       try {
         console.log('Farcaster SDK loaded:', sdk);
         
-        // Check if we're in Farcaster environment
+        // Primary path: detect using isInFarcaster when available
         if (typeof sdk.isInFarcaster === 'function') {
           const isInFarcaster = await sdk.isInFarcaster();
-          window.isFarcasterMiniApp = isInFarcaster;
-          
-          if (isInFarcaster) {
-            console.log('Farcaster Mini App environment detected');
-            
-            // Initialize SDK
-            if (typeof sdk.initialize === 'function') {
-              await sdk.initialize();
-              console.log('Farcaster SDK initialized');
-            } else {
-              console.log('Farcaster SDK initialize method not available');
-            }
-            
-            // Don't call ready() here - let the app do it when ready
-          } else {
-            console.log('Running in web browser environment');
+          window.isFarcasterMiniApp = !!isInFarcaster;
+          if (isInFarcaster && typeof sdk.initialize === 'function') {
+            await sdk.initialize();
+            console.log('Farcaster SDK initialized');
           }
         } else {
           console.log('Farcaster SDK isInFarcaster method not available');
-          window.isFarcasterMiniApp = false;
+          // Fallback heuristic detection (iframe + referrer)
+          const ref = document.referrer || '';
+          const looksLikeFarcaster = (window.top !== window) && (
+            ref.includes('warpcast.com') || ref.includes('miniapps.farcaster') || ref.includes('farcaster')
+          );
+          // Try to initialize regardless; success implies Mini App context
+          if (typeof sdk.initialize === 'function') {
+            try {
+              await sdk.initialize();
+              window.isFarcasterMiniApp = true;
+              console.log('Farcaster SDK initialized (fallback)');
+            } catch (e) {
+              window.isFarcasterMiniApp = looksLikeFarcaster;
+              console.log('Farcaster initialize failed; environment fallback =', window.isFarcasterMiniApp);
+            }
+          } else {
+            window.isFarcasterMiniApp = looksLikeFarcaster;
+          }
+        }
+
+        if (!window.isFarcasterMiniApp) {
+          console.log('Running in web browser environment');
+        } else {
+          console.log('Farcaster Mini App environment detected');
         }
       } catch (error) {
         console.error('Error initializing Farcaster SDK:', error);

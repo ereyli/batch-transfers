@@ -857,6 +857,9 @@ export class WalletManager {
 
   // Get current signer
   getSigner() {
+    if (this.currentWalletType === 'farcaster' && this.farcasterSigner) {
+      return this.farcasterSigner.signer;
+    }
     return this.signer;
   }
 
@@ -896,19 +899,22 @@ export class WalletManager {
 
   // Check if wallet is connected
   isConnected() {
+    if (this.currentWalletType === 'farcaster') {
+      return this.farcasterSigner && this.farcasterSigner.address;
+    }
     return this.signer !== null;
   }
 
   // Get wallet address
   async getAddress() {
+    if (this.currentWalletType === 'farcaster') {
+      return this.farcasterSigner ? this.farcasterSigner.address : null;
+    }
+    
     if (!this.signer) return null;
     
     try {
-      if (this.currentWalletType === 'farcaster') {
-        return this.signer.address;
-      } else {
-        return await this.signer.getAddress();
-      }
+      return await this.signer.getAddress();
     } catch (error) {
       console.error('Error getting address:', error);
       return null;

@@ -302,9 +302,15 @@ export class SendwiseApp {
     const urlParams = new URLSearchParams(window.location.search);
     const hasFarcasterParam = urlParams.has('fc') || urlParams.has('farcaster') || urlParams.has('frame');
     
-    // Check for Farcaster SDK availability
-    const hasFarcasterSDK = typeof window.farcasterSDK !== 'undefined' || 
-                            typeof window.fc !== 'undefined';
+    // Check for actual Farcaster Mini App environment
+    const isInFrame = window !== window.top;
+    const hasValidFarcasterSDK = window.farcasterSDK && 
+                                 window.farcasterSDK.wallet && 
+                                 typeof window.farcasterSDK.wallet.getEthereumProvider === 'function';
+    
+    // More strict detection - require at least 2 indicators for web context
+    const indicators = [isFarcasterUA, isFarcasterReferrer, hasFarcasterParam, isInFrame, hasValidFarcasterSDK];
+    const indicatorCount = indicators.filter(Boolean).length;
     
     console.log('Farcaster detection:', {
       userAgent: userAgent,
@@ -312,10 +318,14 @@ export class SendwiseApp {
       isFarcasterUA,
       isFarcasterReferrer,
       hasFarcasterParam,
-      hasFarcasterSDK
+      isInFrame,
+      hasValidFarcasterSDK,
+      indicatorCount,
+      isDefinitelyFarcaster: indicatorCount >= 2 || (isFarcasterUA && hasValidFarcasterSDK)
     });
     
-    return isFarcasterUA || isFarcasterReferrer || hasFarcasterParam || hasFarcasterSDK;
+    // Must have at least 2 indicators OR user agent + valid SDK
+    return indicatorCount >= 2 || (isFarcasterUA && hasValidFarcasterSDK);
   }
 
   // Initialize Farcaster app with proper loading handling

@@ -31,9 +31,18 @@ export class WalletManager {
     try {
       console.log('Initializing Farcaster Mini App wallet...');
       
-      // Check if we're in Farcaster Mini App environment
-      if (window.isFarcasterMiniApp && window.farcasterSDK) {
-        console.log('Farcaster Mini App detected - setting up wallet connection');
+      // Strict validation for Farcaster Mini App environment
+      if (!window.isFarcasterMiniApp) {
+        console.log('Not in Farcaster Mini App environment, skipping Farcaster wallet initialization');
+        return;
+      }
+      
+      if (!window.farcasterSDK || !window.farcasterSDK.wallet) {
+        console.log('Farcaster SDK or wallet not available, skipping initialization');
+        return;
+      }
+      
+      console.log('Farcaster Mini App detected - setting up wallet connection');
         
                 // Get Farcaster wallet using SDK and Wagmi
         try {
@@ -576,21 +585,21 @@ export class WalletManager {
   // Show Modern Wallet Modal
   showModernWalletModal() {
     try {
-      // If in Farcaster Mini App, don't show modal, auto-connect instead
-      if (window.isFarcasterMiniApp) {
+      // Strict check for Farcaster Mini App environment
+      if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.wallet) {
         console.log('In Farcaster Mini App - wallet modal not needed, auto-connecting');
         // Don't show modal in Farcaster Mini App, just try to auto-connect
         this.initializeFarcasterMiniAppWallet().catch(error => {
           console.error('Auto-connection failed:', error);
-          // Show error message but don't show modal
-          if (window.uiManager) {
-            window.uiManager.updateStatus('Failed to connect to Farcaster wallet', false, true);
-          }
+          // If Farcaster fails, fallback to web modal
+          console.log('Farcaster auto-connect failed, falling back to web wallet modal');
+          this.showEvmWalletModal();
         });
         return;
       }
       
-      // In web, show proper wallet selection modal for EVM wallets
+      // In web (or when Farcaster detection is uncertain), show proper wallet selection modal
+      console.log('Showing web wallet modal');
       this.showEvmWalletModal();
 
     } catch (error) {

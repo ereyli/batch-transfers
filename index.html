@@ -48,12 +48,20 @@
       // Early detection and SDK setup
       (function() {
         const userAgent = navigator.userAgent || '';
-        const isFarcaster = userAgent.toLowerCase().includes('farcaster') || 
-                           userAgent.toLowerCase().includes('warpcast') ||
-                           document.referrer.includes('warpcast.com');
+        const referrer = document.referrer || '';
+        
+        // More strict early detection
+        const isFarcasterUA = userAgent.toLowerCase().includes('farcaster') || 
+                             userAgent.toLowerCase().includes('warpcast');
+        const isFarcasterReferrer = referrer.includes('warpcast.com') || 
+                                   referrer.includes('farcaster.xyz');
+        const isInFrame = window !== window.top;
+        
+        // Only set as Farcaster if we have strong indicators
+        const isFarcaster = isFarcasterUA && (isFarcasterReferrer || isInFrame);
         
         if (isFarcaster) {
-          console.log('Early Farcaster detection: true');
+          console.log('Early Farcaster detection: true (strict)');
           window.isFarcasterMiniApp = true;
           
           // Suppress Farcaster/Warpcast analytics and framing errors
@@ -94,6 +102,10 @@
           // Try immediately and also on DOM ready
           tryReady();
           document.addEventListener('DOMContentLoaded', tryReady);
+        } else {
+          // Explicitly set as false for web context
+          console.log('Early detection: Not in Farcaster Mini App (web context)');
+          window.isFarcasterMiniApp = false;
         }
       })();
     </script>

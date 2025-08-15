@@ -161,7 +161,7 @@ export class WalletManager {
       case 'disconnected':
         button.innerHTML = `
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 16px;">🌈</span>
+            <span style="font-size: 16px;"></span>
             <span>Connect Wallet</span>
           </div>
         `;

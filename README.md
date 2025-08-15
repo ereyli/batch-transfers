@@ -133,7 +133,7 @@ The app includes a Farcaster manifest at `.well-known/farcaster.json`:
   "miniapp": {
     "version": "1",
     "name": "Sendwise",
-    "iconUrl": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png",
+    "iconUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "homeUrl": "https://www.sendwise.xyz",
     "primaryCategory": "finance",
     "requiredChains": ["eip155:8453", "eip155:10", "eip155:42161"],

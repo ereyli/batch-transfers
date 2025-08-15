@@ -234,6 +234,30 @@ h1 {
   touch-action: manipulation;
 }
 
+/* Fix logo positioning in Farcaster Mini App */
+.farcaster-mode .logo {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 20px;
+}
+
+.farcaster-mode .logo img {
+  max-width: 120px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Ensure header content doesn't overlap */
+.farcaster-mode .header h1 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.farcaster-mode .header p {
+  margin-bottom: 20px;
+}
+
 /* Main Form */
 .main-form {
   background: rgba(255, 255, 255, 0.05);

@@ -212,7 +212,95 @@ export class WalletManager {
       // Show connecting state
       this.updateConnectButtonState('connecting');
 
-      // Get Farcaster wallet
+      // Force Farcaster wallet connection in Mini App
+      if (window.isFarcasterMiniApp) {
+        console.log('Farcaster Mini App detected - forcing wallet connection');
+        
+        // Try multiple approaches to get wallet
+        let wallet = null;
+        let user = null;
+        
+        // Approach 1: Try SDK directly
+        try {
+          const [userResult, walletResult] = await Promise.all([
+            window.farcasterSDK.actions.getUser().catch(err => {
+              console.warn('Could not get Farcaster user:', err);
+              return null;
+            }),
+            window.farcasterSDK.actions.getWallet().catch(err => {
+              console.warn('Could not get Farcaster wallet:', err);
+              return null;
+            })
+          ]);
+          
+          user = userResult;
+          wallet = walletResult;
+          
+          if (wallet) {
+            console.log('Farcaster wallet connected via SDK:', wallet.address);
+          }
+        } catch (error) {
+          console.warn('SDK approach failed:', error);
+        }
+        
+        // Approach 2: Try Wagmi if SDK failed
+        if (!wallet && window.wagmiClient) {
+          try {
+            const { data: account } = await window.wagmiClient.getAccount();
+            if (account) {
+              wallet = { address: account.address };
+              console.log('Farcaster wallet connected via Wagmi:', account.address);
+            }
+          } catch (error) {
+            console.warn('Wagmi approach failed:', error);
+          }
+        }
+        
+        if (!wallet) {
+          throw new Error('No Farcaster wallet available');
+        }
+        
+        // Create Farcaster wallet signer
+        this.farcasterSigner = {
+          address: wallet.address,
+          provider: window.wagmiClient ? window.wagmiClient.getPublicClient() : null,
+          getAddress: () => Promise.resolve(wallet.address),
+          signMessage: async (message) => {
+            if (window.wagmiClient) {
+              const { data: signature } = await window.wagmiClient.signMessage({ message });
+              return signature;
+            } else {
+              return await window.farcasterSDK.actions.signMessage(message);
+            }
+          },
+          signTransaction: async (transaction) => {
+            return await window.farcasterSDK.actions.signTransaction(transaction);
+          }
+        };
+        
+        // Force set as current signer
+        this.signer = this.farcasterSigner;
+        this.currentWalletType = 'farcaster';
+        
+        // Update UI (but don't show button in Farcaster Mini App)
+        if (!window.isFarcasterMiniApp) {
+          this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+        }
+        
+        // Send notification to Farcaster
+        await this.sendFarcasterNotification('Connected to Sendwise! 🚀');
+        
+        console.log('Farcaster wallet connected successfully in Mini App');
+        
+        // Update UI status
+        if (window.uiManager) {
+          window.uiManager.updateStatus('Farcaster wallet connected successfully', true, false);
+        }
+        
+        return this.signer;
+      }
+      
+      // For web browser, normal connection flow
       const wallet = await window.farcasterSDK.actions.getWallet();
       const user = await window.farcasterSDK.actions.getUser();
 
@@ -424,38 +512,57 @@ export class WalletManager {
       // Build wallet options dynamically based on availability
       let walletOptionsHTML = '';
       
-      if (availableWallets.includes('metamask')) {
+      // In Farcaster Mini App, only show Farcaster wallet
+      if (window.isFarcasterMiniApp && availableWallets.includes('farcaster')) {
         walletOptionsHTML += `
-          <button class="wallet-option" data-wallet="metamask" style="
+          <button class="wallet-option" data-wallet="farcaster" style="
             display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
             border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
             font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
             font-family: 'Inter', sans-serif;
           ">
-            <span style="font-size: 24px;">🦊</span>
+            <span style="font-size: 24px;">📱</span>
             <div>
-              <div>MetaMask</div>
-              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with MetaMask</div>
+              <div>Farcaster Wallet</div>
+              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Farcaster</div>
             </div>
           </button>
         `;
-      }
-      
-      if (availableWallets.includes('coinbase')) {
-        walletOptionsHTML += `
-          <button class="wallet-option" data-wallet="coinbase" style="
-            display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-            border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-            font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-            font-family: 'Inter', sans-serif;
-          ">
-            <span style="font-size: 24px;">🪙</span>
-            <div>
-              <div>Coinbase Wallet</div>
-              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Coinbase</div>
-            </div>
-          </button>
-        `;
+      } else {
+        // For web browser, show all available wallets
+        if (availableWallets.includes('metamask')) {
+          walletOptionsHTML += `
+            <button class="wallet-option" data-wallet="metamask" style="
+              display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
+              border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
+              font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
+              font-family: 'Inter', sans-serif;
+            ">
+              <span style="font-size: 24px;">🦊</span>
+              <div>
+                <div>MetaMask</div>
+                <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with MetaMask</div>
+              </div>
+            </button>
+          `;
+        }
+        
+        if (availableWallets.includes('coinbase')) {
+          walletOptionsHTML += `
+            <button class="wallet-option" data-wallet="coinbase" style="
+              display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
+              border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
+              font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
+              font-family: 'Inter', sans-serif;
+            ">
+              <span style="font-size: 24px;">🪙</span>
+              <div>
+                <div>Coinbase Wallet</div>
+                <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Coinbase</div>
+              </div>
+            </button>
+          `;
+        }
       }
       
       // If no wallets detected, show install options
@@ -630,9 +737,12 @@ export class WalletManager {
     // Check for Farcaster Mini App environment first
     if (window.isFarcasterMiniApp && window.farcasterSDK) {
       wallets.push('farcaster');
-      console.log('Farcaster Mini App detected - adding Farcaster wallet');
+      console.log('Farcaster Mini App detected - ONLY Farcaster wallet allowed');
+      // In Farcaster Mini App, ONLY allow Farcaster wallet
+      return wallets;
     }
     
+    // For web browser, allow all wallets
     // Check for MetaMask and other ethereum providers
     if (window.ethereum) {
       // Check specific wallet types

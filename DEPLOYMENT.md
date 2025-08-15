@@ -167,7 +167,7 @@ curl https://your-domain.com/.well-known/farcaster.json
 
 2. **Image Accessibility**
 ```bash
-curl -I https://your-domain.com/logo.png
+curl -I https://your-domain.com/.well-known/logo.png
 curl -I https://your-domain.com/screenshot1.png
 ```
 
@@ -263,7 +263,7 @@ app.use((req, res, next) => {
 ```html
 <picture>
   <source srcset="logo.webp" type="image/webp">
-  <img src="logo.png" alt="Sendwise Logo">
+  <img src=".well-known/logo.png" alt="Sendwise Logo">
 </picture>
 ```
 

@@ -57,5 +57,5 @@ export const ABI_BATCH_ERC20 = [
 export const APP_CONFIG = {
   fee: "0.001", // ETH fee for transactions
   gasLimit: 500000,
-  logoUrl: "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png"
+  logoUrl: "https://www.sendwise.xyz/.well-known/logo.png"
 };

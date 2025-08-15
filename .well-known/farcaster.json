@@ -44,7 +44,7 @@
       "actions.signTransaction",
       "actions.sendNotification"
     ],
-    "canonicalDomain": "www.sendwise.xyz",
+    "canonicalDomain": "sendwise.xyz",
     "noindex": false
   }
 }

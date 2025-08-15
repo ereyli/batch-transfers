@@ -182,20 +182,28 @@ export class WalletManager {
 
   // Setup Farcaster event listeners
   setupFarcasterEventListeners() {
-    if (window.farcasterSDK) {
-      // Listen for wallet changes
-      window.farcasterSDK.actions.onWalletChange((wallet) => {
-        console.log('Farcaster wallet changed:', wallet);
-        if (wallet) {
-          this.farcasterSigner.address = wallet.address;
-          this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
-        }
-      });
+    if (window.farcasterSDK && window.farcasterSDK.actions) {
+      // Check if onWalletChange method exists
+      if (typeof window.farcasterSDK.actions.onWalletChange === 'function') {
+        window.farcasterSDK.actions.onWalletChange((wallet) => {
+          console.log('Farcaster wallet changed:', wallet);
+          if (wallet) {
+            this.farcasterSigner.address = wallet.address;
+            this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+          }
+        });
+      } else {
+        console.log('Farcaster SDK onWalletChange method not available');
+      }
       
-      // Listen for user changes
-      window.farcasterSDK.actions.onUserChange((user) => {
-        console.log('Farcaster user changed:', user);
-      });
+      // Check if onUserChange method exists
+      if (typeof window.farcasterSDK.actions.onUserChange === 'function') {
+        window.farcasterSDK.actions.onUserChange((user) => {
+          console.log('Farcaster user changed:', user);
+        });
+      } else {
+        console.log('Farcaster SDK onUserChange method not available');
+      }
     }
     
     // Set up Wagmi event listeners if available
@@ -767,6 +775,12 @@ export class WalletManager {
     mainBtn.style.background = 'rgba(255, 255, 255, 0.1)';
     mainBtn.style.border = '2px solid rgba(255, 255, 255, 0.2)';
     mainBtn.onclick = () => this.disconnectWallet();
+    
+    // Show send button when wallet is connected
+    if (address && window.uiManager) {
+      window.uiManager.toggleSendButton(true);
+      console.log('Send button should now be visible');
+    }
   }
 
   // Get wallet icon

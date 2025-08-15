@@ -47,8 +47,12 @@ export class SendwiseApp {
             const address = await this.walletManager.getSigner().getAddress();
             console.log('Wallet connected:', address);
             
-            // Update UI immediately
+                      // Update UI immediately
+          if (this.uiManager && typeof this.uiManager.updateWalletDisplay === 'function') {
             this.uiManager.updateWalletDisplay(address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+          } else {
+            console.log('UI Manager updateWalletDisplay method not available');
+          }
           }
         } catch (error) {
           console.error('Failed to auto-connect Farcaster wallet:', error);

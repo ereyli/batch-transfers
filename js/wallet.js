@@ -203,13 +203,15 @@ export class WalletManager {
             
             console.log('Farcaster wallet successfully initialized and connected');
             
-            // Send notification
+            // Send notification (optional)
             try {
-              await window.farcasterSDK.actions.sendNotification({
-                title: 'Sendwise Connected!',
-                body: 'Farcaster wallet connected successfully',
-                url: window.location.href
-              });
+              if (window.farcasterSDK && window.farcasterSDK.actions && typeof window.farcasterSDK.actions.sendNotification === 'function') {
+                await window.farcasterSDK.actions.sendNotification({
+                  title: 'Sendwise Connected!',
+                  body: 'Farcaster wallet connected successfully',
+                  url: window.location.href
+                });
+              }
             } catch (error) {
               console.warn('Could not send notification:', error);
             }

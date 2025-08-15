@@ -1,6 +1,6 @@
 {
   "name": "Sendwise",
-  "description": "Smart Batch Transfers for ETH & ERC20 Tokens. Send multiple transactions in one go, save gas fees, and streamline your crypto payments.",
+  "description": "Smart Batch Transfers for ETH & ERC20 Tokens. Send multiple transactions in one go, save gas fees, and streamline your crypto payments. Perfect for airdrops, payroll, and bulk payments.",
   "icon": "https://www.sendwise.xyz/.well-known/logo.png",
   "url": "https://www.sendwise.xyz",
   "developer": {
@@ -17,20 +17,22 @@
     "gas-savings",
     "airdrop",
     "payroll",
-    "bulk-payments"
+    "bulk-payments",
+    "crypto",
+    "web3"
   ],
   "screenshots": [
     {
       "url": "https://www.sendwise.xyz/.well-known/screenshot1.png",
-      "alt": "Sendwise Batch Transfer Interface"
+      "alt": "Sendwise Batch Transfer Interface - Clean and intuitive UI for sending multiple transactions"
     },
     {
       "url": "https://www.sendwise.xyz/.well-known/screenshot2.png", 
-      "alt": "Sendwise CSV Import Feature"
+      "alt": "Sendwise CSV Import Feature - Easy bulk import from CSV files"
     },
     {
       "url": "https://www.sendwise.xyz/.well-known/screenshot3.png",
-      "alt": "Sendwise Transaction History"
+      "alt": "Sendwise Transaction History - Track all your batch transfers"
     }
   ],
   "permissions": [
@@ -58,10 +60,25 @@
     "gas-optimization", 
     "csv-import",
     "multi-token-support",
-    "transaction-history"
+    "transaction-history",
+    "farcaster-integration",
+    "wallet-connection"
   ],
   "social": {
     "twitter": "@sendwise_xyz",
-    "discord": "https://discord.gg/sendwise"
+    "discord": "https://discord.gg/sendwise",
+    "github": "https://github.com/sendwise"
+  },
+  "publishing": {
+    "status": "ready",
+    "reviewNotes": "Sendwise is a fully functional batch transfer application that allows users to send ETH and ERC20 tokens to multiple addresses in a single transaction. The app is optimized for gas savings and provides a seamless user experience within the Farcaster ecosystem.",
+    "targetAudience": "Crypto users, DeFi participants, project teams, and anyone who needs to send multiple transactions efficiently.",
+    "useCases": [
+      "Airdrop distributions",
+      "Payroll payments",
+      "Bulk token transfers",
+      "Community rewards",
+      "Project funding"
+    ]
   }
 }

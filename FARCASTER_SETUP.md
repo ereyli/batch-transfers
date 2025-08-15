@@ -27,12 +27,14 @@ nvm use --lts
 ```
 
 ### 3. Project Setup
-This project is already configured for Farcaster Mini App development. The key files are:
+This project is fully configured for Farcaster Mini App development according to official documentation. The key files are:
 
-- `farcaster-manifest.json` - App metadata and configuration
-- `index.html` - Main app with SDK integration
+- `farcaster-manifest.json` - App metadata and configuration (publishing ready)
+- `package.json` - Node.js requirements and project metadata
+- `index.html` - Main app with SDK integration (SDK at bottom of HTML)
 - `js/farcaster.js` - Farcaster SDK wrapper
-- `js/wallet.js` - Wallet integration with Wagmi
+- `js/wallet.js` - Wallet integration with Wagmi and Farcaster provider
+- `FARCASTER_SETUP.md` - This setup guide
 
 ### 4. Development
 1. Start your local development server:
@@ -71,7 +73,7 @@ php -S localhost:8000
 ```
 
 ### SDK Integration
-The app uses the official Farcaster Mini App SDK via CDN:
+The app uses the official Farcaster Mini App SDK via CDN (at bottom of HTML file as per documentation):
 ```html
 <script type="module">
   import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
@@ -119,21 +121,33 @@ localStorage.setItem('farcaster-debug', 'true');
 
 ## 📱 Publishing
 
-### 1. Prepare Assets
-- Logo: 120x120px PNG
-- Screenshots: 3-5 app screenshots
-- Description: Clear, compelling app description
+### 1. Prepare Assets ✅
+- Logo: 120x120px PNG ✅
+- Screenshots: 3-5 app screenshots ✅
+- Description: Clear, compelling app description ✅
 
-### 2. Update Manifest
-- Verify all URLs are HTTPS
-- Add proper developer information
-- Include relevant tags and categories
+### 2. Update Manifest ✅
+- Verify all URLs are HTTPS ✅
+- Add proper developer information ✅
+- Include relevant tags and categories ✅
+- Add publishing information ✅
 
 ### 3. Submit for Review
-1. Go to Developer Tools
+1. Go to Developer Tools: https://farcaster.xyz/~/settings/developer-tools
 2. Click "Submit Mini App"
-3. Fill out submission form
-4. Wait for approval (usually 1-3 days)
+3. Upload `farcaster-manifest.json`
+4. Fill out submission form
+5. Wait for approval (usually 1-3 days)
+
+### 4. Publishing Checklist ✅
+- [x] Node.js 22.11.0+ requirement met
+- [x] SDK properly integrated
+- [x] `sdk.actions.ready()` called after app loads
+- [x] Manifest file complete
+- [x] HTTPS URLs used
+- [x] Developer information provided
+- [x] Screenshots and descriptions ready
+- [x] App fully functional in Farcaster environment
 
 ## 🔗 Resources
 

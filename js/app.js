@@ -84,10 +84,23 @@ export class SendwiseApp {
       if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.actions) {
         try {
           console.log('Calling sdk.actions.ready() to hide splash screen...');
+          
+          // Wait a bit to ensure everything is fully loaded
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
           await window.farcasterSDK.actions.ready();
           console.log('Farcaster SDK ready() called successfully');
         } catch (error) {
           console.error('Error calling sdk.actions.ready():', error);
+          
+          // Try again after a delay
+          try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await window.farcasterSDK.actions.ready();
+            console.log('Farcaster SDK ready() called successfully on retry');
+          } catch (retryError) {
+            console.error('Error calling sdk.actions.ready() on retry:', retryError);
+          }
         }
       }
       

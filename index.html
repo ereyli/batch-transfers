@@ -60,37 +60,7 @@
   <script src="https://cdn.jsdelivr.net/npm/wagmi@2.5.7/dist/wagmi.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-wagmi-connector@0.1.0/dist/index.umd.js"></script>
   
-  <!-- Farcaster Mini App SDK -->
-  <script type="module">
-    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
-    
-    // Global SDK reference
-    window.farcasterSDK = sdk;
-    
-    // Initialize SDK immediately
-    (async () => {
-      try {
-        // Check if we're in Farcaster environment
-        const isInFarcaster = await sdk.isInFarcaster();
-        window.isFarcasterMiniApp = isInFarcaster;
-        
-        if (isInFarcaster) {
-          console.log('Farcaster Mini App environment detected');
-          
-          // Initialize SDK
-          await sdk.initialize();
-          
-          console.log('Farcaster SDK initialized');
-          
-          // Don't call ready() here - let the app do it when ready
-        } else {
-          console.log('Running in web browser environment');
-        }
-      } catch (error) {
-        console.error('Error initializing Farcaster SDK:', error);
-      }
-    })();
-  </script>
+
   
   <!-- Fonts and Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -475,6 +445,38 @@
         }
       }
     });
+  </script>
+  
+  <!-- Farcaster Mini App SDK - Must be at the bottom of HTML file -->
+  <script type="module">
+    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
+    
+    // Global SDK reference
+    window.farcasterSDK = sdk;
+    
+    // Initialize SDK immediately
+    (async () => {
+      try {
+        // Check if we're in Farcaster environment
+        const isInFarcaster = await sdk.isInFarcaster();
+        window.isFarcasterMiniApp = isInFarcaster;
+        
+        if (isInFarcaster) {
+          console.log('Farcaster Mini App environment detected');
+          
+          // Initialize SDK
+          await sdk.initialize();
+          
+          console.log('Farcaster SDK initialized');
+          
+          // Don't call ready() here - let the app do it when ready
+        } else {
+          console.log('Running in web browser environment');
+        }
+      } catch (error) {
+        console.error('Error initializing Farcaster SDK:', error);
+      }
+    })();
   </script>
 </body>
 </html>

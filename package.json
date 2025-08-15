@@ -1,0 +1,41 @@
+{
+  "name": "sendwise-batch-transfers",
+  "version": "1.0.0",
+  "description": "Smart Batch Transfers for ETH & ERC20 Tokens - Farcaster Mini App",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "serve": "python -m http.server 8000",
+    "build": "echo 'No build step required for static HTML app'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "farcaster",
+    "mini-app",
+    "batch-transfer",
+    "ethereum",
+    "defi",
+    "wallet",
+    "crypto"
+  ],
+  "author": "Sendwise Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sendwise/batch-transfers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sendwise/batch-transfers/issues"
+  },
+  "homepage": "https://www.sendwise.xyz",
+  "dependencies": {},
+  "devDependencies": {},
+  "farcaster": {
+    "miniApp": true,
+    "manifest": "./farcaster-manifest.json"
+  }
+}

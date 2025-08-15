@@ -37,6 +37,6 @@
   "devDependencies": {},
   "farcaster": {
     "miniApp": true,
-    "manifest": "./farcaster-manifest.json"
+    "manifest": "./.well-known/farcaster.json"
   }
 }

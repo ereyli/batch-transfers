@@ -24,8 +24,21 @@ export class SendwiseApp {
 
   async initialize() {
     try {
-      // Show loading screen for all environments
-      this.uiManager.showLoading();
+      // Show loading screen only for web browser (not Farcaster Mini App)
+      if (!window.isFarcasterMiniApp) {
+        this.uiManager.showLoading();
+      }
+      
+      // Call sdk.actions.ready() for Farcaster Mini App as soon as possible
+      if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.actions) {
+        try {
+          console.log('Calling sdk.actions.ready() to hide splash screen...');
+          await window.farcasterSDK.actions.ready();
+          console.log('Farcaster SDK ready() called successfully');
+        } catch (error) {
+          console.error('Error calling sdk.actions.ready():', error);
+        }
+      }
       
       // Initialize wallet manager (includes Farcaster)
       await this.walletManager.initialize();
@@ -82,37 +95,8 @@ export class SendwiseApp {
       // Track app engagement for Farcaster search ranking
       this.trackAppEngagement();
       
-      // Call sdk.actions.ready() for Farcaster Mini App AFTER everything is initialized
-      if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.actions) {
-        try {
-          console.log('Calling sdk.actions.ready() to hide splash screen...');
-          
-          // Wait a bit to ensure everything is fully loaded
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          await window.farcasterSDK.actions.ready();
-          console.log('Farcaster SDK ready() called successfully');
-        } catch (error) {
-          console.error('Error calling sdk.actions.ready():', error);
-          
-          // Try again after a delay
-          try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await window.farcasterSDK.actions.ready();
-            console.log('Farcaster SDK ready() called successfully on retry');
-          } catch (retryError) {
-            console.error('Error calling sdk.actions.ready() on retry:', retryError);
-          }
-        }
-      }
-      
-      // Hide loading screen after a short delay for Farcaster Mini App
-      if (window.isFarcasterMiniApp) {
-        // Keep loading screen visible for a bit longer in Farcaster
-        setTimeout(() => {
-          this.uiManager.hideLoading();
-        }, 2000);
-      } else {
+      // Hide loading screen only for web browser
+      if (!window.isFarcasterMiniApp) {
         this.uiManager.hideLoading();
       }
       

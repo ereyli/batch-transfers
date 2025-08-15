@@ -322,6 +322,9 @@ export class SendwiseApp {
   async initializeFarcasterApp() {
     console.log('Initializing Farcaster Mini App...');
     
+    // Setup CORS error suppression for Farcaster analytics
+    this.setupFarcasterErrorSuppression();
+    
     try {
       // Wait for Farcaster SDK to be available with timeout
       const sdk = await this.waitForFarcasterSDK(5000);
@@ -346,7 +349,10 @@ export class SendwiseApp {
       }
       
     } catch (error) {
-      console.error('Error initializing Farcaster app:', error);
+      // Don't log CORS-related errors
+      if (!error.message?.includes('privy.farcaster.xyz') && !error.message?.includes('CORS')) {
+        console.error('Error initializing Farcaster app:', error);
+      }
       // Fallback: dispatch ready event anyway to prevent infinite loading
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('farcasterSdkReady', { detail: null }));
@@ -385,5 +391,29 @@ export class SendwiseApp {
       
       checkSDK();
     });
+  }
+
+  // Setup error suppression for Farcaster analytics CORS errors
+  setupFarcasterErrorSuppression() {
+    if (window.farcasterErrorSuppressionSetup) return; // Already setup
+    
+    // Intercept fetch to suppress CORS errors from Farcaster analytics
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const url = args[0];
+      if (typeof url === 'string' && url.includes('privy.farcaster.xyz')) {
+        // Silently handle Farcaster analytics requests
+        return originalFetch.apply(this, args).catch(error => {
+          // Suppress CORS errors for analytics
+          if (error.message?.includes('CORS') || error.name === 'TypeError') {
+            return Promise.resolve(new Response('{}', { status: 200 }));
+          }
+          throw error;
+        });
+      }
+      return originalFetch.apply(this, args);
+    };
+    
+    window.farcasterErrorSuppressionSetup = true;
   }
 }

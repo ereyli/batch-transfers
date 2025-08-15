@@ -56,12 +56,28 @@
           console.log('Early Farcaster detection: true');
           window.isFarcasterMiniApp = true;
           
+          // Suppress Farcaster analytics CORS errors
+          const originalConsoleError = console.error;
+          console.error = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('privy.farcaster.xyz') && message.includes('CORS')) {
+              // Suppress CORS errors from Farcaster analytics
+              return;
+            }
+            originalConsoleError.apply(console, args);
+          };
+          
           // Try to call ready as soon as possible if SDK is available
           const tryReady = () => {
             const sdk = window.farcasterSDK || window.fc || window.parent?.farcasterSDK || window.parent?.fc;
             if (sdk && sdk.actions && sdk.actions.ready) {
               console.log('Early SDK ready() call');
-              sdk.actions.ready().catch(e => console.log('Early ready() error:', e));
+              sdk.actions.ready().catch(e => {
+                // Don't log CORS-related errors
+                if (!e.message?.includes('privy.farcaster.xyz')) {
+                  console.log('Early ready() error:', e);
+                }
+              });
             }
           };
           

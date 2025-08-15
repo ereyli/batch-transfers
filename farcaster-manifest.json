@@ -1,14 +1,24 @@
 {
   "name": "Sendwise",
-  "description": "Smart Batch Transfers for ETH & ERC20 Tokens. Send multiple transactions in one go, save gas fees, and streamline your crypto payments. Perfect for airdrops, payroll, and bulk payments.",
+  "description": "Smart Batch Transfers for ETH and ERC20 Tokens. Send multiple transactions in one go, save gas fees, and streamline your crypto payments. Perfect for airdrops, payroll, and bulk payments.",
   "icon": "https://www.sendwise.xyz/.well-known/logo.png",
   "url": "https://www.sendwise.xyz",
+  "tagline": "Smart Batch Transfers",
+  "ogTitle": "Sendwise - Batch Transfers",
+  "ogDescription": "Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time!",
+  "heroImageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
+  "screenshotUrls": [
+    "https://www.sendwise.xyz/.well-known/screenshot1.png",
+    "https://www.sendwise.xyz/.well-known/screenshot2.png",
+    "https://www.sendwise.xyz/.well-known/screenshot3.png"
+  ],
   "developer": {
     "name": "Sendwise Team",
     "url": "https://www.sendwise.xyz",
     "email": "hello@sendwise.xyz"
   },
   "categories": ["Finance", "DeFi", "Tools"],
+  "primaryCategory": "finance",
   "tags": [
     "batch-transfer",
     "ethereum", 
@@ -17,9 +27,7 @@
     "gas-savings",
     "airdrop",
     "payroll",
-    "bulk-payments",
-    "crypto",
-    "web3"
+    "bulk-payments"
   ],
   "screenshots": [
     {

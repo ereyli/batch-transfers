@@ -323,7 +323,7 @@ export class WalletManager {
       if (mainBtn) {
         mainBtn.innerHTML = `
           <div style="display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 2;">
-            <span style="font-size: 20px;">🌈</span>
+            <span style="font-size: 20px;"></span>
             <span>Connect Wallet</span>
           </div>
           <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%); opacity: 0; transition: opacity 0.3s ease; z-index: 1;" class="button-overlay"></div>

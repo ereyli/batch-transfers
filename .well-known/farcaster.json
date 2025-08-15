@@ -4,6 +4,8 @@
     "name": "Sendwise",
     "iconUrl": "https://www.sendwise.xyz/.well-known/icon.png",
     "homeUrl": "https://www.sendwise.xyz",
+    "imageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
+    "buttonTitle": "🚀 Start Batch Transfer",
     "splashImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "splashBackgroundColor": "#1a1a1a",
     "subtitle": "Smart Batch Transfers",
@@ -23,8 +25,6 @@
     "requiredCapabilities": [
       "actions.signIn",
       "wallet.getEthereumProvider"
-    ],
-    "imageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
-    "buttonTitle": "🚀 Start Batch Transfer"
+    ]
   }
 }

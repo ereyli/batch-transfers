@@ -1,30 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sendwise: Smart Batch Transfers</title>
-      <link rel="icon" href="https://www.sendwise.xyz/.well-known/logo.png" type="image/png" />
-  
-  <!-- Farcaster Mini App Sharing Meta Tags -->
-      <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://www.sendwise.xyz/.well-known/hero-image.png","button":{"title":"🚀 Start Batch Transfer","action":{"type":"launch_miniapp","url":"https://www.sendwise.xyz","name":"Sendwise","splashImageUrl":"https://www.sendwise.xyz/.well-known/logo.png","splashBackgroundColor":"#1a1a1a"}}}' />
-  <!-- For backward compatibility -->
-      <meta name="fc:frame" content='{"version":"1","imageUrl":"https://www.sendwise.xyz/.well-known/hero-image.png","button":{"title":"🚀 Start Batch Transfer","action":{"type":"launch_frame","url":"https://www.sendwise.xyz","name":"Sendwise","splashImageUrl":"https://www.sendwise.xyz/.well-known/logo.png","splashBackgroundColor":"#1a1a1a"}}}' />
-  
-  <!-- Open Graph Meta Tags for better sharing -->
-  <meta property="og:title" content="Sendwise - Smart Batch Transfers" />
-  <meta property="og:description" content="Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time! Perfect for airdrops, payroll, and bulk payments." />
-      <meta property="og:image" content="https://www.sendwise.xyz/.well-known/hero-image.png" />
-  <meta property="og:url" content="https://www.sendwise.xyz" />
-  <meta property="og:type" content="website" />
-  
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers. Perfect for airdrops, payroll, and bulk payments." />
-  <meta name="keywords" content="batch transfer, ethereum, defi, wallet, gas savings, airdrop, payroll, bulk payments, sendwise" />
-  <meta name="author" content="Sendwise Team" />
-  <meta name="robots" content="index, follow" />
-  
-  <!-- Structured Data for SEO -->
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="https://www.sendwise.xyz/.well-known/icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>Sendwise - Smart Batch Transfers</title>
+
+    <!-- Farcaster Mini App Open Graph Metadata -->
+    <meta property="og:title" content="Sendwise - Smart Batch Transfers" />
+    <meta property="og:description" content="Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers." />
+    <meta property="og:image" content="https://www.sendwise.xyz/.well-known/hero-image.png" />
+    <meta property="og:type" content="farcaster.miniapp" />
+    <meta property="og:url" content="https://www.sendwise.xyz/" />
+    <meta property="og:site_name" content="Sendwise" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:determiner" content="the" />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sendwise - Smart Batch Transfers" />
+    <meta name="twitter:description" content="Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers." />
+    <meta name="twitter:url" content="https://www.sendwise.xyz/" />
+    <meta name="twitter:image" content="https://www.sendwise.xyz/.well-known/hero-image.png" />
+
+    <meta name="description" content="Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers." />
+    <meta name="keywords" content="batch transfer, ethereum, defi, wallet, gas savings, airdrop, payroll, bulk payments, sendwise" />
+    <meta name="author" content="Sendwise Team" />
+    <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#1a1a1a" />
+
+    <!-- Safe Area CSS -->
+    <style>
+      :root {
+        --safe-area-inset-top: env(safe-area-inset-top);
+        --safe-area-inset-bottom: env(safe-area-inset-bottom);
+        --safe-area-inset-left: env(safe-area-inset-left);
+        --safe-area-inset-right: env(safe-area-inset-right);
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: #1a1a1a;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+        color: #ffffff;
+      }
+
+      #root {
+        min-height: 100vh;
+        padding-top: var(--safe-area-inset-top);
+        padding-bottom: var(--safe-area-inset-bottom);
+        padding-left: var(--safe-area-inset-left);
+        padding-right: var(--safe-area-inset-right);
+      }
+
+      input, textarea, select {
+        font-size: 16px !important;
+      }
+
+      * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      input, textarea, [contenteditable] {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+      }
+
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid #667eea;
+        border-top: 3px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    
+    <!-- Structured Data for SEO -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -67,20 +147,21 @@
   <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-  <!-- Loading Screen - Enhanced for Farcaster Mini App -->
-  <div id="loading" class="loading" style="display: none;">
-    <div class="loading-content">
-      <div class="loading-logo">
-        <img src="https://www.sendwise.xyz/.well-known/logo.png" alt="Sendwise Logo" />
+  <div id="root">
+    <!-- Loading Screen - Enhanced for Farcaster Mini App -->
+    <div id="loading" class="loading" style="display: none;">
+      <div class="loading-content">
+        <div class="loading-logo">
+          <img src="https://www.sendwise.xyz/.well-known/logo.png" alt="Sendwise Logo" />
+        </div>
+        <div class="loading-spinner"></div>
+        <h3>🚀 Sendwise</h3>
+        <p>Smart Batch Transfers</p>
+        <div class="loading-subtitle">Connecting to Farcaster...</div>
       </div>
-      <div class="loading-spinner"></div>
-      <h3>🚀 Sendwise</h3>
-      <p>Smart Batch Transfers</p>
-      <div class="loading-subtitle">Connecting to Farcaster...</div>
     </div>
-  </div>
 
-  <div class="container">
+    <div class="container">
     <!-- Header -->
     <div class="header fade-in">
       <div class="logo">
@@ -188,6 +269,7 @@
       </button>
     </div>
   </div>
+</div>
 
   <!-- Farcaster Mini App SDK -->
   <script type="module">

@@ -22,6 +22,11 @@ vercel
 - Add custom domain in Vercel dashboard
 - Update `homeUrl` in `.well-known/farcaster.json`
 
+4. **Vercel Configuration**
+- `vercel.json` - Static HTML app configuration
+- `.vercelignore` - Excluded files
+- Build settings: Static HTML, Output Directory: Root (`.`)
+
 ### Option 2: Netlify
 
 1. **Deploy to Netlify**

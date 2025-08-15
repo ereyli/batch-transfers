@@ -1,6 +1,6 @@
 {
   "name": "sendwise-batch-transfers",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Smart Batch Transfers for ETH & ERC20 Tokens - Farcaster Mini App",
   "main": "index.html",
   "scripts": {

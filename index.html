@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="https://www.sendwise.xyz/.well-known/icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no, shrink-to-fit=no" />
     <meta name="format-detection" content="telephone=no" />
 
     <title>Sendwise - Smart Batch Transfers</title>
@@ -34,8 +34,11 @@
         <meta name="theme-color" content="#1a1a1a" />
 
     <!-- Farcaster Mini App Meta Tags -->
-    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://www.sendwise.xyz/.well-known/hero-image.png","button":{"title":"🚀 Start Batch Transfer","action":{"type":"launch_miniapp","url":"https://www.sendwise.xyz","name":"Sendwise","splashImageUrl":"https://www.sendwise.xyz/.well-known/logo.png","splashBackgroundColor":"#1a1a1a"}}}' />
-    <meta name="fc:frame" content='{"version":"1","imageUrl":"https://www.sendwise.xyz/.well-known/hero-image.png","button":{"title":"🚀 Start Batch Transfer","action":{"type":"launch_frame","url":"https://www.sendwise.xyz","name":"Sendwise","splashImageUrl":"https://www.sendwise.xyz/.well-known/logo.png","splashBackgroundColor":"#1a1a1a"}}}' />
+    <meta name="fc:frame" content="vNext" />
+    <meta name="fc:frame:image" content="https://www.sendwise.xyz/.well-known/hero-image.png" />
+    <meta name="fc:frame:button:1" content="🚀 Start Batch Transfer" />
+    <meta name="fc:frame:button:1:action" content="link" />
+    <meta name="fc:frame:button:1:target" content="https://www.sendwise.xyz" />
 
     <!-- Safe Area CSS -->
     <style>
@@ -54,6 +57,10 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         overflow-x: hidden;
+        -webkit-text-size-adjust: 100%;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
         color: #ffffff;
       }
 

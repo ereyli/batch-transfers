@@ -56,12 +56,22 @@
           console.log('Early Farcaster detection: true');
           window.isFarcasterMiniApp = true;
           
-          // Suppress Farcaster analytics CORS errors
+          // Suppress Farcaster/Warpcast analytics and framing errors
           const originalConsoleError = console.error;
           console.error = function(...args) {
             const message = args.join(' ');
-            if (message.includes('privy.farcaster.xyz') && message.includes('CORS')) {
-              // Suppress CORS errors from Farcaster analytics
+            const suppressPatterns = [
+              'privy.farcaster.xyz',
+              'CORS',
+              'ERR_BLOCKED_BY_CLIENT',
+              'dd-proxy',
+              'datadog',
+              'X-Frame-Options',
+              'chromewebdata'
+            ];
+            
+            if (suppressPatterns.some(pattern => message.includes(pattern))) {
+              // Suppress analytics and framing errors
               return;
             }
             originalConsoleError.apply(console, args);

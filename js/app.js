@@ -397,15 +397,24 @@ export class SendwiseApp {
   setupFarcasterErrorSuppression() {
     if (window.farcasterErrorSuppressionSetup) return; // Already setup
     
-    // Intercept fetch to suppress CORS errors from Farcaster analytics
+    // Intercept fetch to suppress CORS errors from Farcaster/Warpcast analytics
     const originalFetch = window.fetch;
     window.fetch = function(...args) {
       const url = args[0];
-      if (typeof url === 'string' && url.includes('privy.farcaster.xyz')) {
-        // Silently handle Farcaster analytics requests
+      const analyticsPatterns = [
+        'privy.farcaster.xyz',
+        'warpcast.com/~/dd-proxy',
+        'datadog',
+        'dd-proxy'
+      ];
+      
+      if (typeof url === 'string' && analyticsPatterns.some(pattern => url.includes(pattern))) {
+        // Silently handle analytics requests
         return originalFetch.apply(this, args).catch(error => {
-          // Suppress CORS errors for analytics
-          if (error.message?.includes('CORS') || error.name === 'TypeError') {
+          // Suppress CORS and blocked errors for analytics
+          if (error.message?.includes('CORS') || 
+              error.message?.includes('ERR_BLOCKED_BY_CLIENT') ||
+              error.name === 'TypeError') {
             return Promise.resolve(new Response('{}', { status: 200 }));
           }
           throw error;

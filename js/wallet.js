@@ -85,10 +85,50 @@ export class WalletManager {
           if (wallet && wallet.address) {
             console.log('User connected to Farcaster wallet:', wallet.address);
             
-            // Create Farcaster wallet signer
+            // Create Farcaster wallet signer with proper provider
+            let provider = null;
+            
+            // Try to get provider from Wagmi client
+            if (window.wagmiClient && window.wagmiClient.getPublicClient) {
+              try {
+                const publicClient = window.wagmiClient.getPublicClient();
+                if (publicClient) {
+                  // Convert Wagmi public client to ethers provider
+                  provider = new window.ethers.providers.Web3Provider(publicClient);
+                }
+              } catch (error) {
+                console.log('Could not create provider from Wagmi client:', error);
+              }
+            }
+            
+            // Fallback: Create provider from Farcaster SDK
+            if (!provider && window.farcasterSDK && window.farcasterSDK.wallet) {
+              try {
+                if (typeof window.farcasterSDK.wallet.getEthereumProvider === 'function') {
+                  const ethProvider = await window.farcasterSDK.wallet.getEthereumProvider();
+                  if (ethProvider) {
+                    provider = new window.ethers.providers.Web3Provider(ethProvider);
+                  }
+                }
+              } catch (error) {
+                console.log('Could not create provider from Farcaster SDK:', error);
+              }
+            }
+            
+            // Final fallback: Create provider for Base network
+            if (!provider) {
+              try {
+                const rpcUrl = 'https://mainnet.base.org';
+                provider = new window.ethers.providers.JsonRpcProvider(rpcUrl);
+                console.log('Created fallback provider for Base network');
+              } catch (error) {
+                console.error('Could not create fallback provider:', error);
+              }
+            }
+            
             this.farcasterSigner = {
               address: wallet.address,
-              provider: window.wagmiClient ? window.wagmiClient.getPublicClient() : null,
+              provider: provider,
               getAddress: () => Promise.resolve(wallet.address),
               signMessage: async (message) => {
                 try {

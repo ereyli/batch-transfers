@@ -8,43 +8,21 @@
     "splashBackgroundColor": "#1a1a1a",
     "subtitle": "Smart Batch Transfers",
     "description": "Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers.",
-    "screenshotUrls": [
-      "https://www.sendwise.xyz/.well-known/screenshot1.png",
-      "https://www.sendwise.xyz/.well-known/screenshot2.png",
-      "https://www.sendwise.xyz/.well-known/screenshot3.png"
-    ],
-    "primaryCategory": "finance",
-    "tags": [
-      "batch-transfer",
-      "ethereum",
-      "defi",
-      "wallet",
-      "gas-savings",
-      "airdrop",
-      "payroll",
-      "bulk-payments"
-    ],
-    "heroImageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
     "tagline": "Smart Batch Transfers",
+    "primaryCategory": "finance",
+    "tags": ["batch-transfer", "ethereum", "defi", "wallet", "gas-savings"],
+    "heroImageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
     "ogTitle": "Sendwise - Batch Transfers",
     "ogDescription": "Send ETH and ERC20 tokens to multiple addresses in a single transaction.",
     "ogImageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
-    "requiredChains": [
-      "eip155:8453",
-      "eip155:10",
-      "eip155:42161",
-      "eip155:139",
-      "eip155:140",
-      "eip155:141"
-    ],
-    "requiredCapabilities": [
-      "actions.signIn",
-      "wallet.getEthereumProvider",
-      "actions.signMessage",
-      "actions.signTransaction",
-      "actions.sendNotification"
+    "screenshotUrls": [
+      "https://www.sendwise.xyz/.well-known/hero-image.png"
     ],
     "canonicalDomain": "www.sendwise.xyz",
-    "noindex": false
+    "requiredChains": ["eip155:8453", "eip155:10", "eip155:42161"],
+    "requiredCapabilities": [
+      "actions.signIn",
+      "wallet.getEthereumProvider"
+    ]
   }
 }

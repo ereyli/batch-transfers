@@ -2,16 +2,15 @@
   "miniapp": {
     "version": "1",
     "name": "Sendwise",
-    "iconUrl": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png",
+    "iconUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "homeUrl": "https://www.sendwise.xyz",
-    "splashImageUrl": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png",
+    "splashImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "splashBackgroundColor": "#1a1a1a",
     "subtitle": "Smart Batch Transfers",
     "description": "Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers. Perfect for airdrops, payroll, and bulk payments.",
     "screenshotUrls": [
-      "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/screenshot1.png",
-      "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/screenshot2.png",
-      "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/screenshot3.png"
+      "https://www.sendwise.xyz/.well-known/logo.png",
+     
     ],
     "primaryCategory": "finance",
     "tags": [
@@ -24,11 +23,11 @@
       "payroll",
       "bulk-payments"
     ],
-    "heroImageUrl": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/hero-image.png",
+    "heroImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "tagline": "Smart Batch Transfers for ETH & ERC20",
     "ogTitle": "Sendwise - Smart Batch Transfers",
     "ogDescription": "Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time!",
-    "ogImageUrl": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/share-image.png",
+    "ogImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "requiredChains": [
       "eip155:8453",
       "eip155:10",

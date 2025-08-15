@@ -447,6 +447,33 @@
     });
   </script>
   
+  <!-- Global Error Handler for SVG and other errors -->
+  <script>
+    // Global error handler to suppress SVG attribute errors
+    window.addEventListener('error', function(e) {
+      if (e.message && e.message.includes('Expected length') && e.message.includes('svg')) {
+        console.log('Suppressed SVG attribute error:', e.message);
+        e.preventDefault();
+        return false;
+      }
+    });
+    
+    // Override console.error to filter out known Farcaster SDK errors
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+      const message = args.join(' ');
+      if (message.includes('Expected length') && message.includes('svg')) {
+        console.log('Suppressed SVG error:', message);
+        return;
+      }
+      if (message.includes('X-Frame-Options') && message.includes('deny')) {
+        console.log('Suppressed X-Frame-Options error:', message);
+        return;
+      }
+      originalConsoleError.apply(console, args);
+    };
+  </script>
+
   <!-- Farcaster Mini App SDK - Must be at the bottom of HTML file -->
   <script type="module">
     import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'

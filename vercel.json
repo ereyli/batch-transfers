@@ -35,7 +35,7 @@
       ]
     },
     {
-      "source": "/.well-known/(.*)",
+      "source": "/.well-known/farcaster.json",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -44,6 +44,19 @@
         {
           "key": "Content-Type",
           "value": "application/json"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/(.*\\.png)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Content-Type",
+          "value": "image/png"
         }
       ]
     }

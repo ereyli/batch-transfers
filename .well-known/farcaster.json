@@ -2,17 +2,17 @@
   "miniapp": {
     "version": "1",
     "name": "Sendwise",
-      "iconUrl": "https://www.sendwise.xyz/.well-known/logo.png",
-  "homeUrl": "https://www.sendwise.xyz",
-  "splashImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
+    "iconUrl": "https://www.sendwise.xyz/.well-known/logo.png",
+    "homeUrl": "https://www.sendwise.xyz",
+    "splashImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "splashBackgroundColor": "#1a1a1a",
     "subtitle": "Smart Batch Transfers",
     "description": "Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers. Perfect for airdrops, payroll, and bulk payments.",
-      "screenshotUrls": [
-    "https://www.sendwise.xyz/.well-known/screenshot1.png",
-    "https://www.sendwise.xyz/.well-known/screenshot2.png",
-    "https://www.sendwise.xyz/.well-known/screenshot3.png"
-  ],
+    "screenshotUrls": [
+      "https://www.sendwise.xyz/.well-known/screenshot1.png",
+      "https://www.sendwise.xyz/.well-known/screenshot2.png",
+      "https://www.sendwise.xyz/.well-known/screenshot3.png"
+    ],
     "primaryCategory": "finance",
     "tags": [
       "batch-transfer",

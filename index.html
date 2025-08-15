@@ -80,10 +80,9 @@
           // Initialize SDK
           await sdk.initialize();
           
-          // Call ready() to hide splash screen
-          await sdk.actions.ready();
+          console.log('Farcaster SDK initialized');
           
-          console.log('Farcaster SDK initialized and ready');
+          // Don't call ready() here - let the app do it when ready
         } else {
           console.log('Running in web browser environment');
         }
@@ -290,8 +289,14 @@
             farcasterInfo.style.display = 'block';
           }
           
-          // Set up Farcaster-specific UI adjustments immediately
-          setupFarcasterUI();
+                // Set up Farcaster-specific UI adjustments immediately
+      setupFarcasterUI();
+      
+      // Hide wallet button in Farcaster Mini App
+      const walletButtonContainer = document.getElementById('walletButtonContainer');
+      if (walletButtonContainer) {
+        walletButtonContainer.style.display = 'none';
+      }
           
           // Initialize Wagmi for Farcaster Mini App
           const wagmiInitialized = initializeWagmi();
@@ -333,8 +338,12 @@
     // Setup Farcaster-specific UI adjustments
     function setupFarcasterUI() {
       // Disable native gestures to prevent app from closing
-      if (window.farcasterSDK) {
-        window.farcasterSDK.actions.disableNativeGestures();
+      if (window.farcasterSDK && window.farcasterSDK.actions) {
+        try {
+          window.farcasterSDK.actions.disableNativeGestures();
+        } catch (error) {
+          console.warn('Could not disable native gestures:', error);
+        }
       }
       
       // Hide wallet button in Farcaster Mini App

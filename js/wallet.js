@@ -41,14 +41,16 @@ export class WalletManager {
           let wallet = null;
           
           try {
-            wallet = await window.farcasterSDK.wallet.getWallet();
-            console.log('Farcaster wallet from SDK:', wallet);
+            if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.getWallet) {
+              wallet = await window.farcasterSDK.wallet.getWallet();
+              console.log('Farcaster wallet from SDK:', wallet);
+            }
           } catch (error) {
             console.log('Could not get wallet from SDK:', error);
           }
           
           // Method 2: Try to get Ethereum provider
-          if (!wallet && window.farcasterSDK.wallet.getEthereumProvider) {
+          if (!wallet && window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
             try {
               const provider = await window.farcasterSDK.wallet.getEthereumProvider();
               if (provider) {
@@ -89,7 +91,7 @@ export class WalletManager {
                   if (window.wagmiClient) {
                     const { data: signature } = await window.wagmiClient.signMessage({ message });
                     return signature;
-                  } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                  } else if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
                     const provider = await window.farcasterSDK.wallet.getEthereumProvider();
                     const accounts = await provider.request({ method: 'eth_accounts' });
                     const signature = await provider.request({
@@ -110,7 +112,7 @@ export class WalletManager {
                   if (window.wagmiClient) {
                     const { data: signature } = await window.wagmiClient.signTransaction(transaction);
                     return signature;
-                  } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                  } else if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
                     const provider = await window.farcasterSDK.wallet.getEthereumProvider();
                     const signature = await provider.request({
                       method: 'eth_signTransaction',
@@ -130,7 +132,7 @@ export class WalletManager {
                   if (window.wagmiClient) {
                     const { data: hash } = await window.wagmiClient.sendTransaction(transaction);
                     return hash;
-                  } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                  } else if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
                     const provider = await window.farcasterSDK.wallet.getEthereumProvider();
                     const hash = await provider.request({
                       method: 'eth_sendTransaction',
@@ -284,14 +286,16 @@ export class WalletManager {
       let wallet = null;
       
       try {
-        wallet = await window.farcasterSDK.wallet.connectWallet();
-        console.log('Connected via SDK:', wallet);
+        if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.connectWallet) {
+          wallet = await window.farcasterSDK.wallet.connectWallet();
+          console.log('Connected via SDK:', wallet);
+        }
       } catch (error) {
         console.log('SDK connection failed:', error);
       }
       
       // Method 2: Try to connect using Ethereum provider
-      if (!wallet && window.farcasterSDK.wallet.getEthereumProvider) {
+      if (!wallet && window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
         try {
           const provider = await window.farcasterSDK.wallet.getEthereumProvider();
           const accounts = await provider.request({ method: 'eth_requestAccounts' });
@@ -330,14 +334,14 @@ export class WalletManager {
               if (window.wagmiClient) {
                 const { data: signature } = await window.wagmiClient.signMessage({ message });
                 return signature;
-              } else if (window.farcasterSDK.wallet.getEthereumProvider) {
-                const provider = await window.farcasterSDK.wallet.getEthereumProvider();
-                const accounts = await provider.request({ method: 'eth_accounts' });
-                const signature = await provider.request({
-                  method: 'personal_sign',
-                  params: [message, accounts[0]]
-                });
-                return signature;
+                                } else if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
+                    const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                    const accounts = await provider.request({ method: 'eth_accounts' });
+                    const signature = await provider.request({
+                      method: 'personal_sign',
+                      params: [message, accounts[0]]
+                    });
+                    return signature;
               } else {
                 throw new Error('No signing method available');
               }
@@ -351,13 +355,13 @@ export class WalletManager {
               if (window.wagmiClient) {
                 const { data: signature } = await window.wagmiClient.signTransaction(transaction);
                 return signature;
-              } else if (window.farcasterSDK.wallet.getEthereumProvider) {
-                const provider = await window.farcasterSDK.wallet.getEthereumProvider();
-                const signature = await provider.request({
-                  method: 'eth_signTransaction',
-                  params: [transaction]
-                });
-                return signature;
+                                } else if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
+                    const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                    const signature = await provider.request({
+                      method: 'eth_signTransaction',
+                      params: [transaction]
+                    });
+                    return signature;
               } else {
                 throw new Error('No transaction signing method available');
               }
@@ -371,13 +375,13 @@ export class WalletManager {
               if (window.wagmiClient) {
                 const { data: hash } = await window.wagmiClient.sendTransaction(transaction);
                 return hash;
-              } else if (window.farcasterSDK.wallet.getEthereumProvider) {
-                const provider = await window.farcasterSDK.wallet.getEthereumProvider();
-                const hash = await provider.request({
-                  method: 'eth_sendTransaction',
-                  params: [transaction]
-                });
-                return hash;
+                                } else if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
+                    const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                    const hash = await provider.request({
+                      method: 'eth_sendTransaction',
+                      params: [transaction]
+                    });
+                    return hash;
               } else {
                 throw new Error('No transaction sending method available');
               }

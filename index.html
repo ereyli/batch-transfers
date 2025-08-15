@@ -50,18 +50,28 @@
         const userAgent = navigator.userAgent || '';
         const referrer = document.referrer || '';
         
-        // More strict early detection
+        // Balanced detection - allow mobile Farcaster app
         const isFarcasterUA = userAgent.toLowerCase().includes('farcaster') || 
                              userAgent.toLowerCase().includes('warpcast');
         const isFarcasterReferrer = referrer.includes('warpcast.com') || 
                                    referrer.includes('farcaster.xyz');
         const isInFrame = window !== window.top;
+        const isMobile = /Mobile|Android|iPhone|iPad/.test(userAgent);
         
-        // Only set as Farcaster if we have strong indicators
-        const isFarcaster = isFarcasterUA && (isFarcasterReferrer || isInFrame);
+        // Farcaster if: (User Agent + Referrer) OR (User Agent + Frame) OR (Mobile + User Agent)
+        const isFarcaster = (isFarcasterUA && isFarcasterReferrer) || 
+                           (isFarcasterUA && isInFrame) || 
+                           (isMobile && isFarcasterUA);
         
         if (isFarcaster) {
-          console.log('Early Farcaster detection: true (strict)');
+          console.log('Early Farcaster detection: true', {
+            userAgent: userAgent,
+            referrer: referrer,
+            isFarcasterUA: isFarcasterUA,
+            isFarcasterReferrer: isFarcasterReferrer,
+            isInFrame: isInFrame,
+            isMobile: isMobile
+          });
           window.isFarcasterMiniApp = true;
           
           // Suppress Farcaster/Warpcast analytics and framing errors

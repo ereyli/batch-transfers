@@ -31,14 +31,21 @@ export class WalletManager {
     try {
       console.log('Initializing Farcaster Mini App wallet...');
       
-      // Strict validation for Farcaster Mini App environment
+      // Basic validation for Farcaster Mini App environment
       if (!window.isFarcasterMiniApp) {
         console.log('Not in Farcaster Mini App environment, skipping Farcaster wallet initialization');
         return;
       }
       
-      if (!window.farcasterSDK || !window.farcasterSDK.wallet) {
-        console.log('Farcaster SDK or wallet not available, skipping initialization');
+      // Try to initialize even if SDK is not immediately available (may load later)
+      if (!window.farcasterSDK) {
+        console.log('Farcaster SDK not yet available, will retry...');
+        // Try again in a moment
+        setTimeout(() => {
+          if (window.farcasterSDK) {
+            this.initializeFarcasterMiniAppWallet();
+          }
+        }, 1000);
         return;
       }
       
@@ -585,8 +592,8 @@ export class WalletManager {
   // Show Modern Wallet Modal
   showModernWalletModal() {
     try {
-      // Strict check for Farcaster Mini App environment
-      if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.wallet) {
+      // Check for Farcaster Mini App environment
+      if (window.isFarcasterMiniApp) {
         console.log('In Farcaster Mini App - wallet modal not needed, auto-connecting');
         // Don't show modal in Farcaster Mini App, just try to auto-connect
         this.initializeFarcasterMiniAppWallet().catch(error => {

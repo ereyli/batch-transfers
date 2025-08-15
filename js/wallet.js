@@ -541,209 +541,18 @@ export class WalletManager {
         });
         return;
       }
-      
-      // Detect available wallets first
+      // In web, simplify to directly try Farcaster first or show minimal modal with only Farcaster
       const availableWallets = this.detectAvailableWallets();
-      console.log('Available wallets:', availableWallets);
-      
-      // Create modern modal with wallet selection
-      const modal = document.createElement('div');
-      modal.className = 'modern-wallet-modal-overlay';
-      modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        backdrop-filter: blur(8px);
-      `;
-
-      const modalContent = document.createElement('div');
-      modalContent.className = 'modern-wallet-modal-content';
-      modalContent.style.cssText = `
-        background: white;
-        border-radius: 20px;
-        padding: 32px;
-        max-width: 480px;
-        width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        animation: modalSlideIn 0.3s ease-out;
-        font-family: 'Inter', sans-serif;
-      `;
-
-      // Build wallet options dynamically based on availability
-      let walletOptionsHTML = '';
-      
-      // In Farcaster Mini App, only show Farcaster wallet
-      if (window.isFarcasterMiniApp) {
-        walletOptionsHTML += `
-          <button class="wallet-option" data-wallet="farcaster" style="
-            display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-            border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-            font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-            font-family: 'Inter', sans-serif;
-          ">
-            <span style="font-size: 24px;">📱</span>
-            <div>
-              <div>Farcaster Wallet</div>
-              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Farcaster</div>
-            </div>
-          </button>
-        `;
-      } else {
-        // For web browser, show all available wallets
-        if (availableWallets.includes('metamask')) {
-          walletOptionsHTML += `
-            <button class="wallet-option" data-wallet="metamask" style="
-              display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-              border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-              font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-              font-family: 'Inter', sans-serif;
-            ">
-              <span style="font-size: 24px;">🦊</span>
-              <div>
-                <div>MetaMask</div>
-                <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with MetaMask</div>
-              </div>
-            </button>
-          `;
-        }
-        
-        if (availableWallets.includes('coinbase')) {
-          walletOptionsHTML += `
-            <button class="wallet-option" data-wallet="coinbase" style="
-              display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-              border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-              font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-              font-family: 'Inter', sans-serif;
-            ">
-              <span style="font-size: 24px;">🪙</span>
-              <div>
-                <div>Coinbase Wallet</div>
-                <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Coinbase</div>
-              </div>
-            </button>
-          `;
-        }
+      if (!availableWallets.includes('farcaster')) {
+        // Show minimal info modal
+        alert('Open this app inside Farcaster to connect with the Farcaster wallet.');
+        return;
       }
-      
-      // If no wallets detected, show install options
-      if (availableWallets.length === 0) {
-        walletOptionsHTML = `
-          <div style="text-align: center; padding: 24px; color: #666;">
-            <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
-            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No Wallets Detected</div>
-            <div style="font-size: 14px; margin-bottom: 16px;">Please install one of these wallet extensions:</div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <button onclick="window.open('https://metamask.io/download/', '_blank')" style="
-                padding: 8px 16px; border: 1px solid #667eea; border-radius: 8px; background: white; 
-                color: #667eea; cursor: pointer; font-size: 14px; font-weight: 600;
-              ">Install MetaMask</button>
-              <button onclick="window.open('https://www.coinbase.com/wallet', '_blank')" style="
-                padding: 8px 16px; border: 1px solid #667eea; border-radius: 8px; background: white; 
-                color: #667eea; cursor: pointer; font-size: 14px; font-weight: 600;
-              ">Install Coinbase Wallet</button>
-            </div>
-          </div>
-        `;
-      }
-
-      // Build supported networks info
-      const supportedNetworks = this.getSupportedNetworks();
-      const networksList = supportedNetworks.map(chainId => 
-        `${NETWORK_NAMES[chainId]} (${chainId})`
-      ).join(', ');
-
-      modalContent.innerHTML = `
-        <div style="text-align: center; margin-bottom: 32px;">
-          <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; color: #1a1a1a;">Connect Wallet</h2>
-          <p style="margin: 0; color: #666; font-size: 16px;">Choose your preferred wallet</p>
-          <div style="margin-top: 12px; padding: 12px; background: #f8f9ff; border-radius: 8px; border: 1px solid #e0e8ff;">
-            <div style="font-size: 12px; font-weight: 600; color: #667eea; margin-bottom: 4px;">Supported Networks:</div>
-            <div style="font-size: 11px; color: #666;">${networksList}</div>
-          </div>
-        </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          ${walletOptionsHTML}
-        </div>
-        
-        <button class="close-modal" style="
-          margin-top: 24px; width: 100%; padding: 12px; border: none; border-radius: 12px; 
-          background: #f0f0f0; color: #666; font-size: 16px; font-weight: 600; cursor: pointer;
-          transition: background 0.2s ease; font-family: 'Inter', sans-serif;
-        ">Cancel</button>
-      `;
-
-      modal.appendChild(modalContent);
-      document.body.appendChild(modal);
-
-      // Add CSS animation
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes modalSlideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        
-        .wallet-option:hover {
-          border-color: #667eea !important;
-          background: #f8f9ff !important;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-        }
-        
-        .close-modal:hover {
-          background: #e0e0e0 !important;
-        }
-      `;
-      document.head.appendChild(style);
-
-      // Add event listeners
-      const walletOptions = modalContent.querySelectorAll('.wallet-option');
-      walletOptions.forEach(option => {
-        option.addEventListener('click', async () => {
-          const walletType = option.dataset.wallet;
-          try {
-            switch (walletType) {
-              case 'farcaster':
-                await this.connectFarcasterWallet();
-                break;
-              case 'metamask':
-                await this.switchToMetaMask();
-                break;
-              case 'coinbase':
-                await this.switchToCoinbase();
-                break;
-            }
-            this.closeModal(modal);
-          } catch (error) {
-            console.error(`Error connecting to ${walletType}:`, error);
-            alert(`Failed to connect to ${walletType}: ${error.message}`);
-          }
-        });
-      });
-
-      const closeButton = modalContent.querySelector('.close-modal');
-      closeButton.addEventListener('click', () => {
-        this.closeModal(modal);
-      });
-
-      // Close modal when clicking outside
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          this.closeModal(modal);
+      // If Farcaster is available, attempt connection
+      this.connectFarcasterWallet().catch((err) => {
+        console.error('Farcaster connection failed:', err);
+        if (window.uiManager) {
+          window.uiManager.updateStatus('Failed to connect to Farcaster wallet', false, true);
         }
       });
 
@@ -803,40 +612,16 @@ export class WalletManager {
   // Detect available wallets
   detectAvailableWallets() {
     const wallets = [];
-    
-    // Check for Farcaster Mini App environment first
+    // In Farcaster Mini App, ONLY allow Farcaster wallet
     if (window.isFarcasterMiniApp) {
       wallets.push('farcaster');
-      console.log('Farcaster Mini App detected - ONLY Farcaster wallet allowed');
-      // In Farcaster Mini App, ONLY allow Farcaster wallet
       return wallets;
     }
-    
-    // For web browser, allow all wallets but with timeout handling
-    // Check for MetaMask and other ethereum providers
-    if (window.ethereum) {
-      // Check specific wallet types
-      if (window.ethereum.isMetaMask) {
-        wallets.push('metamask');
-      }
-      if (window.ethereum.isCoinbaseWallet) {
-        wallets.push('coinbase');
-      }
-      
-      // If no specific type detected but ethereum exists, assume MetaMask
-      if (wallets.length === 0) {
-        wallets.push('metamask');
-      }
-    }
-    
-    // Check for Coinbase Wallet extension
-    if (window.coinbaseWalletExtension) {
-      if (!wallets.includes('coinbase')) {
-        wallets.push('coinbase');
-      }
-    }
-    
-    console.log('Detected wallets:', wallets);
+    // On web, still allow all (unchanged)
+    if (window.ethereum?.isMetaMask) wallets.push('metamask');
+    if (window.ethereum?.isCoinbaseWallet) wallets.push('coinbase');
+    if (wallets.length === 0 && window.ethereum) wallets.push('metamask');
+    if (window.coinbaseWalletExtension && !wallets.includes('coinbase')) wallets.push('coinbase');
     return wallets;
   }
 
@@ -1026,19 +811,17 @@ export class WalletManager {
 
   // Get network information
   getNetworkInfo() {
-    if (!this.signer || !this.signer.provider) {
-      return null;
-    }
-    
     try {
-      // For Farcaster wallet, return default network info
+      // If Farcaster wallet: prefer user-selected chain if available
       if (this.currentWalletType === 'farcaster') {
-        return {
-          chainId: 8453, // Base mainnet
-          name: 'Base'
-        };
+        const selected = window.selectedChainId ? Number(window.selectedChainId) : 8453;
+        return { chainId: selected, name: this.getChainName(selected) };
       }
-      
+
+      if (!this.signer || !this.signer.provider) {
+        return null;
+      }
+
       // For other wallets, get from provider
       const provider = this.signer.provider;
       if (provider && provider.network) {
@@ -1047,7 +830,7 @@ export class WalletManager {
           name: this.getChainName(provider.network.chainId)
         };
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error getting network info:', error);

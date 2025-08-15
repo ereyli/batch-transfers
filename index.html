@@ -82,9 +82,11 @@
       </div>
       <h1>Sendwise</h1>
       <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
-      <div class="supported-networks">
-        <div class="network-icon"></div>
-        <span>Base • Optimism • Arbitrum • Ethereum</span>
+      <div class="supported-networks" id="networkTags" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+        <button class="network-tag" data-chain="8453" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Base</button>
+        <button class="network-tag" data-chain="10" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Optimism</button>
+        <button class="network-tag" data-chain="42161" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Arbitrum</button>
+        <button class="network-tag" data-chain="1" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Ethereum</button>
       </div>
       
       <!-- Wallet Button - Below Logo (Only shown in web browser) -->
@@ -233,6 +235,8 @@
           window.wagmiClient = window.wagmi.createClient(config);
           
           console.log('Wagmi initialized successfully');
+          // Expose config for potential chain switching helpers
+          window.wagmiConfig = config;
           return true;
         } else {
           console.warn('Wagmi libraries not available');
@@ -303,6 +307,58 @@
       } catch (error) {
         console.error('Error initializing Farcaster Mini App:', error);
       }
+    }
+
+    // Setup clickable network tags (user selects sending network by tapping a tag)
+    function setupNetworkTags() {
+      // Default selected chain is Base
+      if (!window.selectedChainId) {
+        window.selectedChainId = 8453;
+      }
+      const container = document.getElementById('networkTags');
+      if (!container) return;
+      const tags = container.querySelectorAll('.network-tag');
+
+      function highlightSelected() {
+        tags.forEach(tag => {
+          const isActive = Number(tag.dataset.chain) === Number(window.selectedChainId);
+          tag.style.background = isActive ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255,255,255,0.06)';
+          tag.style.border = isActive ? '1px solid rgba(102,126,234,0.8)' : '1px solid rgba(255,255,255,0.2)';
+        });
+      }
+
+      async function trySwitchChain(chainId) {
+        try {
+          if (window.wagmiClient && typeof window.wagmiClient.switchChain === 'function') {
+            await window.wagmiClient.switchChain({ chainId });
+            console.log('Switched chain via Wagmi to', chainId);
+            return true;
+          }
+        } catch (err) {
+          console.warn('switchChain not available or failed:', err);
+        }
+        return false;
+      }
+
+      tags.forEach(tag => {
+        tag.addEventListener('click', async () => {
+          const chainId = Number(tag.dataset.chain);
+          window.selectedChainId = chainId;
+          highlightSelected();
+          // Attempt to switch chain if supported
+          await trySwitchChain(chainId);
+          // Inform managers if available
+          if (window.walletManager && typeof window.walletManager.updateMainConnectButton === 'function') {
+            const address = await (window.walletManager.getAddress?.() || Promise.resolve(''));
+            const networkNameMap = { 1: 'Ethereum', 10: 'Optimism', 42161: 'Arbitrum', 8453: 'Base' };
+            const networkName = networkNameMap[chainId] || 'Network';
+            window.walletManager.updateMainConnectButton(address || '', 'Farcaster Wallet', networkName, 'farcaster');
+          }
+        });
+      });
+
+      // Initial highlight
+      highlightSelected();
     }
 
     // Setup Farcaster-specific UI adjustments
@@ -412,6 +468,9 @@
         
         // Initialize Farcaster Mini App first
         await initializeFarcasterMiniApp();
+
+        // Setup network tag handlers
+        setupNetworkTags();
         
         // Initialize Sendwise app
         const app = new SendwiseApp();

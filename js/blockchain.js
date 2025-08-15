@@ -542,9 +542,18 @@ export class BlockchainManager {
         parsedAmounts.push(parsedAmount);
       }
       
-      // Get current chain
-      const { data: chain } = await window.wagmiClient.getChainId();
-      const chainId = chain;
+      // Determine target chain: user-selected if available, else current
+      let chainId = window.selectedChainId ? Number(window.selectedChainId) : null;
+      try {
+        const { data: currentChain } = await window.wagmiClient.getChainId();
+        if (!chainId) chainId = currentChain;
+        // Attempt to switch if different
+        if (chainId && currentChain && chainId !== currentChain && typeof window.wagmiClient.switchChain === 'function') {
+          await window.wagmiClient.switchChain({ chainId });
+        }
+      } catch (e) {
+        console.warn('Could not read/switch chain via Wagmi:', e);
+      }
       
       // Get contract addresses
       const contractAddress = transferType === 'eth' ? CONTRACTS[chainId] : CONTRACTS_ERC20[chainId];

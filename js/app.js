@@ -80,29 +80,7 @@ export class SendwiseApp {
       // Track app engagement for Farcaster search ranking
       this.trackAppEngagement();
       
-      // Call sdk.actions.ready() for Farcaster Mini App AFTER everything is initialized
-      if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.actions) {
-        try {
-          console.log('Calling sdk.actions.ready() to hide splash screen...');
-          
-          // Wait a bit to ensure everything is fully loaded
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          await window.farcasterSDK.actions.ready();
-          console.log('Farcaster SDK ready() called successfully');
-        } catch (error) {
-          console.error('Error calling sdk.actions.ready():', error);
-          
-          // Try again after a delay
-          try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await window.farcasterSDK.actions.ready();
-            console.log('Farcaster SDK ready() called successfully on retry');
-          } catch (retryError) {
-            console.error('Error calling sdk.actions.ready() on retry:', retryError);
-          }
-        }
-      }
+      // SDK removed: cannot call ready(); rely on app's own loading UX
       
       // Hide loading screen immediately after initialization
       if (!window.isFarcasterMiniApp) {
@@ -161,11 +139,7 @@ export class SendwiseApp {
   // Track events for analytics
   trackEvent(eventName, data = {}) {
     try {
-      // Send to Farcaster if in Mini App mode
-      if (window.isFarcasterMiniApp && window.farcasterSDK) {
-        // Farcaster tracks engagement automatically
-        console.log('Farcaster engagement tracked:', eventName, data);
-      }
+      // SDK removed: no Farcaster engagement hook here
       
       // Send to analytics service
       if (window.gtag) {

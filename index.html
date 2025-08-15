@@ -364,16 +364,8 @@
       highlightSelected();
     }
 
-    // Setup Farcaster-specific UI adjustments
+    // Setup Farcaster-specific UI adjustments (SDK-free)
     function setupFarcasterUI() {
-      // Disable native gestures to prevent app from closing
-      if (window.farcasterSDK && window.farcasterSDK.actions) {
-        try {
-          window.farcasterSDK.actions.disableNativeGestures();
-        } catch (error) {
-          console.warn('Could not disable native gestures:', error);
-        }
-      }
       
       // Hide wallet button in Farcaster Mini App
       const walletButtonContainer = document.getElementById('walletButtonContainer');
@@ -436,27 +428,9 @@
     // Add to Farcaster Collection
     async function addToCollection() {
       try {
-        if (window.isFarcasterMiniApp && window.farcasterSDK) {
-          await window.farcasterSDK.actions.addMiniApp();
-          document.getElementById('addToCollectionBtn').innerHTML = '✅ Added to Collection';
-          document.getElementById('addToCollectionBtn').disabled = true;
-          
-          // Show success message
-          if (window.uiManager) {
-            window.uiManager.updateStatus('✅ Added to Farcaster Collection!', 'success');
-          }
-          
-          // Send notification
-          await window.farcasterSDK.actions.sendNotification({
-            title: 'Sendwise Added!',
-            body: 'Sendwise has been added to your collection. Start making batch transfers!',
-            url: window.location.href
-          });
-        } else {
-          // Fallback for web browser (no alerts in sandbox)
-          if (window.uiManager) {
-            window.uiManager.updateStatus('Add to Collection works only inside Farcaster.', false, true);
-          }
+        // Without SDK, just show a message in Mini App
+        if (window.uiManager) {
+          window.uiManager.updateStatus('Add to Collection is not available without SDK.', false, true);
         }
       } catch (error) {
         console.error('Error adding to collection:', error);
@@ -538,55 +512,20 @@
     };
   </script>
 
-  <!-- Farcaster Mini App SDK - Must be at the bottom of HTML file -->
-  <script type="module">
-    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
-    
-    // Global SDK reference
-    window.farcasterSDK = sdk;
-    
-    // Initialize SDK immediately
-    (async () => {
+  <!-- SDK-free Farcaster detection (heuristic) -->
+  <script>
+    (function() {
       try {
-        console.log('Farcaster SDK loaded:', sdk);
-        
-        // Primary path: detect using isInFarcaster when available
-        if (typeof sdk.isInFarcaster === 'function') {
-          const isInFarcaster = await sdk.isInFarcaster();
-          window.isFarcasterMiniApp = !!isInFarcaster;
-          if (isInFarcaster && typeof sdk.initialize === 'function') {
-            await sdk.initialize();
-            console.log('Farcaster SDK initialized');
-          }
-        } else {
-          console.log('Farcaster SDK isInFarcaster method not available');
-          // Fallback heuristic detection (iframe + referrer)
-          const ref = document.referrer || '';
-          const looksLikeFarcaster = (window.top !== window) && (
-            ref.includes('warpcast.com') || ref.includes('miniapps.farcaster') || ref.includes('farcaster')
-          );
-          // Try to initialize regardless; success implies Mini App context
-          if (typeof sdk.initialize === 'function') {
-            try {
-              await sdk.initialize();
-              window.isFarcasterMiniApp = true;
-              console.log('Farcaster SDK initialized (fallback)');
-            } catch (e) {
-              window.isFarcasterMiniApp = looksLikeFarcaster;
-              console.log('Farcaster initialize failed; environment fallback =', window.isFarcasterMiniApp);
-            }
-          } else {
-            window.isFarcasterMiniApp = looksLikeFarcaster;
-          }
+        const ref = document.referrer || '';
+        const looksLikeMiniApp = (window.top !== window) && (
+          ref.includes('warpcast') || ref.includes('miniapps.farcaster') || ref.includes('farcaster')
+        );
+        // Only set if not already set by earlier code
+        if (typeof window.isFarcasterMiniApp === 'undefined' || window.isFarcasterMiniApp === false) {
+          window.isFarcasterMiniApp = looksLikeMiniApp;
         }
-
-        if (!window.isFarcasterMiniApp) {
-          console.log('Running in web browser environment');
-        } else {
-          console.log('Farcaster Mini App environment detected');
-        }
-      } catch (error) {
-        console.error('Error initializing Farcaster SDK:', error);
+        console.log('Farcaster heuristic mode:', window.isFarcasterMiniApp);
+      } catch (e) {
         window.isFarcasterMiniApp = false;
       }
     })();

@@ -17,8 +17,7 @@ export class FarcasterManager {
         
         console.log('Running in Farcaster Mini App environment');
         
-        // Show Farcaster info
-        this.showFarcasterInfo();
+        // Initialize wallet selector
         this.showWalletSelector();
         
         console.log('Farcaster Mini App initialized successfully');

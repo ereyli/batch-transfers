@@ -113,11 +113,7 @@
 
     <!-- Farcaster Info -->
     <div id="farcasterInfo" class="farcaster-info" style="display:none;">
-      <strong>🚀 Farcaster Mini App Mode</strong><br>
-      Connected to Farcaster ecosystem with enhanced wallet integration
-      <button id="addToCollectionBtn" onclick="addToCollection()" class="add-to-collection-btn">
-        ⭐ Add to Collection
-      </button>
+      <!-- Farcaster info removed - focus on wallet connection -->
     </div>
 
     <!-- Main Form -->
@@ -260,19 +256,15 @@
         if (window.isFarcasterMiniApp) {
           console.log('Running in Farcaster Mini App environment');
           
-          // Show Farcaster info
-          const farcasterInfo = document.getElementById('farcasterInfo');
-          if (farcasterInfo) {
-            farcasterInfo.style.display = 'block';
-          }
+          // Farcaster environment detected - no extra UI needed
           
                 // Set up Farcaster-specific UI adjustments immediately
       setupFarcasterUI();
       
-      // Hide wallet button in Farcaster Mini App
+      // Keep wallet button visible for manual connection
       const walletButtonContainer = document.getElementById('walletButtonContainer');
       if (walletButtonContainer) {
-        walletButtonContainer.style.display = 'none';
+        walletButtonContainer.style.display = 'block';
       }
           
           // Initialize Wagmi for Farcaster Mini App
@@ -425,37 +417,9 @@
       document.body.classList.add('farcaster-mode');
     }
 
-    // Add to Farcaster Collection
+    // Placeholder function - not needed for basic wallet connection
     async function addToCollection() {
-      try {
-        if (window.isFarcasterMiniApp && window.farcasterSDK) {
-          await window.farcasterSDK.actions.addMiniApp();
-          document.getElementById('addToCollectionBtn').innerHTML = '✅ Added to Collection';
-          document.getElementById('addToCollectionBtn').disabled = true;
-          
-          // Show success message
-          if (window.uiManager) {
-            window.uiManager.updateStatus('✅ Added to Farcaster Collection!', 'success');
-          }
-          
-          // Send notification
-          await window.farcasterSDK.actions.sendNotification({
-            title: 'Sendwise Added!',
-            body: 'Sendwise has been added to your collection. Start making batch transfers!',
-            url: window.location.href
-          });
-        } else {
-          // Fallback for web browser
-          if (window.uiManager) {
-            window.uiManager.updateStatus('Add to Collection works only inside Farcaster.', false, true);
-          }
-        }
-      } catch (error) {
-        console.error('Error adding to collection:', error);
-        if (window.uiManager) {
-          window.uiManager.updateStatus('❌ Failed to add to collection', 'error');
-        }
-      }
+      console.log('Add to Collection function called');
     }
 
     // Initialize app when DOM is loaded

@@ -589,26 +589,130 @@ export class WalletManager {
         });
         return;
       }
-      // In web, simplify to directly try Farcaster first or show minimal modal with only Farcaster
-      const availableWallets = this.detectAvailableWallets();
-      if (!availableWallets.includes('farcaster')) {
-        // Show minimal info without alert in sandbox
-        if (window.uiManager) {
-          window.uiManager.updateStatus('Open this app inside Farcaster to connect with the Farcaster wallet.', false, true);
-        }
-        return;
-      }
-      // If Farcaster is available, attempt connection
-      this.connectFarcasterWallet().catch((err) => {
-        console.error('Farcaster connection failed:', err);
-        if (window.uiManager) {
-          window.uiManager.updateStatus('Failed to connect to Farcaster wallet', false, true);
-        }
-      });
+      
+      // In web, show proper wallet selection modal for EVM wallets
+      this.showEvmWalletModal();
 
     } catch (error) {
       console.error('Error showing modern wallet modal:', error);
     }
+  }
+
+  // Show EVM Wallet Selection Modal (Web only)
+  showEvmWalletModal() {
+    const availableWallets = this.detectAvailableWallets();
+    
+    if (availableWallets.length === 0) {
+      if (window.uiManager) {
+        window.uiManager.updateStatus('No compatible wallets found. Please install MetaMask, Coinbase Wallet, Trust Wallet, or Rainbow.', false, true);
+      }
+      return;
+    }
+
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'wallet-modal-overlay';
+    modal.style.cssText = `
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.8); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 10000;
+      backdrop-filter: blur(5px);
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: #1a1a1a; 
+      border-radius: 20px; 
+      padding: 30px; 
+      max-width: 400px; 
+      width: 90%; 
+      max-height: 80vh; 
+      overflow-y: auto;
+      border: 1px solid #333;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    `;
+
+    modalContent.innerHTML = `
+      <div style="text-align: center; margin-bottom: 25px;">
+        <h2 style="color: white; margin: 0 0 10px 0; font-size: 24px;">Connect Wallet</h2>
+        <p style="color: #888; margin: 0; font-size: 14px;">Choose your preferred wallet to connect</p>
+      </div>
+      <div id="walletList"></div>
+      <div style="text-align: center; margin-top: 20px;">
+        <button onclick="this.closest('.wallet-modal-overlay').remove()" style="
+          background: #333; 
+          color: white; 
+          border: none; 
+          padding: 10px 20px; 
+          border-radius: 10px; 
+          cursor: pointer;
+          font-size: 14px;
+        ">Cancel</button>
+      </div>
+    `;
+
+    const walletList = modalContent.querySelector('#walletList');
+    
+    // Add wallet buttons
+    availableWallets.forEach(walletType => {
+      const button = document.createElement('button');
+      button.style.cssText = `
+        width: 100%; 
+        padding: 15px; 
+        margin: 8px 0; 
+        background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%); 
+        border: 1px solid #444; 
+        border-radius: 12px; 
+        color: white; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between;
+        transition: all 0.3s ease;
+        font-size: 16px;
+      `;
+      
+      const walletInfo = this.getWalletInfo(walletType);
+      button.innerHTML = `
+        <div style="display: flex; align-items: center;">
+          <span style="font-size: 24px; margin-right: 12px;">${walletInfo.icon}</span>
+          <span style="font-weight: 500;">${walletInfo.name}</span>
+        </div>
+        <span style="color: #888; font-size: 12px;">${walletInfo.status}</span>
+      `;
+      
+      button.onmouseover = () => {
+        button.style.background = 'linear-gradient(135deg, #3d3d3d 0%, #2a2a2a 100%)';
+        button.style.borderColor = '#555';
+      };
+      
+      button.onmouseout = () => {
+        button.style.background = 'linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%)';
+        button.style.borderColor = '#444';
+      };
+      
+      button.onclick = async () => {
+        modal.remove();
+        await this.connectWalletByType(walletType);
+      };
+      
+      walletList.appendChild(button);
+    });
+
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    // Close on outside click
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    };
   }
 
   // Close modal helper
@@ -659,19 +763,156 @@ export class WalletManager {
     }
   }
 
+  // Connect to Trust Wallet
+  async connectTrustWallet() {
+    if (!window.ethereum?.isTrust) {
+      throw new Error('Trust Wallet not detected. Please install Trust Wallet extension.');
+    }
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      
+      if (accounts.length === 0) {
+        throw new Error('No accounts found in Trust Wallet');
+      }
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      this.signer = provider.getSigner();
+      this.currentWalletType = 'trust';
+
+      const addr = accounts[0];
+      const network = await provider.getNetwork();
+      const balance = await provider.getBalance(addr);
+      const chainName = this.getChainName(network.chainId);
+      const balanceEth = ethers.utils.formatEther(balance);
+      
+      // Update button
+      this.updateMainConnectButton(addr, `${parseFloat(balanceEth).toFixed(4)} ETH`, chainName, 'trust');
+
+      window.dispatchEvent(new CustomEvent('walletConnected', {
+        detail: { address: accounts[0], wallet: 'trust' }
+      }));
+
+      console.log('Connected to Trust Wallet:', addr);
+      return accounts[0];
+    } catch (error) {
+      console.error('Trust Wallet connection error:', error);
+      throw new Error('Failed to connect to Trust Wallet: ' + error.message);
+    }
+  }
+
+  // Connect to Rainbow Wallet
+  async connectRainbowWallet() {
+    if (!window.ethereum?.isRainbow) {
+      throw new Error('Rainbow Wallet not detected. Please install Rainbow Wallet extension.');
+    }
+
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      
+      if (accounts.length === 0) {
+        throw new Error('No accounts found in Rainbow Wallet');
+      }
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      this.signer = provider.getSigner();
+      this.currentWalletType = 'rainbow';
+
+      const addr = accounts[0];
+      const network = await provider.getNetwork();
+      const balance = await provider.getBalance(addr);
+      const chainName = this.getChainName(network.chainId);
+      const balanceEth = ethers.utils.formatEther(balance);
+      
+      // Update button
+      this.updateMainConnectButton(addr, `${parseFloat(balanceEth).toFixed(4)} ETH`, chainName, 'rainbow');
+
+      window.dispatchEvent(new CustomEvent('walletConnected', {
+        detail: { address: accounts[0], wallet: 'rainbow' }
+      }));
+
+      console.log('Connected to Rainbow Wallet:', addr);
+      return accounts[0];
+    } catch (error) {
+      console.error('Rainbow Wallet connection error:', error);
+      throw new Error('Failed to connect to Rainbow Wallet: ' + error.message);
+    }
+  }
+
+  // Connect to WalletConnect
+  async connectWalletConnect() {
+    try {
+      // Basic WalletConnect implementation - can be enhanced with WalletConnect v2
+      if (!window.WalletConnect) {
+        throw new Error('WalletConnect not available. Install a WalletConnect compatible wallet.');
+      }
+
+      // For now, redirect to WalletConnect compatible wallets
+      const wallets = ['metamask', 'trust', 'rainbow'];
+      const available = wallets.filter(wallet => {
+        switch(wallet) {
+          case 'metamask': return window.ethereum?.isMetaMask;
+          case 'trust': return window.ethereum?.isTrust;
+          case 'rainbow': return window.ethereum?.isRainbow;
+          default: return false;
+        }
+      });
+
+      if (available.length > 0) {
+        // Connect with first available wallet
+        return await this.connectWallet(available[0]);
+      } else {
+        throw new Error('No compatible wallets found. Please install MetaMask, Trust Wallet, or Rainbow.');
+      }
+    } catch (error) {
+      console.error('WalletConnect connection error:', error);
+      throw new Error('Failed to connect via WalletConnect: ' + error.message);
+    }
+  }
+
   // Detect available wallets
   detectAvailableWallets() {
     const wallets = [];
+    
     // In Farcaster Mini App, ONLY allow Farcaster wallet
     if (window.isFarcasterMiniApp) {
       wallets.push('farcaster');
       return wallets;
     }
-    // On web, still allow all (unchanged)
-    if (window.ethereum?.isMetaMask) wallets.push('metamask');
-    if (window.ethereum?.isCoinbaseWallet) wallets.push('coinbase');
-    if (wallets.length === 0 && window.ethereum) wallets.push('metamask');
-    if (window.coinbaseWalletExtension && !wallets.includes('coinbase')) wallets.push('coinbase');
+    
+    // On web, detect all available EVM wallets
+    
+    // MetaMask detection
+    if (window.ethereum?.isMetaMask) {
+      wallets.push('metamask');
+    }
+    
+    // Coinbase Wallet detection
+    if (window.ethereum?.isCoinbaseWallet || window.coinbaseWalletExtension) {
+      wallets.push('coinbase');
+    }
+    
+    // Trust Wallet detection
+    if (window.ethereum?.isTrust) {
+      wallets.push('trust');
+    }
+    
+    // Rainbow Wallet detection
+    if (window.ethereum?.isRainbow) {
+      wallets.push('rainbow');
+    }
+    
+    // WalletConnect detection (if available)
+    if (window.WalletConnect) {
+      wallets.push('walletconnect');
+    }
+    
+    // Generic Ethereum provider (fallback)
+    if (wallets.length === 0 && window.ethereum) {
+      wallets.push('metamask'); // Default to MetaMask interface
+    }
+    
+    console.log('Detected available wallets:', wallets);
     return wallets;
   }
 
@@ -822,11 +1063,11 @@ export class WalletManager {
     if (!mainBtn) return;
 
     const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
-    const walletIcon = this.getWalletIcon(walletType);
+    const walletInfo = this.getWalletInfo(walletType);
     
     mainBtn.innerHTML = `
       <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-        <span style="font-size: 18px;">${walletIcon}</span>
+        <span style="font-size: 18px;">${walletInfo.icon}</span>
         <div style="text-align: left;">
           <div style="font-weight: 600;">${shortAddress}</div>
           <div style="font-size: 12px; opacity: 0.8;">${balance} • ${chainName}</div>
@@ -845,13 +1086,100 @@ export class WalletManager {
     }
   }
 
-  // Get wallet icon
-  getWalletIcon(walletType) {
+  // Get wallet info
+  getWalletInfo(walletType) {
     switch (walletType) {
-      case 'farcaster': return '🔗';
-      case 'metamask': return '🦊';
-      case 'coinbase': return '🪙';
-      default: return '💳';
+      case 'metamask':
+        return {
+          icon: '🦊',
+          name: 'MetaMask',
+          status: window.ethereum?.isMetaMask ? 'Detected' : 'Not Installed'
+        };
+      case 'coinbase':
+        return {
+          icon: '🪙',
+          name: 'Coinbase Wallet',
+          status: (window.ethereum?.isCoinbaseWallet || window.coinbaseWalletExtension) ? 'Detected' : 'Not Installed'
+        };
+      case 'trust':
+        return {
+          icon: '🛡️',
+          name: 'Trust Wallet',
+          status: window.ethereum?.isTrust ? 'Detected' : 'Not Installed'
+        };
+      case 'rainbow':
+        return {
+          icon: '🌈',
+          name: 'Rainbow',
+          status: window.ethereum?.isRainbow ? 'Detected' : 'Not Installed'
+        };
+      case 'walletconnect':
+        return {
+          icon: '🔗',
+          name: 'WalletConnect',
+          status: 'Available'
+        };
+      case 'farcaster':
+        return {
+          icon: '🟪',
+          name: 'Farcaster',
+          status: 'Detected'
+        };
+      default:
+        return {
+          icon: '💳',
+          name: 'Unknown Wallet',
+          status: 'Unknown'
+        };
+    }
+  }
+
+  // Get wallet icon (legacy method for compatibility)
+  getWalletIcon(walletType) {
+    return this.getWalletInfo(walletType).icon;
+  }
+
+  // Connect wallet by type
+  async connectWalletByType(walletType) {
+    try {
+      this.updateConnectButtonState('connecting');
+      
+      switch (walletType) {
+        case 'metamask':
+          await this.switchToMetaMask();
+          break;
+        case 'coinbase':
+          await this.connectCoinbaseWallet();
+          break;
+        case 'trust':
+          await this.connectTrustWallet();
+          break;
+        case 'rainbow':
+          await this.connectRainbowWallet();
+          break;
+        case 'walletconnect':
+          await this.connectWalletConnect();
+          break;
+        case 'farcaster':
+          await this.connectFarcasterWallet();
+          break;
+        default:
+          throw new Error(`Unsupported wallet type: ${walletType}`);
+      }
+      
+      // Update UI after successful connection
+      const address = await this.getAddress();
+      if (address && window.uiManager) {
+        window.uiManager.updateStatus(`Connected to ${this.getWalletInfo(walletType).name}`, true, false);
+      }
+      
+    } catch (error) {
+      console.error(`Error connecting to ${walletType}:`, error);
+      this.updateConnectButtonState('disconnected');
+      
+      if (window.uiManager) {
+        window.uiManager.updateStatus(`Failed to connect: ${error.message}`, false, true);
+      }
     }
   }
 

@@ -271,9 +271,10 @@
               const user = await sdk.actions.getUser();
               if (user) {
                 isInFarcaster = true;
+                console.log('Farcaster user detected:', user);
               }
             } catch (error) {
-              console.log('Not in Farcaster environment (user check failed)');
+              console.log('Not in Farcaster environment (user check failed):', error.message);
             }
           }
         } catch (error) {
@@ -312,24 +313,40 @@
           console.log('Farcaster user:', user);
           console.log('Farcaster wallet:', wallet);
           
+          // If we have a wallet, update UI immediately
+          if (wallet && wallet.address) {
+            console.log('Wallet found, updating UI...');
+            // Update UI to show connected state
+            if (typeof updateWalletDisplay === 'function') {
+              updateWalletDisplay(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+            }
+          }
+          
           // If Wagmi is available, set up wallet connection
           if (wagmiInitialized && window.wagmiClient) {
             // Auto-connect to wallet if available
             try {
               const { data: account } = await window.wagmiClient.getAccount();
-              if (account) {
-                console.log('Auto-connected to wallet:', account.address);
+              if (account && account.address) {
+                console.log('Auto-connected to wallet via Wagmi:', account.address);
                 // Update UI to show connected state
-                updateWalletDisplay(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+                if (typeof updateWalletDisplay === 'function') {
+                  updateWalletDisplay(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+                }
               }
             } catch (error) {
-              console.warn('Could not auto-connect to wallet:', error);
+              console.warn('Could not auto-connect to wallet via Wagmi:', error);
             }
           }
           
           // Call ready() as soon as UI is set up
-          await sdk.actions.ready();
-          console.log('Farcaster Mini App ready!');
+          try {
+            await sdk.actions.ready();
+            console.log('Farcaster Mini App ready!');
+          } catch (readyError) {
+            console.warn('Error calling sdk.actions.ready():', readyError);
+            // Continue anyway, don't let this block the app
+          }
           
         } else {
           console.log('Running in web browser environment');
@@ -344,8 +361,10 @@
         console.error('Error initializing Farcaster Mini App:', error);
         // Always call ready() even if there's an error to prevent infinite loading
         try {
-          await sdk.actions.ready();
-          console.log('Farcaster Mini App ready (with errors)!');
+          if (sdk && sdk.actions && sdk.actions.ready) {
+            await sdk.actions.ready();
+            console.log('Farcaster Mini App ready (with errors)!');
+          }
         } catch (readyError) {
           console.error('Error calling sdk.actions.ready():', readyError);
         }

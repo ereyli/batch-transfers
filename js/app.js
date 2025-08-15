@@ -24,8 +24,10 @@ export class SendwiseApp {
 
   async initialize() {
     try {
-      // Show loading screen
-      this.uiManager.showLoading();
+      // Show loading screen only for web browser
+      if (!window.isFarcasterMiniApp) {
+        this.uiManager.showLoading();
+      }
       
       // Initialize wallet manager (includes Farcaster)
       await this.walletManager.initialize();
@@ -35,7 +37,7 @@ export class SendwiseApp {
         console.log('Farcaster Mini App detected - forcing wallet connection');
         try {
           // Wait a bit for Farcaster SDK to be fully ready
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 1500));
           
           await this.walletManager.initializeFarcasterMiniAppWallet();
           console.log('Farcaster wallet auto-connected successfully');
@@ -44,11 +46,30 @@ export class SendwiseApp {
           if (this.walletManager.getSigner()) {
             const address = await this.walletManager.getSigner().getAddress();
             console.log('Wallet connected:', address);
+            
+            // Update UI immediately
+            this.uiManager.updateWalletDisplay(address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
           }
         } catch (error) {
           console.error('Failed to auto-connect Farcaster wallet:', error);
           // Don't show error to user in Farcaster Mini App
           // But try to continue with the app
+          
+          // Try alternative connection methods
+          try {
+            console.log('Trying alternative connection methods...');
+            
+            // Try to get wallet from global context
+            if (window.wagmiClient) {
+              const { data: account } = await window.wagmiClient.getAccount();
+              if (account && account.address) {
+                console.log('Alternative connection successful:', account.address);
+                this.uiManager.updateWalletDisplay(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+              }
+            }
+          } catch (altError) {
+            console.warn('Alternative connection also failed:', altError);
+          }
         }
       }
       
@@ -60,11 +81,15 @@ export class SendwiseApp {
       this.trackAppEngagement();
       
       // Hide loading screen immediately after initialization
-      this.uiManager.hideLoading();
+      if (!window.isFarcasterMiniApp) {
+        this.uiManager.hideLoading();
+      }
       
     } catch (error) {
       console.error('Error initializing app:', error);
-      this.uiManager.hideLoading();
+      if (!window.isFarcasterMiniApp) {
+        this.uiManager.hideLoading();
+      }
     }
   }
 

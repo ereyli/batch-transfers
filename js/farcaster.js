@@ -8,25 +8,56 @@ export class FarcasterManager {
   // Initialize Farcaster Mini App
   async initialize() {
     try {
-      // Try to load Farcaster SDK dynamically
-      await this.loadFarcasterSDK();
+      console.log('Initializing Farcaster Mini App...');
       
-      if (this.sdk && typeof this.sdk.isInFarcaster === 'function') {
+      // Try to load Farcaster SDK dynamically
+      const sdkLoaded = await this.loadFarcasterSDK();
+      
+      if (this.sdk && sdkLoaded) {
+        console.log('Farcaster SDK loaded, checking environment...');
+        
         // Check if running in Farcaster environment
-        const isInFarcaster = await this.sdk.isInFarcaster();
+        let isInFarcaster = false;
+        
+        try {
+          if (typeof this.sdk.isInFarcaster === 'function') {
+            isInFarcaster = await this.sdk.isInFarcaster();
+          } else {
+            // Fallback detection methods
+            isInFarcaster = window.isFarcasterMiniApp || 
+                           window.location.href.includes('farcaster') ||
+                           window.location.href.includes('warpcast');
+          }
+        } catch (error) {
+          console.warn('Error checking Farcaster environment:', error);
+          // Fallback detection
+          isInFarcaster = window.isFarcasterMiniApp || 
+                         window.location.href.includes('farcaster') ||
+                         window.location.href.includes('warpcast');
+        }
         
         if (isInFarcaster) {
+          console.log('Running in Farcaster Mini App environment');
           this.isFarcasterMode = true;
           this.showFarcasterInfo();
           this.showWalletSelector();
           
           // Initialize Farcaster SDK
-          if (typeof this.sdk.initialize === 'function') {
-            await this.sdk.initialize();
+          try {
+            if (typeof this.sdk.initialize === 'function') {
+              await this.sdk.initialize();
+              console.log('Farcaster SDK initialized');
+            }
+          } catch (error) {
+            console.warn('Error initializing Farcaster SDK:', error);
           }
           
           // Set up Farcaster wallet integration
-          await this.setupFarcasterWallet();
+          try {
+            await this.setupFarcasterWallet();
+          } catch (error) {
+            console.warn('Error setting up Farcaster wallet:', error);
+          }
           
           console.log('Farcaster Mini App initialized successfully');
         } else {
@@ -36,8 +67,15 @@ export class FarcasterManager {
         
         // Hide loading screen and show app
         this.hideLoading();
-        if (this.sdk.actions && typeof this.sdk.actions.ready === 'function') {
-          await this.sdk.actions.ready();
+        
+        // Call ready() if available
+        try {
+          if (this.sdk.actions && typeof this.sdk.actions.ready === 'function') {
+            await this.sdk.actions.ready();
+            console.log('Farcaster SDK ready() called');
+          }
+        } catch (error) {
+          console.warn('Error calling sdk.actions.ready():', error);
         }
       } else {
         console.log('Farcaster SDK not available, running in web mode');
@@ -56,11 +94,64 @@ export class FarcasterManager {
   // Load Farcaster SDK dynamically
   async loadFarcasterSDK() {
     try {
-      const { sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+      console.log('Loading Farcaster SDK...');
+      
+      // Try multiple ways to load the SDK
+      let sdk = null;
+      
+      // Method 1: Try ESM import
+      try {
+        const { sdk: importedSdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+        sdk = importedSdk;
+        console.log('Farcaster SDK loaded via ESM import');
+      } catch (error) {
+        console.warn('ESM import failed:', error.message);
+      }
+      
+      // Method 2: Try global window object
+      if (!sdk && window.farcasterSDK) {
+        sdk = window.farcasterSDK;
+        console.log('Farcaster SDK loaded from global window object');
+      }
+      
+      // Method 3: Try dynamic script loading
+      if (!sdk) {
+        try {
+          const script = document.createElement('script');
+          script.src = 'https://esm.sh/@farcaster/miniapp-sdk';
+          script.type = 'module';
+          
+          await new Promise((resolve, reject) => {
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+          
+          // Wait a bit for the script to initialize
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          if (window.farcasterSDK) {
+            sdk = window.farcasterSDK;
+            console.log('Farcaster SDK loaded via dynamic script');
+          }
+        } catch (error) {
+          console.warn('Dynamic script loading failed:', error.message);
+        }
+      }
+      
       this.sdk = sdk;
+      
+      if (sdk) {
+        console.log('Farcaster SDK loaded successfully');
+        return true;
+      } else {
+        console.log('Farcaster SDK not available');
+        return false;
+      }
     } catch (error) {
-      console.log('Farcaster SDK not available:', error.message);
+      console.error('Error loading Farcaster SDK:', error);
       this.sdk = null;
+      return false;
     }
   }
 

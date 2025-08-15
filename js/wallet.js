@@ -40,9 +40,11 @@ export class WalletManager {
         let user = null;
         
         // Approach 1: Try SDK directly first (most reliable)
-        if (window.farcasterSDK) {
+        if (window.farcasterSDK && window.farcasterSDK.actions) {
           try {
             console.log('Trying SDK approach...');
+            
+            // First try to get user and wallet in parallel
             const [userResult, walletResult] = await Promise.all([
               window.farcasterSDK.actions.getUser().catch(err => {
                 console.warn('Could not get Farcaster user:', err);
@@ -57,20 +59,22 @@ export class WalletManager {
             user = userResult;
             wallet = walletResult;
             
-            if (wallet) {
+            if (wallet && wallet.address) {
               console.log('Farcaster wallet connected via SDK:', wallet.address);
+            } else {
+              console.log('No wallet found via SDK, trying alternative approaches...');
             }
           } catch (error) {
             console.warn('SDK approach failed:', error);
           }
         }
         
-        // Approach 2: Try Wagmi if SDK failed
-        if (!wallet && window.wagmiClient) {
+        // Approach 2: Try Wagmi if SDK failed or no wallet found
+        if ((!wallet || !wallet.address) && window.wagmiClient) {
           try {
             console.log('Trying Wagmi approach...');
             const { data: account } = await window.wagmiClient.getAccount();
-            if (account) {
+            if (account && account.address) {
               wallet = { address: account.address };
               console.log('Farcaster wallet connected via Wagmi:', account.address);
             }
@@ -79,19 +83,43 @@ export class WalletManager {
           }
         }
         
-        // Approach 3: Try to connect manually
-        if (!wallet && window.farcasterSDK) {
+        // Approach 3: Try to connect manually if still no wallet
+        if (!wallet || !wallet.address) {
           try {
             console.log('Trying manual connection...');
-            await this.connectFarcasterWallet();
-            return; // connectFarcasterWallet handles the rest
+            
+            // Try to connect using SDK
+            if (window.farcasterSDK && window.farcasterSDK.actions) {
+              try {
+                const connectedWallet = await window.farcasterSDK.actions.connectWallet();
+                if (connectedWallet && connectedWallet.address) {
+                  wallet = connectedWallet;
+                  console.log('Manual SDK connection successful:', connectedWallet.address);
+                }
+              } catch (error) {
+                console.warn('Manual SDK connection failed:', error);
+              }
+            }
+            
+            // If SDK connection failed, try Wagmi connection
+            if ((!wallet || !wallet.address) && window.wagmiClient) {
+              try {
+                const { data: account } = await window.wagmiClient.connect();
+                if (account && account.address) {
+                  wallet = { address: account.address };
+                  console.log('Manual Wagmi connection successful:', account.address);
+                }
+              } catch (error) {
+                console.warn('Manual Wagmi connection failed:', error);
+              }
+            }
           } catch (error) {
             console.warn('Manual connection failed:', error);
           }
         }
         
         // If we have a wallet, set it up
-        if (wallet) {
+        if (wallet && wallet.address) {
           console.log('Setting up Farcaster wallet signer...');
           
           // Create a Farcaster wallet signer
@@ -100,15 +128,34 @@ export class WalletManager {
             provider: window.wagmiClient ? window.wagmiClient.getPublicClient() : null,
             getAddress: () => Promise.resolve(wallet.address),
             signMessage: async (message) => {
-              if (window.wagmiClient) {
-                const { data: signature } = await window.wagmiClient.signMessage({ message });
-                return signature;
-              } else {
-                return await window.farcasterSDK.actions.signMessage(message);
+              try {
+                if (window.wagmiClient) {
+                  const { data: signature } = await window.wagmiClient.signMessage({ message });
+                  return signature;
+                } else if (window.farcasterSDK && window.farcasterSDK.actions) {
+                  return await window.farcasterSDK.actions.signMessage(message);
+                } else {
+                  throw new Error('No signing method available');
+                }
+              } catch (error) {
+                console.error('Error signing message:', error);
+                throw error;
               }
             },
             signTransaction: async (transaction) => {
-              return await window.farcasterSDK.actions.signTransaction(transaction);
+              try {
+                if (window.farcasterSDK && window.farcasterSDK.actions) {
+                  return await window.farcasterSDK.actions.signTransaction(transaction);
+                } else if (window.wagmiClient) {
+                  const { data: signature } = await window.wagmiClient.signTransaction(transaction);
+                  return signature;
+                } else {
+                  throw new Error('No transaction signing method available');
+                }
+              } catch (error) {
+                console.error('Error signing transaction:', error);
+                throw error;
+              }
             }
           };
           
@@ -127,7 +174,7 @@ export class WalletManager {
           console.log('Farcaster wallet successfully initialized and connected');
           
           // Send notification
-          if (window.farcasterSDK) {
+          if (window.farcasterSDK && window.farcasterSDK.actions) {
             try {
               await window.farcasterSDK.actions.sendNotification({
                 title: 'Sendwise Connected!',
@@ -139,8 +186,29 @@ export class WalletManager {
             }
           }
           
+          return wallet;
+          
         } else {
-          console.error('Could not connect to Farcaster wallet');
+          console.error('Could not connect to Farcaster wallet after trying all approaches');
+          
+          // Show user-friendly error message
+          if (window.isFarcasterMiniApp) {
+            // In Farcaster Mini App, show a notification instead of alert
+            if (window.farcasterSDK && window.farcasterSDK.actions) {
+              try {
+                await window.farcasterSDK.actions.sendNotification({
+                  title: 'Wallet Connection Failed',
+                  body: 'Please make sure you have a wallet connected in Farcaster',
+                  url: window.location.href
+                });
+              } catch (error) {
+                console.warn('Could not send error notification:', error);
+              }
+            }
+          } else {
+            alert('Could not connect to Farcaster wallet. Please try refreshing the page or connecting manually.');
+          }
+          
           throw new Error('No Farcaster wallet available');
         }
       }

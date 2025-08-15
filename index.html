@@ -202,7 +202,10 @@
         window.walletManager.showModernWalletModal();
       } else {
         console.error('WalletManager not available');
-        alert('Wallet system not initialized. Please refresh the page.');
+        // Avoid alert in sandboxed iframe
+        if (window.uiManager) {
+          window.uiManager.updateStatus('Wallet system not initialized. Please refresh the page.', false, true);
+        }
       }
     };
 
@@ -450,8 +453,10 @@
             url: window.location.href
           });
         } else {
-          // Fallback for web browser
-          alert('Add to Collection feature is only available in Farcaster Mini App');
+          // Fallback for web browser (no alerts in sandbox)
+          if (window.uiManager) {
+            window.uiManager.updateStatus('Add to Collection works only inside Farcaster.', false, true);
+          }
         }
       } catch (error) {
         console.error('Error adding to collection:', error);
@@ -499,8 +504,8 @@
         }
         
         // Show error message only in web browser
-        if (!window.isFarcasterMiniApp) {
-          alert('Failed to initialize Sendwise app. Please refresh the page.');
+        if (!window.isFarcasterMiniApp && window.uiManager) {
+          window.uiManager.updateStatus('Failed to initialize. Please refresh the page.', false, true);
         }
       }
     });

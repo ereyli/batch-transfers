@@ -544,8 +544,10 @@ export class WalletManager {
       // In web, simplify to directly try Farcaster first or show minimal modal with only Farcaster
       const availableWallets = this.detectAvailableWallets();
       if (!availableWallets.includes('farcaster')) {
-        // Show minimal info modal
-        alert('Open this app inside Farcaster to connect with the Farcaster wallet.');
+        // Show minimal info without alert in sandbox
+        if (window.uiManager) {
+          window.uiManager.updateStatus('Open this app inside Farcaster to connect with the Farcaster wallet.', false, true);
+        }
         return;
       }
       // If Farcaster is available, attempt connection

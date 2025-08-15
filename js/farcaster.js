@@ -42,7 +42,9 @@ export class FarcasterManager {
   async switchToFarcasterWallet() {
     try {
       if (!this.isFarcasterMode) {
-        alert('Farcaster wallet only available in Farcaster Mini App mode');
+        if (window.uiManager) {
+          window.uiManager.updateStatus('Farcaster wallet is only available inside Farcaster.', false, true);
+        }
         return null;
       }
 
@@ -66,11 +68,15 @@ export class FarcasterManager {
         }
       }
       
-      alert('Farcaster wallet not available');
+      if (window.uiManager) {
+        window.uiManager.updateStatus('Farcaster wallet not available', false, true);
+      }
       return null;
     } catch (error) {
       console.error('Error switching to Farcaster wallet:', error);
-      alert('Failed to connect to Farcaster wallet: ' + error.message);
+      if (window.uiManager) {
+        window.uiManager.updateStatus('Failed to connect to Farcaster wallet: ' + error.message, false, true);
+      }
     }
     return null;
   }

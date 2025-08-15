@@ -535,8 +535,13 @@ export class BlockchainManager {
       const { recipients, amounts } = this.uiManager.getRecipientData();
       
       // Get wallet manager and signer
-      const walletManager = window.app ? window.app.getWalletManager() : null;
+      const walletManager = this.walletManager;
       if (!walletManager || !walletManager.getSigner()) {
+        console.error('Wallet manager or signer not available:', {
+          walletManager: !!walletManager,
+          signer: walletManager ? !!walletManager.getSigner() : false,
+          walletType: walletManager ? walletManager.getCurrentWalletType() : 'none'
+        });
         throw new Error('No wallet connected');
       }
       

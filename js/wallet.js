@@ -471,7 +471,7 @@ export class WalletManager {
   // Send Farcaster notification
   async sendFarcasterNotification(message) {
     try {
-      if (window.farcasterSDK && window.isFarcasterMiniApp) {
+      if (window.farcasterSDK && window.farcasterSDK.actions && typeof window.farcasterSDK.actions.sendNotification === 'function' && window.isFarcasterMiniApp) {
         await window.farcasterSDK.actions.sendNotification({
           title: 'Sendwise',
           body: message,

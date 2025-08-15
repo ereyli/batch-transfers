@@ -32,25 +32,74 @@ export class WalletManager {
       console.log('Initializing Farcaster Mini App wallet...');
       
       // Check if we're in Farcaster Mini App environment
-      if (window.isFarcasterMiniApp && window.wagmiClient) {
+      if (window.isFarcasterMiniApp && window.farcasterSDK) {
         console.log('Farcaster Mini App detected - setting up wallet connection');
         
-        // Check if user is already connected
+        // Get Farcaster wallet using SDK
         try {
-          const { data: account } = await window.wagmiClient.getAccount();
+          // Method 1: Try to get wallet directly from SDK
+          let wallet = null;
           
-          if (account && account.address) {
-            console.log('User already connected to Farcaster wallet:', account.address);
+          try {
+            wallet = await window.farcasterSDK.wallet.getWallet();
+            console.log('Farcaster wallet from SDK:', wallet);
+          } catch (error) {
+            console.log('Could not get wallet from SDK:', error);
+          }
+          
+          // Method 2: Try to get Ethereum provider
+          if (!wallet && window.farcasterSDK.wallet.getEthereumProvider) {
+            try {
+              const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+              if (provider) {
+                const accounts = await provider.request({ method: 'eth_accounts' });
+                if (accounts && accounts.length > 0) {
+                  wallet = { address: accounts[0] };
+                  console.log('Farcaster wallet from provider:', wallet);
+                }
+              }
+            } catch (error) {
+              console.log('Could not get provider:', error);
+            }
+          }
+          
+          // Method 3: Try Wagmi if available
+          if (!wallet && window.wagmiClient) {
+            try {
+              const { data: account } = await window.wagmiClient.getAccount();
+              if (account && account.address) {
+                wallet = account;
+                console.log('Farcaster wallet from Wagmi:', wallet);
+              }
+            } catch (error) {
+              console.log('Could not get account from Wagmi:', error);
+            }
+          }
+          
+          if (wallet && wallet.address) {
+            console.log('User connected to Farcaster wallet:', wallet.address);
             
             // Create Farcaster wallet signer
             this.farcasterSigner = {
-              address: account.address,
-              provider: window.wagmiClient.getPublicClient(),
-              getAddress: () => Promise.resolve(account.address),
+              address: wallet.address,
+              provider: window.wagmiClient ? window.wagmiClient.getPublicClient() : null,
+              getAddress: () => Promise.resolve(wallet.address),
               signMessage: async (message) => {
                 try {
-                  const { data: signature } = await window.wagmiClient.signMessage({ message });
-                  return signature;
+                  if (window.wagmiClient) {
+                    const { data: signature } = await window.wagmiClient.signMessage({ message });
+                    return signature;
+                  } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                    const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                    const accounts = await provider.request({ method: 'eth_accounts' });
+                    const signature = await provider.request({
+                      method: 'personal_sign',
+                      params: [message, accounts[0]]
+                    });
+                    return signature;
+                  } else {
+                    throw new Error('No signing method available');
+                  }
                 } catch (error) {
                   console.error('Error signing message:', error);
                   throw error;
@@ -58,8 +107,19 @@ export class WalletManager {
               },
               signTransaction: async (transaction) => {
                 try {
-                  const { data: signature } = await window.wagmiClient.signTransaction(transaction);
-                  return signature;
+                  if (window.wagmiClient) {
+                    const { data: signature } = await window.wagmiClient.signTransaction(transaction);
+                    return signature;
+                  } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                    const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                    const signature = await provider.request({
+                      method: 'eth_signTransaction',
+                      params: [transaction]
+                    });
+                    return signature;
+                  } else {
+                    throw new Error('No transaction signing method available');
+                  }
                 } catch (error) {
                   console.error('Error signing transaction:', error);
                   throw error;
@@ -67,8 +127,19 @@ export class WalletManager {
               },
               sendTransaction: async (transaction) => {
                 try {
-                  const { data: hash } = await window.wagmiClient.sendTransaction(transaction);
-                  return hash;
+                  if (window.wagmiClient) {
+                    const { data: hash } = await window.wagmiClient.sendTransaction(transaction);
+                    return hash;
+                  } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                    const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                    const hash = await provider.request({
+                      method: 'eth_sendTransaction',
+                      params: [transaction]
+                    });
+                    return hash;
+                  } else {
+                    throw new Error('No transaction sending method available');
+                  }
                 } catch (error) {
                   console.error('Error sending transaction:', error);
                   throw error;
@@ -81,27 +152,25 @@ export class WalletManager {
             this.currentWalletType = 'farcaster';
             
             // Update UI to show connected state
-            this.updateMainConnectButton(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+            this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
             
             // Set up event listeners
             this.setupFarcasterEventListeners();
             
             console.log('Farcaster wallet successfully initialized and connected');
             
-            // Send notification if SDK is available
-            if (window.farcasterSDK && window.farcasterSDK.actions) {
-              try {
-                await window.farcasterSDK.actions.sendNotification({
-                  title: 'Sendwise Connected!',
-                  body: 'Farcaster wallet connected successfully',
-                  url: window.location.href
-                });
-              } catch (error) {
-                console.warn('Could not send notification:', error);
-              }
+            // Send notification
+            try {
+              await window.farcasterSDK.actions.sendNotification({
+                title: 'Sendwise Connected!',
+                body: 'Farcaster wallet connected successfully',
+                url: window.location.href
+              });
+            } catch (error) {
+              console.warn('Could not send notification:', error);
             }
             
-            return account;
+            return wallet;
             
           } else {
             console.log('User not connected to Farcaster wallet');
@@ -117,7 +186,7 @@ export class WalletManager {
           throw error;
         }
       } else {
-        console.log('Not in Farcaster Mini App environment or Wagmi not available');
+        console.log('Not in Farcaster Mini App environment or SDK not available');
         return null;
       }
       
@@ -205,27 +274,73 @@ export class WalletManager {
   // Connect to Farcaster wallet
   async connectFarcasterWallet() {
     try {
-      if (!window.isFarcasterMiniApp || !window.wagmiClient) {
+      if (!window.isFarcasterMiniApp || !window.farcasterSDK) {
         throw new Error('Farcaster Mini App environment not detected');
       }
       
       console.log('Connecting to Farcaster wallet...');
       
-      // Connect using Wagmi
-      const { data: account } = await window.wagmiClient.connect();
+      // Method 1: Try to connect using SDK
+      let wallet = null;
       
-      if (account && account.address) {
-        console.log('Successfully connected to Farcaster wallet:', account.address);
+      try {
+        wallet = await window.farcasterSDK.wallet.connectWallet();
+        console.log('Connected via SDK:', wallet);
+      } catch (error) {
+        console.log('SDK connection failed:', error);
+      }
+      
+      // Method 2: Try to connect using Ethereum provider
+      if (!wallet && window.farcasterSDK.wallet.getEthereumProvider) {
+        try {
+          const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+          const accounts = await provider.request({ method: 'eth_requestAccounts' });
+          if (accounts && accounts.length > 0) {
+            wallet = { address: accounts[0] };
+            console.log('Connected via provider:', wallet);
+          }
+        } catch (error) {
+          console.log('Provider connection failed:', error);
+        }
+      }
+      
+      // Method 3: Try Wagmi if available
+      if (!wallet && window.wagmiClient) {
+        try {
+          const { data: account } = await window.wagmiClient.connect();
+          if (account && account.address) {
+            wallet = account;
+            console.log('Connected via Wagmi:', wallet);
+          }
+        } catch (error) {
+          console.log('Wagmi connection failed:', error);
+        }
+      }
+      
+      if (wallet && wallet.address) {
+        console.log('Successfully connected to Farcaster wallet:', wallet.address);
         
         // Create Farcaster wallet signer
         this.farcasterSigner = {
-          address: account.address,
-          provider: window.wagmiClient.getPublicClient(),
-          getAddress: () => Promise.resolve(account.address),
+          address: wallet.address,
+          provider: window.wagmiClient ? window.wagmiClient.getPublicClient() : null,
+          getAddress: () => Promise.resolve(wallet.address),
           signMessage: async (message) => {
             try {
-              const { data: signature } = await window.wagmiClient.signMessage({ message });
-              return signature;
+              if (window.wagmiClient) {
+                const { data: signature } = await window.wagmiClient.signMessage({ message });
+                return signature;
+              } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                const accounts = await provider.request({ method: 'eth_accounts' });
+                const signature = await provider.request({
+                  method: 'personal_sign',
+                  params: [message, accounts[0]]
+                });
+                return signature;
+              } else {
+                throw new Error('No signing method available');
+              }
             } catch (error) {
               console.error('Error signing message:', error);
               throw error;
@@ -233,8 +348,19 @@ export class WalletManager {
           },
           signTransaction: async (transaction) => {
             try {
-              const { data: signature } = await window.wagmiClient.signTransaction(transaction);
-              return signature;
+              if (window.wagmiClient) {
+                const { data: signature } = await window.wagmiClient.signTransaction(transaction);
+                return signature;
+              } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                const signature = await provider.request({
+                  method: 'eth_signTransaction',
+                  params: [transaction]
+                });
+                return signature;
+              } else {
+                throw new Error('No transaction signing method available');
+              }
             } catch (error) {
               console.error('Error signing transaction:', error);
               throw error;
@@ -242,8 +368,19 @@ export class WalletManager {
           },
           sendTransaction: async (transaction) => {
             try {
-              const { data: hash } = await window.wagmiClient.sendTransaction(transaction);
-              return hash;
+              if (window.wagmiClient) {
+                const { data: hash } = await window.wagmiClient.sendTransaction(transaction);
+                return hash;
+              } else if (window.farcasterSDK.wallet.getEthereumProvider) {
+                const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                const hash = await provider.request({
+                  method: 'eth_sendTransaction',
+                  params: [transaction]
+                });
+                return hash;
+              } else {
+                throw new Error('No transaction sending method available');
+              }
             } catch (error) {
               console.error('Error sending transaction:', error);
               throw error;
@@ -256,14 +393,14 @@ export class WalletManager {
         this.currentWalletType = 'farcaster';
         
         // Update UI
-        this.updateMainConnectButton(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+        this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
         
         // Set up event listeners
         this.setupFarcasterEventListeners();
         
         console.log('Farcaster wallet connected successfully');
         
-        return account;
+        return wallet;
         
       } else {
         throw new Error('Failed to connect to Farcaster wallet');

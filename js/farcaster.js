@@ -11,62 +11,15 @@ export class FarcasterManager {
       console.log('Initializing Farcaster Mini App...');
       
       // Check if we're in Farcaster Mini App environment
-      let isInFarcaster = false;
-      
-      // Method 1: Check for Farcaster SDK
-      if (window.farcasterSDK) {
-        try {
-          const sdk = window.farcasterSDK;
-          const isInFarcasterEnv = await sdk.isInFarcaster();
-          if (isInFarcasterEnv) {
-            isInFarcaster = true;
-            this.sdk = sdk;
-            console.log('Farcaster SDK detected and environment confirmed');
-          }
-        } catch (error) {
-          console.log('Farcaster SDK check failed:', error.message);
-        }
-      }
-      
-      // Method 2: Check URL and user agent
-      if (!isInFarcaster) {
-        if (window.location.href.includes('farcaster') || 
-            window.location.href.includes('warpcast') ||
-            window.navigator.userAgent.includes('Farcaster') ||
-            window.navigator.userAgent.includes('Warpcast')) {
-          isInFarcaster = true;
-          console.log('Farcaster environment detected via URL/User Agent');
-        }
-      }
-      
-      this.isFarcasterMode = isInFarcaster;
-      
-      if (isInFarcaster) {
+      if (window.isFarcasterMiniApp && window.farcasterSDK) {
+        this.isFarcasterMode = true;
+        this.sdk = window.farcasterSDK;
+        
         console.log('Running in Farcaster Mini App environment');
         
         // Show Farcaster info
         this.showFarcasterInfo();
         this.showWalletSelector();
-        
-        // Initialize Farcaster SDK if available
-        if (this.sdk && typeof this.sdk.initialize === 'function') {
-          try {
-            await this.sdk.initialize();
-            console.log('Farcaster SDK initialized');
-          } catch (error) {
-            console.warn('Error initializing Farcaster SDK:', error);
-          }
-        }
-        
-        // Call ready() if available
-        if (this.sdk && this.sdk.actions && typeof this.sdk.actions.ready === 'function') {
-          try {
-            await this.sdk.actions.ready();
-            console.log('Farcaster SDK ready() called');
-          } catch (error) {
-            console.warn('Error calling sdk.actions.ready():', error);
-          }
-        }
         
         console.log('Farcaster Mini App initialized successfully');
       } else {

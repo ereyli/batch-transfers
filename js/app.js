@@ -80,16 +80,6 @@ export class SendwiseApp {
       // Track app engagement for Farcaster search ranking
       this.trackAppEngagement();
       
-      // Call sdk.actions.ready() for Farcaster Mini App
-      if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.actions) {
-        try {
-          await window.farcasterSDK.actions.ready();
-          console.log('Farcaster SDK ready() called successfully');
-        } catch (error) {
-          console.error('Error calling sdk.actions.ready():', error);
-        }
-      }
-      
       // Hide loading screen immediately after initialization
       if (!window.isFarcasterMiniApp) {
         this.uiManager.hideLoading();

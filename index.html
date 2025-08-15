@@ -63,7 +63,34 @@
   <!-- Farcaster Mini App SDK -->
   <script type="module">
     import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
+    
+    // Global SDK reference
     window.farcasterSDK = sdk;
+    
+    // Initialize SDK immediately
+    (async () => {
+      try {
+        // Check if we're in Farcaster environment
+        const isInFarcaster = await sdk.isInFarcaster();
+        window.isFarcasterMiniApp = isInFarcaster;
+        
+        if (isInFarcaster) {
+          console.log('Farcaster Mini App environment detected');
+          
+          // Initialize SDK
+          await sdk.initialize();
+          
+          // Call ready() to hide splash screen
+          await sdk.actions.ready();
+          
+          console.log('Farcaster SDK initialized and ready');
+        } else {
+          console.log('Running in web browser environment');
+        }
+      } catch (error) {
+        console.error('Error initializing Farcaster SDK:', error);
+      }
+    })();
   </script>
   
   <!-- Fonts and Styles -->
@@ -253,37 +280,8 @@
       try {
         console.log('Initializing Farcaster Mini App...');
         
-        // Check if we're in a Farcaster Mini App environment
-        let isInFarcaster = false;
-        
-        // Method 1: Check for Farcaster SDK
-        if (window.farcasterSDK) {
-          try {
-            const sdk = window.farcasterSDK;
-            const isInFarcasterEnv = await sdk.isInFarcaster();
-            if (isInFarcasterEnv) {
-              isInFarcaster = true;
-              console.log('Farcaster SDK detected and environment confirmed');
-            }
-          } catch (error) {
-            console.log('Farcaster SDK check failed:', error.message);
-          }
-        }
-        
-        // Method 2: Check URL and user agent
-        if (!isInFarcaster) {
-          if (window.location.href.includes('farcaster') || 
-              window.location.href.includes('warpcast') ||
-              window.navigator.userAgent.includes('Farcaster') ||
-              window.navigator.userAgent.includes('Warpcast')) {
-            isInFarcaster = true;
-            console.log('Farcaster environment detected via URL/User Agent');
-          }
-        }
-        
-        window.isFarcasterMiniApp = isInFarcaster;
-        
-        if (isInFarcaster) {
+        // Check if we're in Farcaster environment
+        if (window.isFarcasterMiniApp) {
           console.log('Running in Farcaster Mini App environment');
           
           // Show Farcaster info
@@ -315,16 +313,6 @@
               }
             } catch (error) {
               console.warn('Could not check account status:', error);
-            }
-          }
-          
-          // Call ready() if SDK is available
-          if (window.farcasterSDK && window.farcasterSDK.actions) {
-            try {
-              await window.farcasterSDK.actions.ready();
-              console.log('Farcaster Mini App ready!');
-            } catch (readyError) {
-              console.warn('Error calling sdk.actions.ready():', readyError);
             }
           }
           

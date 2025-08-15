@@ -41,16 +41,18 @@ export class WalletManager {
           let wallet = null;
           
           try {
-            if (window.farcasterSDK.wallet && window.farcasterSDK.wallet.getWallet) {
+            if (window.farcasterSDK.wallet && typeof window.farcasterSDK.wallet.getWallet === 'function') {
               wallet = await window.farcasterSDK.wallet.getWallet();
               console.log('Farcaster wallet from SDK:', wallet);
+            } else {
+              console.log('Farcaster SDK wallet.getWallet method not available');
             }
           } catch (error) {
             console.log('Could not get wallet from SDK:', error);
           }
           
           // Method 2: Try to get Ethereum provider
-          if (!wallet && window.farcasterSDK.wallet && window.farcasterSDK.wallet.getEthereumProvider) {
+          if (!wallet && window.farcasterSDK.wallet && typeof window.farcasterSDK.wallet.getEthereumProvider === 'function') {
             try {
               const provider = await window.farcasterSDK.wallet.getEthereumProvider();
               if (provider) {
@@ -63,6 +65,8 @@ export class WalletManager {
             } catch (error) {
               console.log('Could not get provider:', error);
             }
+          } else {
+            console.log('Farcaster SDK wallet.getEthereumProvider method not available');
           }
           
           // Method 3: Try Wagmi if available

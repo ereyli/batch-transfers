@@ -1,6 +1,18 @@
 # Sendwise: Smart Batch Transfers
 
-A modern, modular web application for batch ETH and ERC20 token transfers with Farcaster integration.
+A modern, modular web application and Farcaster Mini App for batch ETH and ERC20 token transfers with native Farcaster integration.
+
+## 🚀 Features
+
+- **Multi-Network Support**: Base, Optimism, Arbitrum, Soneium, Unichain, Ink
+- **Dual Wallet Support**: MetaMask and Farcaster Wallet integration
+- **Batch Transfers**: Send ETH or ERC20 tokens to multiple recipients in one transaction
+- **CSV Import**: Import wallet addresses from CSV files
+- **Modern UI**: Beautiful, responsive design with glassmorphism effects
+- **Farcaster Integration**: Native Farcaster Mini App support with notifications and sharing
+- **Wagmi Integration**: Type-safe wallet interactions for Farcaster Mini App
+- **Viral Loop**: Built-in social sharing for app discovery
+- **Gas Optimization**: Save up to 80% on gas fees compared to individual transfers
 
 ## 🚀 Features
 
@@ -92,10 +104,68 @@ The project has been refactored from a single monolithic HTML file into a modula
 - **Dark Theme**: Optimized for dark mode viewing
 - **Loading States**: Professional loading screens and spinners
 
+## 🌐 Live Demo
+
+- **Web App**: https://www.sendwise.xyz
+- **Farcaster Mini App**: Available in Warpcast App Store
+
+## 📱 Farcaster Mini App Features
+
+- ✅ **Native Wallet Integration**: No wallet selection dialogs
+- ✅ **Batch Transactions**: EIP-5792 support for multiple operations
+- ✅ **Auto-Connection**: Seamless wallet connection
+- ✅ **Push Notifications**: Real-time transfer updates
+- ✅ **Social Sharing**: Viral loop with custom embeds
+- ✅ **Splash Screen**: Branded loading experience
+
+## 🚀 Publishing to Farcaster
+
+### 1. Domain Setup
+- Choose a stable domain (e.g., `sendwise.app`)
+- Ensure HTTPS is enabled
+- Set up proper DNS records
+
+### 2. Manifest File
+The app includes a Farcaster manifest at `.well-known/farcaster.json`:
+
+```json
+{
+  "miniapp": {
+    "version": "1",
+    "name": "Sendwise",
+    "iconUrl": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png",
+    "homeUrl": "https://www.sendwise.xyz",
+    "primaryCategory": "finance",
+    "requiredChains": ["eip155:8453", "eip155:10", "eip155:42161"],
+    "requiredCapabilities": [
+      "actions.signIn",
+      "wallet.getEthereumProvider",
+      "actions.signMessage",
+      "actions.signTransaction",
+      "actions.sendNotification"
+    ]
+  }
+}
+```
+
+### 3. Verification
+1. Visit https://farcaster.xyz/~/developers/mini-apps/manifest
+2. Create a hosted manifest or use the local `.well-known/farcaster.json`
+3. Verify domain ownership with signed message
+4. Submit for review
+
+### 4. Discovery
+Once published, users can:
+- Discover the app in Warpcast App Store
+- Share transfer success in feeds
+- Use native Farcaster wallet integration
+
 ## 🔗 Dependencies
 
 - **Ethers.js**: Web3 library for Ethereum interactions
 - **Farcaster Mini App SDK**: For Farcaster integration
+- **Wagmi**: Type-safe wallet interactions
+- **Viem**: Low-level Ethereum interface
 - **Inter Font**: Modern typography from Google Fonts
 
 ## 📝 License

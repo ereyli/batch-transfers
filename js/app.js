@@ -34,12 +34,82 @@ export class SendwiseApp {
       this.uiManager.onTransferTypeChange();
       this.uiManager.updateRemoveButtons();
       
+      // Track app engagement for Farcaster search ranking
+      this.trackAppEngagement();
+      
       // Hide loading screen immediately after initialization
       this.uiManager.hideLoading();
       
     } catch (error) {
       console.error('Error initializing app:', error);
       this.uiManager.hideLoading();
+    }
+  }
+
+  // Track app engagement for Farcaster search ranking
+  trackAppEngagement() {
+    try {
+      // Track app open
+      this.trackEvent('app_opened');
+      
+      // Track wallet connection
+      if (this.walletManager.getSigner()) {
+        this.trackEvent('wallet_connected');
+      }
+      
+      // Track user interactions
+      document.addEventListener('click', (e) => {
+        if (e.target.matches('button')) {
+          this.trackEvent('button_clicked', { button: e.target.textContent });
+        }
+      });
+      
+      // Track form interactions
+      document.addEventListener('input', (e) => {
+        if (e.target.matches('input')) {
+          this.trackEvent('form_interaction', { field: e.target.name || 'unknown' });
+        }
+      });
+      
+      // Track successful transfers
+      if (window.blockchainManager) {
+        const originalUpdateStatus = window.blockchainManager.uiManager.updateStatus.bind(window.blockchainManager.uiManager);
+        window.blockchainManager.uiManager.updateStatus = (message, isSuccess, isError) => {
+          if (isSuccess && message.includes('completed successfully')) {
+            this.trackEvent('transfer_completed');
+          }
+          return originalUpdateStatus(message, isSuccess, isError);
+        };
+      }
+      
+    } catch (error) {
+      console.error('Error tracking app engagement:', error);
+    }
+  }
+
+  // Track events for analytics
+  trackEvent(eventName, data = {}) {
+    try {
+      // Send to Farcaster if in Mini App mode
+      if (window.isFarcasterMiniApp && window.farcasterSDK) {
+        // Farcaster tracks engagement automatically
+        console.log('Farcaster engagement tracked:', eventName, data);
+      }
+      
+      // Send to analytics service
+      if (window.gtag) {
+        window.gtag('event', eventName, {
+          event_category: 'sendwise_app',
+          event_label: window.isFarcasterMiniApp ? 'farcaster_mini_app' : 'web_app',
+          ...data
+        });
+      }
+      
+      // Log for debugging
+      console.log('App engagement tracked:', eventName, data);
+      
+    } catch (error) {
+      console.error('Error tracking event:', error);
     }
   }
 

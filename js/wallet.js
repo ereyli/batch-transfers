@@ -1,13 +1,12 @@
 import { FarcasterManager } from './farcaster.js';
+import { RPC_ENDPOINTS, NETWORK_NAMES, CONTRACTS } from './config.js';
 
 export class WalletManager {
   constructor() {
     this.signer = null;
     this.currentWalletType = 'metamask';
     this.farcasterManager = new FarcasterManager();
-    this.rainbowConnector = null;
     this.availableWallets = [];
-    this.rainbowKit = null;
   }
 
   // Initialize wallet manager
@@ -15,8 +14,147 @@ export class WalletManager {
     await this.farcasterManager.initialize();
     this.farcasterManager.setupEventListeners();
     
-    // Initialize Rainbow Wallet connector
-    await this.initializeRainbowConnector();
+    // Initialize wallet detection
+    this.detectAvailableWallets();
+    
+    // Check if we're in Farcaster Mini App environment
+    if (window.isFarcasterMiniApp && window.farcasterSDK) {
+      console.log('Initializing Farcaster Mini App wallet integration...');
+      await this.initializeFarcasterMiniAppWallet();
+    }
+    
+    console.log('WalletManager initialized successfully');
+  }
+
+  // Initialize Farcaster Mini App wallet integration
+  async initializeFarcasterMiniAppWallet() {
+    try {
+      // Check if Wagmi is available for Farcaster Mini App
+      if (window.isFarcasterMiniApp && window.wagmiClient) {
+        console.log('Using Wagmi for Farcaster Mini App wallet integration');
+        
+        // Get account info from Wagmi
+        const { data: account } = await window.wagmiClient.getAccount();
+        
+        if (account) {
+          console.log('Farcaster wallet connected via Wagmi:', account.address);
+          
+          // Create a Wagmi-based Farcaster wallet signer
+          this.farcasterSigner = {
+            address: account.address,
+            provider: window.wagmiClient.getPublicClient(),
+            getAddress: () => Promise.resolve(account.address),
+            signMessage: async (message) => {
+              const { data: signature } = await window.wagmiClient.signMessage({ message });
+              return signature;
+            },
+            signTransaction: async (transaction) => {
+              // For Farcaster Mini App, we'll use the SDK for transaction signing
+              return await window.farcasterSDK.actions.signTransaction(transaction);
+            }
+          };
+          
+          // Set as current signer if no other wallet is connected
+          if (!this.signer) {
+            this.signer = this.farcasterSigner;
+            this.currentWalletType = 'farcaster';
+            this.updateMainConnectButton(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+          }
+          
+          // Set up Farcaster-specific event listeners
+          this.setupFarcasterEventListeners();
+          
+        } else {
+          console.log('No wallet connected in Farcaster Mini App');
+        }
+        
+      } else {
+        // Fallback to SDK-only approach
+        console.log('Using SDK-only approach for Farcaster Mini App');
+        
+        // Get Farcaster user and wallet info in parallel for better performance
+        const [user, wallet] = await Promise.all([
+          window.farcasterSDK.actions.getUser().catch(err => {
+            console.warn('Could not get Farcaster user:', err);
+            return null;
+          }),
+          window.farcasterSDK.actions.getWallet().catch(err => {
+            console.warn('Could not get Farcaster wallet:', err);
+            return null;
+          })
+        ]);
+        
+        if (user && wallet) {
+          console.log('Farcaster user:', user);
+          console.log('Farcaster wallet:', wallet);
+          
+          // Create a Farcaster wallet signer
+          this.farcasterSigner = {
+            address: wallet.address,
+            provider: null, // Farcaster handles this
+            getAddress: () => Promise.resolve(wallet.address),
+            signMessage: async (message) => {
+              return await window.farcasterSDK.actions.signMessage(message);
+            },
+            signTransaction: async (transaction) => {
+              return await window.farcasterSDK.actions.signTransaction(transaction);
+            }
+          };
+          
+          // Set as current signer if no other wallet is connected
+          if (!this.signer) {
+            this.signer = this.farcasterSigner;
+            this.currentWalletType = 'farcaster';
+            this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+          }
+          
+          // Set up Farcaster-specific event listeners
+          this.setupFarcasterEventListeners();
+        }
+      }
+    } catch (error) {
+      console.error('Error initializing Farcaster Mini App wallet:', error);
+    }
+  }
+
+  // Setup Farcaster event listeners
+  setupFarcasterEventListeners() {
+    if (window.farcasterSDK) {
+      // Listen for wallet changes
+      window.farcasterSDK.actions.onWalletChange((wallet) => {
+        console.log('Farcaster wallet changed:', wallet);
+        if (wallet) {
+          this.farcasterSigner.address = wallet.address;
+          this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+        }
+      });
+      
+      // Listen for user changes
+      window.farcasterSDK.actions.onUserChange((user) => {
+        console.log('Farcaster user changed:', user);
+      });
+    }
+    
+    // Set up Wagmi event listeners if available
+    if (window.wagmiClient) {
+      // Listen for account changes
+      window.wagmiClient.watchAccount((account) => {
+        console.log('Wagmi account changed:', account);
+        if (account.address) {
+          this.updateMainConnectButton(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+        } else {
+          this.updateMainConnectButton('', 'Connect Wallet', '', '');
+        }
+      });
+      
+      // Listen for chain changes
+      window.wagmiClient.watchChainId((chainId) => {
+        console.log('Wagmi chain changed:', chainId);
+        // Update network display if needed
+        const networkName = this.getChainName(chainId);
+        this.updateMainConnectButton(this.signer?.address || '', 'Farcaster Wallet', networkName, 'farcaster');
+      });
+    }
   }
 
   // Switch to Farcaster wallet
@@ -25,11 +163,89 @@ export class WalletManager {
     if (account) {
       this.signer = account;
       this.currentWalletType = 'farcaster';
-      this.updateWalletButtons();
       this.updateWalletDisplay(account.address);
       return account;
     }
     return null;
+  }
+
+  // Connect Farcaster wallet (Mini App)
+  async connectFarcasterWallet() {
+    try {
+      if (!window.farcasterSDK) {
+        throw new Error('Farcaster SDK not available');
+      }
+
+      // Show connecting state
+      this.updateConnectButtonState('connecting');
+
+      // Get Farcaster wallet
+      const wallet = await window.farcasterSDK.actions.getWallet();
+      const user = await window.farcasterSDK.actions.getUser();
+
+      if (wallet && user) {
+        // Create Farcaster signer
+        this.farcasterSigner = {
+          address: wallet.address,
+          provider: null,
+          getAddress: () => Promise.resolve(wallet.address),
+          signMessage: async (message) => {
+            return await window.farcasterSDK.actions.signMessage(message);
+          },
+          signTransaction: async (transaction) => {
+            return await window.farcasterSDK.actions.signTransaction(transaction);
+          }
+        };
+
+        this.signer = this.farcasterSigner;
+        this.currentWalletType = 'farcaster';
+
+        // Update button
+        this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+
+        // Send notification to Farcaster
+        await this.sendFarcasterNotification('Connected to Sendwise! 🚀');
+
+        console.log('Connected to Farcaster wallet:', wallet.address);
+        
+        // Update UI status
+        if (window.uiManager) {
+          window.uiManager.updateStatus('Farcaster wallet connected successfully', true, false);
+        }
+
+        return this.signer;
+      } else {
+        throw new Error('No Farcaster wallet available');
+      }
+    } catch (error) {
+      console.error('Error connecting to Farcaster wallet:', error);
+      
+      // Reset button state on error
+      this.updateConnectButtonState('disconnected');
+      
+      // Update UI status
+      if (window.uiManager) {
+        window.uiManager.updateStatus('Failed to connect to Farcaster wallet: ' + error.message, false, true);
+      }
+      
+      throw new Error('Failed to connect to Farcaster wallet: ' + error.message);
+    }
+  }
+
+  // Send Farcaster notification
+  async sendFarcasterNotification(message) {
+    try {
+      if (window.farcasterSDK && window.isFarcasterMiniApp) {
+        await window.farcasterSDK.actions.sendNotification({
+          title: 'Sendwise',
+          body: message,
+          url: window.location.href
+        });
+        console.log('Farcaster notification sent:', message);
+      }
+    } catch (error) {
+      console.error('Error sending Farcaster notification:', error);
+    }
   }
 
   // Switch to MetaMask
@@ -40,10 +256,7 @@ export class WalletManager {
       }
 
       // Show connecting state
-      const connectBtn = document.getElementById('rainbowkitConnectBtn');
-      if (connectBtn) {
-        this.updateConnectButtonState(connectBtn, 'connecting');
-      }
+      this.updateConnectButtonState('connecting');
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       
@@ -55,299 +268,88 @@ export class WalletManager {
       
       this.signer = provider.getSigner();
       this.currentWalletType = 'metamask';
-      this.updateWalletButtons();
       
       const addr = await this.signer.getAddress();
       
-      // Get balance and chain info
-      const balance = await provider.getBalance(addr);
+      // Get current network
       const network = await provider.getNetwork();
+      
+      // Check if current network is supported
+      if (!this.isNetworkSupported(network.chainId)) {
+        console.log('Current network not supported, switching to Base...');
+        const switched = await this.switchToSupportedNetwork();
+        if (!switched) {
+          throw new Error('Please switch to a supported network (Base, Optimism, Arbitrum, Soneium, Unichain, or Ink)');
+        }
+        // Get updated network after switch
+        const updatedNetwork = await provider.getNetwork();
+        const chainName = this.getChainName(updatedNetwork.chainId);
+        
+        // Get balance using the correct RPC endpoint
+        const rpcUrl = RPC_ENDPOINTS[updatedNetwork.chainId];
+        if (rpcUrl) {
+          const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
+          const balance = await rpcProvider.getBalance(addr);
+          const balanceEth = ethers.utils.formatEther(balance);
+          
+          // Update button
+          this.updateMainConnectButton(addr, `${parseFloat(balanceEth).toFixed(4)} ETH`, chainName, 'metamask');
+          
+          console.log(`Connected to MetaMask on ${chainName}:`, addr);
+          
+          // Update UI status
+          if (window.uiManager) {
+            window.uiManager.updateStatus(`MetaMask connected successfully on ${chainName}`, true, false);
+          }
+          
+          return this.signer;
+        }
+      }
+      
+      // If already on supported network, proceed normally
+      const balance = await provider.getBalance(addr);
       const chainName = this.getChainName(network.chainId);
       const balanceEth = ethers.utils.formatEther(balance);
       
-              // Update both buttons
-        this.updateWalletDisplay(addr);
-        this.updateMainConnectButton(addr, `${parseFloat(balanceEth).toFixed(4)} ETH`, chainName, 'metamask');
-        if (connectBtn) {
-          this.updateConnectButtonState(connectBtn, 'connected', {
-            address: addr,
-            balance: `${parseFloat(balanceEth).toFixed(4)} ETH`,
-            chainName: chainName,
-            walletType: 'metamask'
-          });
-        }
+      // Update button
+      this.updateMainConnectButton(addr, `${parseFloat(balanceEth).toFixed(4)} ETH`, chainName, 'metamask');
       
-              console.log('Connected to MetaMask:', addr);
-        
-        // Update UI status
-        if (window.uiManager) {
-          window.uiManager.updateStatus('MetaMask connected successfully', true, false);
-        }
-        
-        return this.signer;
-      } catch (error) {
-        console.error('Error connecting to MetaMask:', error);
-        // Reset button state on error
-        const connectBtn = document.getElementById('rainbowkitConnectBtn');
-        if (connectBtn) {
-          this.updateConnectButtonState(connectBtn, 'disconnected');
-        }
-        
-        // Update UI status
-        if (window.uiManager) {
-          window.uiManager.updateStatus('Failed to connect to MetaMask: ' + error.message, false, true);
-        }
-        
-        throw new Error('Failed to connect to MetaMask: ' + error.message);
-      }
-  }
-
-  // Initialize Rainbow Wallet connector
-  async initializeRainbowConnector() {
-    try {
-      console.log('Initializing Rainbow Wallet connector...');
-      
-      // Check for available wallets
-      const availableWallets = this.detectAvailableWallets();
-      console.log('Available wallets:', availableWallets);
-      
-      // Create modern wallet connect button
-      console.log('Calling createModernWalletConnectButton...');
-      this.createModernWalletConnectButton();
-      console.log('createModernWalletConnectButton called successfully');
-      
-    } catch (error) {
-      console.log('Wallet initialization error:', error.message);
-    }
-  }
-
-  // Create Modern Wallet Connect Button (RainbowKit Style)
-  createModernWalletConnectButton() {
-    try {
-      console.log('Setting up modern wallet connect button...');
-      
-      // Get the existing button from HTML
-      const connectButton = document.getElementById('rainbowkitConnectBtn');
-      console.log('Connect button:', connectButton);
-      
-      if (!connectButton) {
-        console.error('Connect button not found!');
-        return;
-      }
-
-      // Add click handler to the existing button
-      connectButton.addEventListener('click', () => {
-        if (this.isConnected()) {
-          this.disconnectWallet();
-        } else {
-          this.showModernWalletModal();
-        }
-      });
-      
-      console.log('Modern wallet connect button setup successfully!');
-
-    } catch (error) {
-      console.error('Error setting up modern wallet connect button:', error);
-    }
-  }
-
-  // Update Connect Button State (RainbowKit Style)
-  updateConnectButtonState(button, state, data = {}) {
-    if (!button) return;
-
-    const isSmallScreen = window.innerWidth < 768;
-    
-    switch (state) {
-      case 'disconnected':
-        button.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 16px;"></span>
-            <span>Connect Wallet</span>
-          </div>
-        `;
-        button.style.cssText = `
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          border-radius: 12px;
-          padding: 12px 24px;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-          margin-top: 10px;
-          font-family: 'Inter', sans-serif;
-          min-width: 140px;
-        `;
-        break;
-        
-      case 'connected':
-        const { address, balance, chainName, walletType } = data;
-        const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
-        const walletIcon = this.getWalletIcon(walletType);
-        
-        if (isSmallScreen) {
-          // Small screen: Show only avatar/icon
-          button.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 18px;">${walletIcon}</span>
-            </div>
-          `;
-        } else {
-          // Large screen: Show full info
-          button.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 16px;">${walletIcon}</span>
-              <div style="text-align: left; line-height: 1.2;">
-                <div style="font-size: 14px; font-weight: 600;">${shortAddress}</div>
-                ${balance ? `<div style="font-size: 12px; opacity: 0.8;">${balance}</div>` : ''}
-              </div>
-              <span style="font-size: 12px; opacity: 0.7;">${chainName || 'ETH'}</span>
-            </div>
-          `;
-        }
-        
-        button.style.cssText = `
-          background: white;
-          color: #1a1a1a;
-          border: 2px solid #e0e0e0;
-          border-radius: 12px;
-          padding: 8px 16px;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          margin-top: 10px;
-          font-family: 'Inter', sans-serif;
-          min-width: 140px;
-        `;
-        break;
-        
-      case 'connecting':
-        button.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <span>Connecting...</span>
-          </div>
-        `;
-        button.style.cssText = `
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          border-radius: 12px;
-          padding: 12px 24px;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: not-allowed;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-          margin-top: 10px;
-          font-family: 'Inter', sans-serif;
-          min-width: 140px;
-          opacity: 0.8;
-        `;
-        break;
-    }
-
-    // Add hover effects for connected state
-    if (state === 'connected') {
-      button.addEventListener('mouseenter', () => {
-        button.style.transform = 'translateY(-1px)';
-        button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-        button.style.borderColor = '#667eea';
-      });
-
-      button.addEventListener('mouseleave', () => {
-        button.style.transform = 'translateY(0)';
-        button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-        button.style.borderColor = '#e0e0e0';
-      });
-    } else {
-      button.addEventListener('mouseenter', () => {
-        button.style.transform = 'translateY(-2px)';
-        button.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
-      });
-
-      button.addEventListener('mouseleave', () => {
-        button.style.transform = 'translateY(0)';
-        button.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
-      });
-    }
-
-    // Add CSS animation for loading spinner
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  // Get wallet icon
-  getWalletIcon(walletType) {
-    switch (walletType) {
-      case 'farcaster': return '🔗';
-      case 'metamask': return '🦊';
-      case 'rainbow': return '🌈';
-      case 'coinbase': return '🪙';
-      case 'trustwallet': return '🛡️';
-      default: return '💳';
-    }
-  }
-
-  // Get chain name
-  getChainName(chainId) {
-    switch (chainId) {
-      case 1: return 'ETH';
-      case 8453: return 'Base';
-      case 10: return 'Optimism';
-      case 42161: return 'Arbitrum';
-      case 137: return 'Polygon';
-      case 56: return 'BSC';
-      default: return 'Unknown';
-    }
-  }
-
-  // Disconnect wallet
-  async disconnectWallet() {
-    try {
-      this.signer = null;
-      this.currentWalletType = null;
-      
-      // Reset main button
-      const mainBtn = document.getElementById('headerWalletBtn');
-      if (mainBtn) {
-        mainBtn.innerHTML = `
-          <div style="display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 2;">
-            <span style="font-size: 20px;"></span>
-            <span>Connect Wallet</span>
-          </div>
-          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%); opacity: 0; transition: opacity 0.3s ease; z-index: 1;" class="button-overlay"></div>
-        `;
-        mainBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        mainBtn.style.border = 'none';
-        mainBtn.onclick = () => window.openWalletModal();
-      }
-      
-      console.log('Wallet disconnected');
+      console.log('Connected to MetaMask:', addr);
       
       // Update UI status
       if (window.uiManager) {
-        window.uiManager.updateStatus('Wallet disconnected', false, false);
+        window.uiManager.updateStatus('MetaMask connected successfully', true, false);
       }
       
+      return this.signer;
     } catch (error) {
-      console.error('Error disconnecting wallet:', error);
+      console.error('Error connecting to MetaMask:', error);
+      
+      // Reset button state on error
+      this.updateConnectButtonState('disconnected');
+      
+      // Update UI status
+      if (window.uiManager) {
+        window.uiManager.updateStatus('Failed to connect to MetaMask: ' + error.message, false, true);
+      }
+      
+      throw new Error('Failed to connect to MetaMask: ' + error.message);
     }
   }
 
   // Show Modern Wallet Modal
   showModernWalletModal() {
     try {
+      // If in Farcaster Mini App, use Farcaster wallet
+      if (window.isFarcasterMiniApp && window.farcasterSDK) {
+        this.connectFarcasterWallet();
+        return;
+      }
+      
+      // Detect available wallets first
+      const availableWallets = this.detectAvailableWallets();
+      console.log('Available wallets:', availableWallets);
+      
       // Create modern modal with wallet selection
       const modal = document.createElement('div');
       modal.className = 'modern-wallet-modal-overlay';
@@ -378,13 +380,11 @@ export class WalletManager {
         font-family: 'Inter', sans-serif;
       `;
 
-      modalContent.innerHTML = `
-        <div style="text-align: center; margin-bottom: 32px;">
-          <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; color: #1a1a1a;">Connect Wallet</h2>
-          <p style="margin: 0; color: #666; font-size: 16px;">Choose your preferred wallet</p>
-        </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 12px;">
+      // Build wallet options dynamically based on availability
+      let walletOptionsHTML = '';
+      
+      if (availableWallets.includes('metamask')) {
+        walletOptionsHTML += `
           <button class="wallet-option" data-wallet="metamask" style="
             display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
             border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
@@ -397,20 +397,11 @@ export class WalletManager {
               <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with MetaMask</div>
             </div>
           </button>
-          
-          <button class="wallet-option" data-wallet="rainbow" style="
-            display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-            border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-            font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-            font-family: 'Inter', sans-serif;
-          ">
-            <span style="font-size: 24px;">🌈</span>
-            <div>
-              <div>Rainbow</div>
-              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Rainbow Wallet</div>
-            </div>
-          </button>
-          
+        `;
+      }
+      
+      if (availableWallets.includes('coinbase')) {
+        walletOptionsHTML += `
           <button class="wallet-option" data-wallet="coinbase" style="
             display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
             border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
@@ -423,19 +414,48 @@ export class WalletManager {
               <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Coinbase</div>
             </div>
           </button>
-          
-          <button class="wallet-option" data-wallet="trustwallet" style="
-            display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-            border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-            font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-            font-family: 'Inter', sans-serif;
-          ">
-            <span style="font-size: 24px;">🛡️</span>
-            <div>
-              <div>Trust Wallet</div>
-              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Trust Wallet</div>
+        `;
+      }
+      
+      // If no wallets detected, show install options
+      if (availableWallets.length === 0) {
+        walletOptionsHTML = `
+          <div style="text-align: center; padding: 24px; color: #666;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No Wallets Detected</div>
+            <div style="font-size: 14px; margin-bottom: 16px;">Please install one of these wallet extensions:</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button onclick="window.open('https://metamask.io/download/', '_blank')" style="
+                padding: 8px 16px; border: 1px solid #667eea; border-radius: 8px; background: white; 
+                color: #667eea; cursor: pointer; font-size: 14px; font-weight: 600;
+              ">Install MetaMask</button>
+              <button onclick="window.open('https://www.coinbase.com/wallet', '_blank')" style="
+                padding: 8px 16px; border: 1px solid #667eea; border-radius: 8px; background: white; 
+                color: #667eea; cursor: pointer; font-size: 14px; font-weight: 600;
+              ">Install Coinbase Wallet</button>
             </div>
-          </button>
+          </div>
+        `;
+      }
+
+      // Build supported networks info
+      const supportedNetworks = this.getSupportedNetworks();
+      const networksList = supportedNetworks.map(chainId => 
+        `${NETWORK_NAMES[chainId]} (${chainId})`
+      ).join(', ');
+
+      modalContent.innerHTML = `
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; color: #1a1a1a;">Connect Wallet</h2>
+          <p style="margin: 0; color: #666; font-size: 16px;">Choose your preferred wallet</p>
+          <div style="margin-top: 12px; padding: 12px; background: #f8f9ff; border-radius: 8px; border: 1px solid #e0e8ff;">
+            <div style="font-size: 12px; font-weight: 600; color: #667eea; margin-bottom: 4px;">Supported Networks:</div>
+            <div style="font-size: 11px; color: #666;">${networksList}</div>
+          </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${walletOptionsHTML}
         </div>
         
         <button class="close-modal" style="
@@ -485,14 +505,8 @@ export class WalletManager {
               case 'metamask':
                 await this.switchToMetaMask();
                 break;
-              case 'rainbow':
-                await this.switchToRainbow();
-                break;
               case 'coinbase':
                 await this.switchToCoinbase();
-                break;
-              case 'trustwallet':
-                await this.switchToTrustWallet();
                 break;
             }
             this.closeModal(modal);
@@ -527,74 +541,11 @@ export class WalletManager {
     }
   }
 
-
-
-  // Switch to Rainbow Wallet
-  async switchToRainbow() {
-    try {
-      // Show connecting state
-      const connectBtn = document.getElementById('rainbowkitConnectBtn');
-      if (connectBtn) {
-        this.updateConnectButtonState(connectBtn, 'connecting');
-      }
-
-      // Direct Rainbow Wallet connection
-      if (!window.rainbow) {
-        throw new Error('Rainbow Wallet not installed. Please install Rainbow Wallet extension.');
-      }
-
-      const result = await window.rainbow.connect();
-      
-      if (result && result.provider) {
-        const provider = new ethers.providers.Web3Provider(result.provider);
-        this.signer = provider.getSigner();
-        this.currentWalletType = 'rainbow';
-        this.updateWalletButtons();
-        
-        const addr = await this.signer.getAddress();
-        
-        // Get balance and chain info
-        const balance = await provider.getBalance(addr);
-        const network = await provider.getNetwork();
-        const chainName = this.getChainName(network.chainId);
-        const balanceEth = ethers.utils.formatEther(balance);
-        
-        // Update both buttons
-        this.updateWalletDisplay(addr);
-        this.updateMainConnectButton(addr, `${parseFloat(balanceEth).toFixed(4)} ETH`, chainName, 'rainbow');
-        if (connectBtn) {
-          this.updateConnectButtonState(connectBtn, 'connected', {
-            address: addr,
-            balance: `${parseFloat(balanceEth).toFixed(4)} ETH`,
-            chainName: chainName,
-            walletType: 'rainbow'
-          });
-        }
-        
-        console.log('Connected to Rainbow Wallet:', addr);
-        return this.signer;
-      } else {
-        throw new Error('Failed to connect to Rainbow Wallet');
-      }
-    } catch (error) {
-      console.error('Error connecting to Rainbow Wallet:', error);
-      // Reset button state on error
-      const connectBtn = document.getElementById('rainbowkitConnectBtn');
-      if (connectBtn) {
-        this.updateConnectButtonState(connectBtn, 'disconnected');
-      }
-      throw new Error('Failed to connect to Rainbow Wallet: ' + error.message);
-    }
-  }
-
   // Switch to Coinbase Wallet
   async switchToCoinbase() {
     try {
       // Show connecting state
-      const connectBtn = document.getElementById('rainbowkitConnectBtn');
-      if (connectBtn) {
-        this.updateConnectButtonState(connectBtn, 'connecting');
-      }
+      this.updateConnectButtonState('connecting');
 
       if (!window.coinbaseWalletExtension) {
         throw new Error('Coinbase Wallet not installed. Please install Coinbase Wallet extension.');
@@ -606,7 +557,6 @@ export class WalletManager {
       if (accounts && accounts.length > 0) {
         this.signer = provider.getSigner();
         this.currentWalletType = 'coinbase';
-        this.updateWalletButtons();
         
         const addr = await this.signer.getAddress();
         
@@ -616,17 +566,8 @@ export class WalletManager {
         const chainName = this.getChainName(network.chainId);
         const balanceEth = ethers.utils.formatEther(balance);
         
-        // Update both buttons
-        this.updateWalletDisplay(addr);
+        // Update button
         this.updateMainConnectButton(addr, `${parseFloat(balanceEth).toFixed(4)} ETH`, chainName, 'coinbase');
-        if (connectBtn) {
-          this.updateConnectButtonState(connectBtn, 'connected', {
-            address: addr,
-            balance: `${parseFloat(balanceEth).toFixed(4)} ETH`,
-            chainName: chainName,
-            walletType: 'coinbase'
-          });
-        }
         
         console.log('Connected to Coinbase Wallet:', addr);
         return this.signer;
@@ -636,131 +577,181 @@ export class WalletManager {
     } catch (error) {
       console.error('Error connecting to Coinbase Wallet:', error);
       // Reset button state on error
-      const connectBtn = document.getElementById('rainbowkitConnectBtn');
-      if (connectBtn) {
-        this.updateConnectButtonState(connectBtn, 'disconnected');
-      }
+      this.updateConnectButtonState('disconnected');
       throw new Error('Failed to connect to Coinbase Wallet: ' + error.message);
     }
   }
-
-  // Switch to Trust Wallet
-  async switchToTrustWallet() {
-    try {
-      // Show connecting state
-      const connectBtn = document.getElementById('rainbowkitConnectBtn');
-      if (connectBtn) {
-        this.updateConnectButtonState(connectBtn, 'connecting');
-      }
-
-      if (!window.trustwallet) {
-        throw new Error('Trust Wallet not installed. Please install Trust Wallet extension.');
-      }
-
-      const provider = new ethers.providers.Web3Provider(window.trustwallet);
-      const accounts = await provider.send('eth_requestAccounts', []);
-      
-      if (accounts && accounts.length > 0) {
-        this.signer = provider.getSigner();
-        this.currentWalletType = 'trustwallet';
-        this.updateWalletButtons();
-        
-        const addr = await this.signer.getAddress();
-        
-        // Get balance and chain info
-        const balance = await provider.getBalance(addr);
-        const network = await provider.getNetwork();
-        const chainName = this.getChainName(network.chainId);
-        const balanceEth = ethers.utils.formatEther(balance);
-        
-        // Update both buttons
-        this.updateWalletDisplay(addr);
-        this.updateMainConnectButton(addr, `${parseFloat(balanceEth).toFixed(4)} ETH`, chainName, 'trustwallet');
-        if (connectBtn) {
-          this.updateConnectButtonState(connectBtn, 'connected', {
-            address: addr,
-            balance: `${parseFloat(balanceEth).toFixed(4)} ETH`,
-            chainName: chainName,
-            walletType: 'trustwallet'
-          });
-        }
-        
-        console.log('Connected to Trust Wallet:', addr);
-        return this.signer;
-      } else {
-        throw new Error('No accounts found in Trust Wallet');
-      }
-    } catch (error) {
-      console.error('Error connecting to Trust Wallet:', error);
-      // Reset button state on error
-      const connectBtn = document.getElementById('rainbowkitConnectBtn');
-      if (connectBtn) {
-        this.updateConnectButtonState(connectBtn, 'disconnected');
-      }
-      throw new Error('Failed to connect to Trust Wallet: ' + error.message);
-    }
-  }
-
-
-
-
 
   // Detect available wallets
   detectAvailableWallets() {
     const wallets = [];
     
+    // Check for MetaMask and other ethereum providers
     if (window.ethereum) {
-      wallets.push('metamask');
+      // Check specific wallet types
+      if (window.ethereum.isMetaMask) {
+        wallets.push('metamask');
+      }
+      if (window.ethereum.isCoinbaseWallet) {
+        wallets.push('coinbase');
+      }
+      
+      // If no specific type detected but ethereum exists, assume MetaMask
+      if (wallets.length === 0) {
+        wallets.push('metamask');
+      }
     }
     
-    if (window.rainbow) {
-      wallets.push('rainbow');
-    }
-    
+    // Check for Coinbase Wallet extension
     if (window.coinbaseWalletExtension) {
-      wallets.push('coinbase');
+      if (!wallets.includes('coinbase')) {
+        wallets.push('coinbase');
+      }
     }
     
-    if (window.trustwallet) {
-      wallets.push('trustwallet');
-    }
-    
+    console.log('Detected wallets:', wallets);
     return wallets;
   }
 
-  // Update wallet selector buttons (no longer needed since we removed individual buttons)
-  updateWalletButtons() {
-    // This function is kept for compatibility but no longer needed
-    // since we removed individual wallet buttons
-  }
+  // Update Connect Button State
+  updateConnectButtonState(state) {
+    const button = document.getElementById('headerWalletBtn');
+    if (!button) return;
 
-  // Update wallet display (now handled by RainbowKit style button)
-  updateWalletDisplay(address) {
-    // This function is now handled by the modern RainbowKit style button
-    // The button automatically updates its state when connected
-  }
-
-  // Get wallet display name
-  getWalletDisplayName() {
-    switch (this.currentWalletType) {
-      case 'farcaster':
-        return '🔗 Farcaster';
-      case 'metamask':
-        return '🦊 MetaMask';
-      case 'rainbow':
-        return '🌈 Rainbow';
-      case 'coinbase':
-        return '🪙 Coinbase';
-      case 'trustwallet':
-        return '🛡️ Trust';
-      default:
-        return 'Wallet';
+    switch (state) {
+      case 'disconnected':
+        button.innerHTML = `
+          <span style="font-size: 16px;">💳</span>
+          <span>Connect Wallet</span>
+        `;
+        button.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        button.style.cursor = 'pointer';
+        break;
+        
+      case 'connecting':
+        button.innerHTML = `
+          <div style="width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          <span>Connecting...</span>
+        `;
+        button.style.cursor = 'not-allowed';
+        break;
     }
   }
 
-  // Check if wallet is connected
-  isConnected() {
-    return this.signer !== null;
+  // Get chain name
+  getChainName(chainId) {
+    return NETWORK_NAMES[chainId] || 'Unknown';
+  }
+
+  // Check if network is supported
+  isNetworkSupported(chainId) {
+    return CONTRACTS.hasOwnProperty(chainId);
+  }
+
+  // Get supported networks
+  getSupportedNetworks() {
+    return Object.keys(CONTRACTS).map(Number);
+  }
+
+  // Switch to supported network
+  async switchToSupportedNetwork() {
+    const signer = this.getSigner();
+    if (!signer) return false;
+
+    try {
+      const provider = signer.provider;
+      const currentNetwork = await provider.getNetwork();
+      
+      // If already on supported network, return true
+      if (this.isNetworkSupported(currentNetwork.chainId)) {
+        return true;
+      }
+
+      // Try to switch to first supported network (Base)
+      const supportedChainId = 8453; // Base network
+      
+      try {
+        await provider.send('wallet_switchEthereumChain', [
+          { chainId: `0x${supportedChainId.toString(16)}` }
+        ]);
+        return true;
+      } catch (switchError) {
+        // If network not added, add it
+        if (switchError.code === 4902) {
+          const networkConfig = this.getNetworkConfig(supportedChainId);
+          if (networkConfig) {
+            await provider.send('wallet_addEthereumChain', [networkConfig]);
+            return true;
+          }
+        }
+        throw switchError;
+      }
+    } catch (error) {
+      console.error('Error switching network:', error);
+      return false;
+    }
+  }
+
+  // Get network configuration for wallet_addEthereumChain
+  getNetworkConfig(chainId) {
+    const networkConfigs = {
+      8453: { // Base
+        chainId: '0x2105',
+        chainName: 'Base',
+        nativeCurrency: {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        rpcUrls: ['https://mainnet.base.org'],
+        blockExplorerUrls: ['https://basescan.org']
+      },
+      10: { // Optimism
+        chainId: '0xa',
+        chainName: 'Optimism',
+        nativeCurrency: {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        rpcUrls: ['https://mainnet.optimism.io'],
+        blockExplorerUrls: ['https://optimistic.etherscan.io']
+      },
+      42161: { // Arbitrum
+        chainId: '0xa4b1',
+        chainName: 'Arbitrum One',
+        nativeCurrency: {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+        blockExplorerUrls: ['https://arbiscan.io']
+      }
+    };
+    
+    return networkConfigs[chainId];
+  }
+
+  // Disconnect wallet
+  async disconnectWallet() {
+    try {
+      this.signer = null;
+      this.currentWalletType = null;
+      
+      // Reset button
+      this.updateConnectButtonState('disconnected');
+      
+      console.log('Wallet disconnected');
+      
+      // Update UI status
+      if (window.uiManager) {
+        window.uiManager.updateStatus('Wallet disconnected', false, false);
+      }
+      
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error);
+    }
   }
 
   // Update main connect button
@@ -772,19 +763,28 @@ export class WalletManager {
     const walletIcon = this.getWalletIcon(walletType);
     
     mainBtn.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; z-index: 2;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
         <span style="font-size: 18px;">${walletIcon}</span>
         <div style="text-align: left;">
           <div style="font-weight: 600;">${shortAddress}</div>
           <div style="font-size: 12px; opacity: 0.8;">${balance} • ${chainName}</div>
         </div>
       </div>
-      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%); opacity: 0; transition: opacity 0.3s ease; z-index: 1;" class="button-overlay"></div>
     `;
     
     mainBtn.style.background = 'rgba(255, 255, 255, 0.1)';
     mainBtn.style.border = '2px solid rgba(255, 255, 255, 0.2)';
     mainBtn.onclick = () => this.disconnectWallet();
+  }
+
+  // Get wallet icon
+  getWalletIcon(walletType) {
+    switch (walletType) {
+      case 'farcaster': return '🔗';
+      case 'metamask': return '🦊';
+      case 'coinbase': return '🪙';
+      default: return '💳';
+    }
   }
 
   // Get current signer
@@ -795,6 +795,37 @@ export class WalletManager {
   // Get current wallet type
   getCurrentWalletType() {
     return this.currentWalletType;
+  }
+
+  // Get network information
+  getNetworkInfo() {
+    if (!this.signer || !this.signer.provider) {
+      return null;
+    }
+    
+    try {
+      // For Farcaster wallet, return default network info
+      if (this.currentWalletType === 'farcaster') {
+        return {
+          chainId: 8453, // Base mainnet
+          name: 'Base'
+        };
+      }
+      
+      // For other wallets, get from provider
+      const provider = this.signer.provider;
+      if (provider && provider.network) {
+        return {
+          chainId: provider.network.chainId,
+          name: this.getChainName(provider.network.chainId)
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting network info:', error);
+      return null;
+    }
   }
 
   // Check if wallet is connected
@@ -832,5 +863,10 @@ export class WalletManager {
   // Get Farcaster manager
   getFarcasterManager() {
     return this.farcasterManager;
+  }
+
+  // Update wallet display (compatibility)
+  updateWalletDisplay(address) {
+    // This function is kept for compatibility
   }
 }

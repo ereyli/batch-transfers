@@ -1,0 +1,40 @@
+{
+  "name": "Sendwise",
+  "description": "Smart Batch Transfers for ETH & ERC20 Tokens",
+  "icon": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png",
+  "url": "https://sendwise.app",
+  "developer": {
+    "name": "Sendwise Team",
+    "url": "https://sendwise.app"
+  },
+  "categories": ["Finance", "DeFi", "Tools"],
+  "tags": ["batch-transfer", "ethereum", "defi", "wallet"],
+  "screenshots": [
+    {
+      "url": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png",
+      "alt": "Sendwise App Screenshot"
+    }
+  ],
+  "permissions": [
+    "user",
+    "wallet",
+    "notifications"
+  ],
+  "supportedNetworks": [
+    "base",
+    "optimism", 
+    "arbitrum",
+    "soneium",
+    "unichain",
+    "ink"
+  ],
+  "version": "1.0.0",
+  "minFarcasterVersion": "1.0.0",
+  "splash": {
+    "backgroundColor": "#1a1a1a",
+    "image": "https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png",
+    "imageWidth": 120,
+    "imageHeight": 120
+  },
+  "disableNativeGestures": true
+}

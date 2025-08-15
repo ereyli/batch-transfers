@@ -10,6 +10,28 @@ export const CONTRACTS = {
 
 export const CONTRACTS_ERC20 = { ...CONTRACTS };
 
+// RPC Endpoints for different networks
+export const RPC_ENDPOINTS = {
+  1: "https://eth.llamarpc.com",           // Ethereum Mainnet
+  8453: "https://mainnet.base.org",        // Base
+  10: "https://mainnet.optimism.io",       // Optimism
+  42161: "https://arb1.arbitrum.io/rpc",   // Arbitrum
+  1868: "https://rpc.soneium.com",         // Soneium
+  130: "https://rpc.unichain.world",       // Unichain
+  57073: "https://rpc.inkchain.io"         // Ink
+};
+
+// Network names for display
+export const NETWORK_NAMES = {
+  1: "Ethereum",
+  8453: "Base",
+  10: "Optimism", 
+  42161: "Arbitrum",
+  1868: "Soneium",
+  130: "Unichain",
+  57073: "Ink"
+};
+
 // Contract ABIs
 export const ABI_TOKEN = [
   "function name() view returns(string)",

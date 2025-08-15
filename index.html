@@ -5,12 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sendwise: Smart Batch Transfers</title>
   <link rel="icon" href="https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png" type="image/png" />
-     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-   <link rel="stylesheet" href="styles/main.css">
+  
+  <!-- Farcaster Mini App Sharing Meta Tags -->
+  <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/share-image.png","button":{"title":"🚀 Start Batch Transfer","action":{"type":"launch_miniapp","url":"https://www.sendwise.xyz","name":"Sendwise","splashImageUrl":"https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png","splashBackgroundColor":"#1a1a1a"}}}' />
+  <!-- For backward compatibility -->
+  <meta name="fc:frame" content='{"version":"1","imageUrl":"https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/share-image.png","button":{"title":"🚀 Start Batch Transfer","action":{"type":"launch_frame","url":"https://www.sendwise.xyz","name":"Sendwise","splashImageUrl":"https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/logo.png","splashBackgroundColor":"#1a1a1a"}}}' />
+  
+  <!-- Open Graph Meta Tags for better sharing -->
+  <meta property="og:title" content="Sendwise - Smart Batch Transfers" />
+  <meta property="og:description" content="Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time! Perfect for airdrops, payroll, and bulk payments." />
+  <meta property="og:image" content="https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/share-image.png" />
+  <meta property="og:url" content="https://www.sendwise.xyz" />
+  <meta property="og:type" content="website" />
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers. Perfect for airdrops, payroll, and bulk payments." />
+  <meta name="keywords" content="batch transfer, ethereum, defi, wallet, gas savings, airdrop, payroll, bulk payments, sendwise" />
+  <meta name="author" content="Sendwise Team" />
+  <meta name="robots" content="index, follow" />
+  
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Sendwise",
+    "description": "Smart Batch Transfers for ETH & ERC20 Tokens",
+    "url": "https://www.sendwise.xyz",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web Browser, Farcaster Mini App",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "Sendwise Team"
+    }
+  }
+  </script>
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sendwise - Smart Batch Transfers" />
+  <meta name="twitter:description" content="Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time!" />
+  <meta name="twitter:image" content="https://bafybeigudidkz2nstogywhcb6gbwicvfdfqgkrdhjsnlvll5esa6hzic4e.ipfs.w3s.link/share-image.png" />
+  
+  <!-- Ethers.js -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  
+  <!-- Wagmi and Viem for Farcaster Mini App -->
+  <script src="https://cdn.jsdelivr.net/npm/viem@2.23.15/dist/viem.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/wagmi@2.5.7/dist/wagmi.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-wagmi-connector@0.1.0/dist/index.umd.js"></script>
+  
+  <!-- Fonts and Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-  <div id="loading" class="loading">
+  <!-- Loading Screen - Only shown in web browser, not in Farcaster Mini App -->
+  <div id="loading" class="loading" style="display: none;">
     <div class="loading-spinner"></div>
     <h3>🚀 Initializing Sendwise...</h3>
     <p>Connecting to Farcaster and Web3 networks...</p>
@@ -19,9 +75,9 @@
   <div class="container">
     <!-- Header with Wallet Button -->
     <div class="header fade-in" style="position: relative;">
-      <!-- Wallet Button - Top Right -->
+      <!-- Modern Wallet Button - Top Right -->
       <div style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
-        <button id="headerWalletBtn" onclick="console.log('Header button clicked!'); console.log('openWalletModal:', window.openWalletModal); if(window.openWalletModal) window.openWalletModal(); else alert('openWalletModal not found!');" style="
+        <button id="headerWalletBtn" onclick="window.openWalletModal()" style="
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
           border: none;
@@ -35,7 +91,7 @@
           font-family: 'Inter', sans-serif;
           min-width: 160px;
         ">
-          <span style="font-size: 16px;"></span>
+          <span style="font-size: 16px;">💳</span>
           <span>Connect Wallet</span>
         </button>
       </div>
@@ -51,15 +107,14 @@
       </div>
     </div>
 
-
-
     <!-- Farcaster Info -->
     <div id="farcasterInfo" class="farcaster-info" style="display:none;">
       <strong>🚀 Farcaster Mini App Mode</strong><br>
       Connected to Farcaster ecosystem with enhanced wallet integration
+      <button id="addToCollectionBtn" onclick="addToCollection()" class="add-to-collection-btn">
+        ⭐ Add to Collection
+      </button>
     </div>
-
-
 
     <!-- Main Form -->
     <div class="main-form slide-up">
@@ -89,12 +144,12 @@
             <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
             <input type="text" placeholder="Amount" class="form-input amount" />
             <div class="recipient-actions">
-                             <button onclick="addInput()" class="recipient-action-btn add-recipient-btn" title="Add Recipient">
-                 ➕
-               </button>
-               <button onclick="removeLast()" class="recipient-action-btn remove-recipient-btn" title="Remove Last" disabled>
-                 ❌
-               </button>
+              <button onclick="addInput()" class="recipient-action-btn add-recipient-btn" title="Add Recipient">
+                ➕
+              </button>
+              <button onclick="removeLast()" class="recipient-action-btn remove-recipient-btn" title="Remove Last" disabled>
+                ❌
+              </button>
             </div>
           </div>
         </div>
@@ -128,277 +183,285 @@
     </div>
   </div>
 
+  <!-- Farcaster Mini App SDK -->
   <script type="module">
+    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
     import { SendwiseApp } from './js/app.js';
 
-    // Global wallet modal function - Define immediately
+    // Global variables
+    window.farcasterSDK = sdk;
+    window.isFarcasterMiniApp = false;
+
+    // Global wallet modal function
     window.openWalletModal = () => {
-      console.log('openWalletModal called - Creating modal directly');
+      console.log('openWalletModal called');
       
-      // Create modal directly
-      const modal = document.createElement('div');
-      modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-        backdrop-filter: blur(8px);
-      `;
+      if (window.walletManager) {
+        window.walletManager.showModernWalletModal();
+      } else {
+        console.error('WalletManager not available');
+        alert('Wallet system not initialized. Please refresh the page.');
+      }
+    };
 
-      const modalContent = document.createElement('div');
-      modalContent.style.cssText = `
-        background: white;
-        border-radius: 20px;
-        padding: 32px;
-        max-width: 480px;
-        width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        font-family: 'Inter', sans-serif;
-      `;
-
-      modalContent.innerHTML = `
-        <div style="text-align: center; margin-bottom: 32px;">
-          <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; color: #1a1a1a;">Connect Wallet</h2>
-          <p style="margin: 0; color: #666; font-size: 16px;">Choose your preferred wallet</p>
-        </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <button onclick="connectMetaMask(); closeModal();" style="
-            display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-            border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-            font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-            font-family: 'Inter', sans-serif;
-          ">
-            <span style="font-size: 24px;">🦊</span>
-            <div>
-              <div>MetaMask</div>
-              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with MetaMask</div>
-            </div>
-          </button>
+    // Initialize Wagmi for Farcaster Mini App
+    function initializeWagmi() {
+      try {
+        if (window.wagmi && window.viem && window.FarcasterMiniAppConnector) {
+          console.log('Initializing Wagmi for Farcaster Mini App...');
           
-          <button onclick="connectWalletConnect(); closeModal();" style="
-            display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-            border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-            font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-            font-family: 'Inter', sans-serif;
-          ">
-            <span style="font-size: 24px;">🔗</span>
-            <div>
-              <div>WalletConnect</div>
-              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with mobile wallet</div>
-            </div>
-          </button>
-          
-          <button onclick="connectCoinbase(); closeModal();" style="
-            display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
-            border-radius: 12px; background: white; cursor: pointer; transition: all 0.2s ease;
-            font-size: 16px; font-weight: 600; color: #1a1a1a; text-align: left; width: 100%;
-            font-family: 'Inter', sans-serif;
-          ">
-            <span style="font-size: 24px;">🪙</span>
-            <div>
-              <div>Coinbase Wallet</div>
-              <div style="font-size: 14px; font-weight: 400; color: #666; margin-top: 2px;">Connect with Coinbase Wallet</div>
-            </div>
-          </button>
-          
-          <button onclick="detectAndConnect(); closeModal();" style="
-            display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #667eea; 
-            border-radius: 12px; background: #f8f9ff; cursor: pointer; transition: all 0.2s ease;
-            font-size: 16px; font-weight: 600; color: #667eea; text-align: left; width: 100%;
-            font-family: 'Inter', sans-serif;
-          ">
-            <span style="font-size: 24px;">🔍</span>
-            <div>
-              <div>Auto Detect</div>
-              <div style="font-size: 14px; font-weight: 400; color: #667eea; margin-top: 2px;">Automatically detect installed wallets</div>
-            </div>
-          </button>
-        </div>
-        
-        <button onclick="closeModal()" style="
-          margin-top: 24px; width: 100%; padding: 12px; border: none; border-radius: 12px; 
-          background: #f0f0f0; color: #666; font-size: 16px; font-weight: 600; cursor: pointer;
-          transition: background 0.2s ease; font-family: 'Inter', sans-serif;
-        ">Cancel</button>
-      `;
-
-      modal.appendChild(modalContent);
-      document.body.appendChild(modal);
-
-      // Close modal function
-      window.closeModal = () => {
-        if (modal.parentNode) {
-          modal.parentNode.removeChild(modal);
-        }
-      };
-
-      // MetaMask connection function
-      window.connectMetaMask = async () => {
-        try {
-          if (!window.ethereum) {
-            alert('MetaMask not installed! Please install MetaMask extension.');
-            window.open('https://metamask.io/download/', '_blank');
-            return;
-          }
-
-          console.log('Connecting to MetaMask...');
-          const accounts = await window.ethereum.request({ 
-            method: 'eth_requestAccounts' 
+          // Create Wagmi config
+          const config = window.wagmi.createConfig({
+            chains: [
+              { id: 8453, name: 'Base' },
+              { id: 10, name: 'Optimism' },
+              { id: 42161, name: 'Arbitrum' },
+              { id: 139, name: 'Soneium' },
+              { id: 140, name: 'Unichain' },
+              { id: 141, name: 'Ink' }
+            ],
+            transports: {
+              8453: window.wagmi.http('https://mainnet.base.org'),
+              10: window.wagmi.http('https://mainnet.optimism.io'),
+              42161: window.wagmi.http('https://arb1.arbitrum.io/rpc'),
+              139: window.wagmi.http('https://rpc.soneium.com'),
+              140: window.wagmi.http('https://rpc.unichain.com'),
+              141: window.wagmi.http('https://rpc.ink.com')
+            },
+            connectors: [
+              window.FarcasterMiniAppConnector.farcasterMiniApp()
+            ]
           });
           
-          if (accounts && accounts.length > 0) {
-            const account = accounts[0];
-            console.log('Connected account:', account);
-            
-            // Get network info
-            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-            console.log('Chain ID:', chainId);
-            
-            // Get balance
-            const balance = await window.ethereum.request({
-              method: 'eth_getBalance',
-              params: [account, 'latest']
-            });
-            
-            // Convert balance from hex to decimal and then to ETH
-            const balanceInWei = parseInt(balance, 16);
-            const balanceInEth = (balanceInWei / Math.pow(10, 18)).toFixed(4);
-            
-            // Update header button with detailed info
-            const headerBtn = document.getElementById('headerWalletBtn');
-            if (headerBtn) {
-              const shortAddress = account.slice(0, 6) + '...' + account.slice(-4);
-              headerBtn.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 16px;">🦊</span>
-                  <div style="text-align: left; line-height: 1.2;">
-                    <div style="font-size: 12px; font-weight: 600;">${shortAddress}</div>
-                    <div style="font-size: 10px; opacity: 0.8;">${balanceInEth} ETH</div>
-                  </div>
-                </div>
-              `;
-              headerBtn.style.background = 'rgba(255, 255, 255, 0.1)';
-              headerBtn.style.border = '2px solid rgba(255, 255, 255, 0.2)';
-              // Update click handler for disconnect
-              headerBtn.onclick = () => {
-                if (confirm('Disconnect wallet?')) {
-                  window.disconnectWallet();
-                }
-              };
-            }
-            
-            // Store connection info globally
-            window.walletInfo = {
-              address: account,
-              balance: balanceInEth,
-              chainId: chainId,
-              type: 'metamask'
-            };
-            
-            alert(`MetaMask connected successfully!\nAddress: ${shortAddress}\nBalance: ${balanceInEth} ETH`);
-          } else {
-            throw new Error('No accounts returned from MetaMask');
-          }
-        } catch (error) {
-          console.error('MetaMask connection error:', error);
-          if (error.code === 4001) {
-            alert('Connection rejected by user');
-          } else {
-            alert('Failed to connect MetaMask: ' + error.message);
-          }
-        }
-      };
-
-      // Disconnect wallet function
-      window.disconnectWallet = () => {
-        window.walletInfo = null;
-        const headerBtn = document.getElementById('headerWalletBtn');
-        if (headerBtn) {
-          headerBtn.innerHTML = '<span style="font-size: 16px;">🌈</span> <span>Connect Wallet</span>';
-          headerBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-          headerBtn.style.border = 'none';
-          headerBtn.onclick = () => window.openWalletModal();
-        }
-        alert('Wallet disconnected successfully!');
-      };
-
-      // WalletConnect function
-      window.connectWalletConnect = () => {
-        alert('WalletConnect integration coming soon!\n\nFor now, please use:\n- MetaMask browser extension\n- Coinbase Wallet extension\n- Or Auto Detect for other wallets');
-      };
-
-      // Coinbase Wallet function
-      window.connectCoinbase = async () => {
-        try {
-          if (window.coinbaseWalletExtension) {
-            const accounts = await window.coinbaseWalletExtension.request({ 
-              method: 'eth_requestAccounts' 
-            });
-            alert('Coinbase Wallet connected: ' + accounts[0]);
-          } else {
-            alert('Coinbase Wallet not detected!\n\nPlease install Coinbase Wallet extension or use the mobile app with WalletConnect.');
-            window.open('https://www.coinbase.com/wallet', '_blank');
-          }
-        } catch (error) {
-          alert('Failed to connect Coinbase Wallet: ' + error.message);
-        }
-      };
-
-      // Auto detect function
-      window.detectAndConnect = async () => {
-        const wallets = [];
-        
-        if (window.ethereum) {
-          if (window.ethereum.isMetaMask) wallets.push('🦊 MetaMask');
-          if (window.ethereum.isCoinbaseWallet) wallets.push('🪙 Coinbase');
-          if (window.ethereum.isRabby) wallets.push('🐰 Rabby');
-          if (window.ethereum.isTrust) wallets.push('🛡️ Trust Wallet');
-          if (window.ethereum.isBraveWallet) wallets.push('🦁 Brave Wallet');
-        }
-        
-        if (window.tronWeb) wallets.push('🔥 TronLink');
-        if (window.solana) wallets.push('🔮 Phantom');
-        
-        if (wallets.length === 0) {
-          alert('No wallets detected!\n\nPlease install one of these:\n- MetaMask\n- Coinbase Wallet\n- Trust Wallet\n- Brave Wallet');
-          window.open('https://metamask.io/download/', '_blank');
+          // Create Wagmi client
+          window.wagmiClient = window.wagmi.createClient(config);
+          
+          console.log('Wagmi initialized successfully');
+          return true;
         } else {
-          const walletList = wallets.join('\n- ');
-          alert(`Detected wallets:\n- ${walletList}\n\nClick MetaMask to connect with the primary wallet.`);
-          // Auto connect to primary wallet
-          window.connectMetaMask();
+          console.warn('Wagmi libraries not available');
+          return false;
         }
-      };
+      } catch (error) {
+        console.error('Error initializing Wagmi:', error);
+        return false;
+      }
+    }
 
-      // Close when clicking outside
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          window.closeModal();
+    // Initialize Farcaster Mini App
+    async function initializeFarcasterMiniApp() {
+      try {
+        console.log('Initializing Farcaster Mini App...');
+        
+        // Check if we're in a Farcaster Mini App environment
+        const isInFarcaster = await sdk.actions.isInFarcaster();
+        window.isFarcasterMiniApp = isInFarcaster;
+        
+        if (isInFarcaster) {
+          console.log('Running in Farcaster Mini App environment');
+          
+          // Show Farcaster info
+          const farcasterInfo = document.getElementById('farcasterInfo');
+          if (farcasterInfo) {
+            farcasterInfo.style.display = 'block';
+          }
+          
+          // Set up Farcaster-specific UI adjustments immediately
+          setupFarcasterUI();
+          
+          // Initialize Wagmi for Farcaster Mini App
+          const wagmiInitialized = initializeWagmi();
+          
+          // Get user and wallet info in parallel for better performance
+          const [user, wallet] = await Promise.all([
+            sdk.actions.getUser().catch(err => {
+              console.warn('Could not get Farcaster user:', err);
+              return null;
+            }),
+            sdk.actions.getWallet().catch(err => {
+              console.warn('Could not get Farcaster wallet:', err);
+              return null;
+            })
+          ]);
+          
+          console.log('Farcaster user:', user);
+          console.log('Farcaster wallet:', wallet);
+          
+          // If Wagmi is available, set up wallet connection
+          if (wagmiInitialized && window.wagmiClient) {
+            // Auto-connect to wallet if available
+            try {
+              const { data: account } = await window.wagmiClient.getAccount();
+              if (account) {
+                console.log('Auto-connected to wallet:', account.address);
+                // Update UI to show connected state
+                updateWalletDisplay(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+              }
+            } catch (error) {
+              console.warn('Could not auto-connect to wallet:', error);
+            }
+          }
+          
+          // Call ready() as soon as UI is set up
+          await sdk.actions.ready();
+          console.log('Farcaster Mini App ready!');
+          
+        } else {
+          console.log('Running in web browser environment');
+          // Show loading screen for web browser
+          const loadingElement = document.getElementById('loading');
+          if (loadingElement) {
+            loadingElement.style.display = 'flex';
+          }
         }
-      });
-    };
+        
+      } catch (error) {
+        console.error('Error initializing Farcaster Mini App:', error);
+        // Always call ready() even if there's an error to prevent infinite loading
+        try {
+          await sdk.actions.ready();
+          console.log('Farcaster Mini App ready (with errors)!');
+        } catch (readyError) {
+          console.error('Error calling sdk.actions.ready():', readyError);
+        }
+      }
+    }
+
+    // Setup Farcaster-specific UI adjustments
+    function setupFarcasterUI() {
+      // Disable native gestures to prevent app from closing
+      if (window.farcasterSDK) {
+        window.farcasterSDK.actions.disableNativeGestures();
+      }
+      
+      // Adjust header for mobile
+      const header = document.querySelector('.header');
+      if (header) {
+        header.style.paddingTop = '60px'; // Account for Farcaster header
+      }
+      
+      // Make wallet button more prominent in Farcaster
+      const walletBtn = document.getElementById('headerWalletBtn');
+      if (walletBtn) {
+        walletBtn.style.fontSize = '16px';
+        walletBtn.style.padding = '14px 28px';
+      }
+      
+      // Add Farcaster-specific styles
+      const style = document.createElement('style');
+      style.textContent = `
+        .farcaster-mode .header {
+          padding-top: 60px;
+        }
+        
+        .farcaster-mode .container {
+          max-width: 100%;
+          padding: 0 16px;
+        }
+        
+        .farcaster-mode .main-form {
+          margin-top: 20px;
+        }
+        
+        .farcaster-mode .recipients-section {
+          margin-top: 20px;
+        }
+        
+        .farcaster-mode .csv-section {
+          margin-top: 30px;
+        }
+        
+        /* Prevent content reflow */
+        .farcaster-mode * {
+          box-sizing: border-box;
+        }
+        
+        /* Optimize for mobile touch */
+        .farcaster-mode button {
+          min-height: 44px;
+          touch-action: manipulation;
+        }
+        
+        .farcaster-mode input {
+          min-height: 44px;
+          touch-action: manipulation;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Add Farcaster mode class to body
+      document.body.classList.add('farcaster-mode');
+    }
+
+    // Add to Farcaster Collection
+    async function addToCollection() {
+      try {
+        if (window.isFarcasterMiniApp && window.farcasterSDK) {
+          await window.farcasterSDK.actions.addMiniApp();
+          document.getElementById('addToCollectionBtn').innerHTML = '✅ Added to Collection';
+          document.getElementById('addToCollectionBtn').disabled = true;
+          
+          // Show success message
+          if (window.uiManager) {
+            window.uiManager.updateStatus('✅ Added to Farcaster Collection!', 'success');
+          }
+          
+          // Send notification
+          await window.farcasterSDK.actions.sendNotification({
+            title: 'Sendwise Added!',
+            body: 'Sendwise has been added to your collection. Start making batch transfers!',
+            url: window.location.href
+          });
+        } else {
+          // Fallback for web browser
+          alert('Add to Collection feature is only available in Farcaster Mini App');
+        }
+      } catch (error) {
+        console.error('Error adding to collection:', error);
+        if (window.uiManager) {
+          window.uiManager.updateStatus('❌ Failed to add to collection', 'error');
+        }
+      }
+    }
 
     // Initialize app when DOM is loaded
     window.addEventListener('DOMContentLoaded', async function() {
       try {
-        const app = new SendwiseApp();
-        window.sendwiseApp = app; // Global reference for debugging
+        console.log('Initializing Sendwise app...');
         
-        // Make wallet manager globally accessible
+        // Initialize Farcaster Mini App first
+        await initializeFarcasterMiniApp();
+        
+        // Initialize Sendwise app
+        const app = new SendwiseApp();
+        window.sendwiseApp = app;
         window.walletManager = app.getWalletManager();
         
-        console.log('App initialized, openWalletModal available:', typeof window.openWalletModal);
-        console.log('WalletManager globally available:', !!window.walletManager);
+        console.log('Sendwise app initialized successfully');
+        
+        // Hide loading screen only for web browser
+        if (!window.isFarcasterMiniApp) {
+          const loadingElement = document.getElementById('loading');
+          if (loadingElement) {
+            loadingElement.style.display = 'none';
+          }
+        }
+        
       } catch (error) {
-        console.error('Failed to initialize Sendwise app:', error);
-        document.getElementById('loading').classList.add('hidden');
+        console.error('Failed to initialize app:', error);
+        
+        // Hide loading screen even on error (only for web browser)
+        if (!window.isFarcasterMiniApp) {
+          const loadingElement = document.getElementById('loading');
+          if (loadingElement) {
+            loadingElement.style.display = 'none';
+          }
+        }
+        
+        // Show error message only in web browser
+        if (!window.isFarcasterMiniApp) {
+          alert('Failed to initialize Sendwise app. Please refresh the page.');
+        }
       }
     });
   </script>

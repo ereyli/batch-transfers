@@ -39,22 +39,8 @@ export class WalletManager {
         let wallet = null;
         let user = null;
         
-        // Approach 1: Try Wagmi first
-        if (window.wagmiClient) {
-          try {
-            console.log('Trying Wagmi approach...');
-            const { data: account } = await window.wagmiClient.getAccount();
-            if (account) {
-              wallet = { address: account.address };
-              console.log('Farcaster wallet connected via Wagmi:', account.address);
-            }
-          } catch (error) {
-            console.warn('Wagmi approach failed:', error);
-          }
-        }
-        
-        // Approach 2: Try SDK directly
-        if (!wallet && window.farcasterSDK) {
+        // Approach 1: Try SDK directly first (most reliable)
+        if (window.farcasterSDK) {
           try {
             console.log('Trying SDK approach...');
             const [userResult, walletResult] = await Promise.all([
@@ -76,6 +62,20 @@ export class WalletManager {
             }
           } catch (error) {
             console.warn('SDK approach failed:', error);
+          }
+        }
+        
+        // Approach 2: Try Wagmi if SDK failed
+        if (!wallet && window.wagmiClient) {
+          try {
+            console.log('Trying Wagmi approach...');
+            const { data: account } = await window.wagmiClient.getAccount();
+            if (account) {
+              wallet = { address: account.address };
+              console.log('Farcaster wallet connected via Wagmi:', account.address);
+            }
+          } catch (error) {
+            console.warn('Wagmi approach failed:', error);
           }
         }
         
@@ -626,6 +626,12 @@ export class WalletManager {
   // Detect available wallets
   detectAvailableWallets() {
     const wallets = [];
+    
+    // Check for Farcaster Mini App environment first
+    if (window.isFarcasterMiniApp && window.farcasterSDK) {
+      wallets.push('farcaster');
+      console.log('Farcaster Mini App detected - adding Farcaster wallet');
+    }
     
     // Check for MetaMask and other ethereum providers
     if (window.ethereum) {

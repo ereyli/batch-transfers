@@ -34,11 +34,21 @@ export class SendwiseApp {
       if (window.isFarcasterMiniApp) {
         console.log('Farcaster Mini App detected - forcing wallet connection');
         try {
+          // Wait a bit for Farcaster SDK to be fully ready
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
           await this.walletManager.initializeFarcasterMiniAppWallet();
           console.log('Farcaster wallet auto-connected successfully');
+          
+          // Update UI to show connected state
+          if (this.walletManager.getSigner()) {
+            const address = await this.walletManager.getSigner().getAddress();
+            console.log('Wallet connected:', address);
+          }
         } catch (error) {
           console.error('Failed to auto-connect Farcaster wallet:', error);
           // Don't show error to user in Farcaster Mini App
+          // But try to continue with the app
         }
       }
       

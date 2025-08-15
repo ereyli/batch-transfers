@@ -254,7 +254,32 @@
         console.log('Initializing Farcaster Mini App...');
         
         // Check if we're in a Farcaster Mini App environment
-        const isInFarcaster = await sdk.actions.isInFarcaster();
+        let isInFarcaster = false;
+        try {
+          // Try to detect Farcaster Mini App environment
+          if (window.location.href.includes('farcaster') || 
+              window.location.href.includes('warpcast') ||
+              window.navigator.userAgent.includes('Farcaster') ||
+              window.navigator.userAgent.includes('Warpcast')) {
+            isInFarcaster = true;
+          }
+          
+          // Also check if Farcaster SDK is available and working
+          if (sdk && sdk.actions) {
+            try {
+              // Try to get user info - if it works, we're in Farcaster
+              const user = await sdk.actions.getUser();
+              if (user) {
+                isInFarcaster = true;
+              }
+            } catch (error) {
+              console.log('Not in Farcaster environment (user check failed)');
+            }
+          }
+        } catch (error) {
+          console.log('Farcaster detection failed:', error);
+        }
+        
         window.isFarcasterMiniApp = isInFarcaster;
         
         if (isInFarcaster) {

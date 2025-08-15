@@ -588,8 +588,12 @@ export class BlockchainManager {
         const total = parsedAmounts.reduce((sum, amount) => sum.add(amount), window.ethers.BigNumber.from(0));
         const fee = window.ethers.utils.parseEther(APP_CONFIG.fee);
         
+        // For Farcaster wallet, use manual gas limit to avoid eth_estimateGas
+        const gasLimit = 500000; // Conservative gas limit for batch transfers
+        
         const tx = await contract.batchSend(recipients, parsedAmounts, {
-          value: total.add(fee)
+          value: total.add(fee),
+          gasLimit: gasLimit
         });
         
         this.uiManager.updateStatus('⏳ Transaction sent! Hash: ' + tx.hash, true, false);
@@ -609,13 +613,16 @@ export class BlockchainManager {
           signer
         );
         
-        const approveTx = await tokenContract.approve(contractAddress, window.ethers.constants.MaxUint256);
+        const approveTx = await tokenContract.approve(contractAddress, window.ethers.constants.MaxUint256, {
+          gasLimit: 100000 // Manual gas limit for approve
+        });
         this.uiManager.updateStatus('⏳ Approving tokens...', false, false);
         await approveTx.wait();
         
         // Then batch send
         const tx = await contract.batchSendERC20(tokenAddress, recipients, parsedAmounts, {
-          value: fee
+          value: fee,
+          gasLimit: 500000 // Manual gas limit for batch send
         });
         
         this.uiManager.updateStatus('⏳ Transaction sent! Hash: ' + tx.hash, true, false);

@@ -29,15 +29,13 @@ export class SendwiseApp {
         this.uiManager.showLoading();
       }
       
-      // Call sdk.actions.ready() for Farcaster Mini App as soon as possible
-      if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.actions) {
-        try {
-          console.log('Calling sdk.actions.ready() to hide splash screen...');
-          await window.farcasterSDK.actions.ready();
-          console.log('Farcaster SDK ready() called successfully');
-        } catch (error) {
-          console.error('Error calling sdk.actions.ready():', error);
-        }
+      // Enhanced Farcaster Mini App detection and initialization
+      const isFarcasterContext = this.detectFarcasterContext();
+      window.isFarcasterMiniApp = isFarcasterContext;
+      
+      if (isFarcasterContext) {
+        console.log('Farcaster context detected - initializing...');
+        await this.initializeFarcasterApp();
       }
       
       // Initialize wallet manager (includes Farcaster)
@@ -269,5 +267,123 @@ export class SendwiseApp {
 
   getBlockchainManager() {
     return this.blockchainManager;
+  }
+
+  // Enhanced Farcaster detection method
+  detectFarcasterContext() {
+    // Check multiple indicators for Farcaster context
+    const userAgent = navigator.userAgent || '';
+    const referrer = document.referrer || '';
+    
+    // Check for Farcaster user agent patterns
+    const farcasterUserAgents = [
+      'farcaster',
+      'warpcast',
+      'FarcasterMobile',
+      'Warpcast'
+    ];
+    
+    const isFarcasterUA = farcasterUserAgents.some(ua => 
+      userAgent.toLowerCase().includes(ua.toLowerCase())
+    );
+    
+    // Check for Farcaster referrer patterns
+    const farcasterReferrers = [
+      'warpcast.com',
+      'farcaster.xyz',
+      'client.farcaster.xyz'
+    ];
+    
+    const isFarcasterReferrer = farcasterReferrers.some(ref => 
+      referrer.toLowerCase().includes(ref.toLowerCase())
+    );
+    
+    // Check for URL parameters that indicate Farcaster
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasFarcasterParam = urlParams.has('fc') || urlParams.has('farcaster') || urlParams.has('frame');
+    
+    // Check for Farcaster SDK availability
+    const hasFarcasterSDK = typeof window.farcasterSDK !== 'undefined' || 
+                            typeof window.fc !== 'undefined';
+    
+    console.log('Farcaster detection:', {
+      userAgent: userAgent,
+      referrer: referrer,
+      isFarcasterUA,
+      isFarcasterReferrer,
+      hasFarcasterParam,
+      hasFarcasterSDK
+    });
+    
+    return isFarcasterUA || isFarcasterReferrer || hasFarcasterParam || hasFarcasterSDK;
+  }
+
+  // Initialize Farcaster app with proper loading handling
+  async initializeFarcasterApp() {
+    console.log('Initializing Farcaster Mini App...');
+    
+    try {
+      // Wait for Farcaster SDK to be available with timeout
+      const sdk = await this.waitForFarcasterSDK(5000);
+      
+      if (sdk && sdk.actions && sdk.actions.ready) {
+        console.log('Calling Farcaster SDK ready() to hide splash screen...');
+        await sdk.actions.ready();
+        console.log('Farcaster SDK ready() called successfully');
+        
+        // Store SDK reference globally
+        window.farcasterSDK = sdk;
+        
+        // Dispatch custom event for components
+        window.dispatchEvent(new CustomEvent('farcasterSdkReady', { detail: sdk }));
+        
+      } else {
+        console.warn('Farcaster SDK ready() method not available');
+        // Still try to hide loading by dispatching ready event manually
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('farcasterSdkReady', { detail: null }));
+        }, 1000);
+      }
+      
+    } catch (error) {
+      console.error('Error initializing Farcaster app:', error);
+      // Fallback: dispatch ready event anyway to prevent infinite loading
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('farcasterSdkReady', { detail: null }));
+      }, 2000);
+    }
+  }
+
+  // Wait for Farcaster SDK to be available
+  waitForFarcasterSDK(timeout = 5000) {
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      
+      const checkSDK = () => {
+        // Check for various SDK patterns
+        const sdk = window.farcasterSDK || 
+                   window.fc || 
+                   window.parent?.farcasterSDK || 
+                   window.parent?.fc;
+        
+        if (sdk) {
+          console.log('Farcaster SDK found:', sdk);
+          resolve(sdk);
+          return;
+        }
+        
+        // Check if timeout exceeded
+        if (Date.now() - startTime > timeout) {
+          console.log('Farcaster SDK timeout reached');
+          resolve(null);
+          return;
+        }
+        
+        // Continue checking
+        setTimeout(checkSDK, 100);
+      };
+      
+      checkSDK();
+    });
   }
 }

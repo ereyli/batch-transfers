@@ -33,12 +33,44 @@
     <meta name="robots" content="index, follow" />
         <meta name="theme-color" content="#1a1a1a" />
 
-    <!-- Farcaster Mini App Meta Tags -->
+    <!-- Farcaster Frame Meta Tags -->
     <meta name="fc:frame" content="vNext" />
     <meta name="fc:frame:image" content="https://www.sendwise.xyz/.well-known/hero-image.png" />
-    <meta name="fc:frame:button:1" content="🚀 Start Batch Transfer" />
+    <meta name="fc:frame:button:1" content="Launch App" />
     <meta name="fc:frame:button:1:action" content="link" />
     <meta name="fc:frame:button:1:target" content="https://www.sendwise.xyz" />
+    
+    <!-- Farcaster Mini App Manifest -->
+    <link rel="farcaster_manifest" href="https://www.sendwise.xyz/.well-known/farcaster.json" />
+    
+    <!-- Early Farcaster SDK Detection -->
+    <script>
+      // Early detection and SDK setup
+      (function() {
+        const userAgent = navigator.userAgent || '';
+        const isFarcaster = userAgent.toLowerCase().includes('farcaster') || 
+                           userAgent.toLowerCase().includes('warpcast') ||
+                           document.referrer.includes('warpcast.com');
+        
+        if (isFarcaster) {
+          console.log('Early Farcaster detection: true');
+          window.isFarcasterMiniApp = true;
+          
+          // Try to call ready as soon as possible if SDK is available
+          const tryReady = () => {
+            const sdk = window.farcasterSDK || window.fc || window.parent?.farcasterSDK || window.parent?.fc;
+            if (sdk && sdk.actions && sdk.actions.ready) {
+              console.log('Early SDK ready() call');
+              sdk.actions.ready().catch(e => console.log('Early ready() error:', e));
+            }
+          };
+          
+          // Try immediately and also on DOM ready
+          tryReady();
+          document.addEventListener('DOMContentLoaded', tryReady);
+        }
+      })();
+    </script>
 
     <!-- Safe Area CSS -->
     <style>

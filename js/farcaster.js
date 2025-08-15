@@ -11,9 +11,9 @@ export class FarcasterManager {
       console.log('Initializing Farcaster Mini App...');
       
       // Check if we're in Farcaster Mini App environment
-      if (window.isFarcasterMiniApp) {
+      if (window.isFarcasterMiniApp && window.farcasterSDK) {
         this.isFarcasterMode = true;
-        this.sdk = null;
+        this.sdk = window.farcasterSDK;
         
         console.log('Running in Farcaster Mini App environment');
         
@@ -83,12 +83,31 @@ export class FarcasterManager {
 
   // Send Farcaster notification
   async sendNotification(message) {
-    // SDK removed: no-op
+    if (this.isFarcasterMode && this.sdk && this.sdk.actions) {
+      try {
+        await this.sdk.actions.sendNotification({
+          title: 'Sendwise Batch Transfer',
+          body: message,
+          url: window.location.href
+        });
+      } catch (error) {
+        console.error('Error sending Farcaster notification:', error);
+      }
+    }
   }
 
   // Share to Farcaster
   async shareToFarcaster() {
-    // SDK removed: no-op
+    if (this.isFarcasterMode && this.sdk && this.sdk.actions) {
+      try {
+        await this.sdk.actions.share({
+          text: 'Just completed a batch transfer with Sendwise! 🚀',
+          url: window.location.href
+        });
+      } catch (error) {
+        console.error('Error sharing to Farcaster:', error);
+      }
+    }
   }
 
   // Show Farcaster info
@@ -125,6 +144,17 @@ export class FarcasterManager {
 
   // Setup event listeners
   setupEventListeners() {
-    // SDK removed: no-op
+    if (this.sdk && this.sdk.events && typeof this.sdk.events.on === 'function') {
+      this.sdk.events.on('walletConnected', (account) => {
+        console.log('Wallet connected:', account);
+        // You can emit a custom event here if needed
+        window.dispatchEvent(new CustomEvent('farcasterWalletConnected', { detail: account }));
+      });
+
+      this.sdk.events.on('walletDisconnected', () => {
+        console.log('Wallet disconnected');
+        window.dispatchEvent(new CustomEvent('farcasterWalletDisconnected'));
+      });
+    }
   }
 }

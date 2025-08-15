@@ -429,7 +429,17 @@ export class BlockchainManager {
   // Share to Farcaster
   async shareToFarcaster(message) {
     try {
-      if (true) {
+      if (window.isFarcasterMiniApp && window.farcasterSDK) {
+        // Use Farcaster SDK to share with dynamic image
+        const currentImageUrl = document.querySelector('.share-image-preview img')?.src;
+        if (currentImageUrl) {
+          // Update the page's meta tags for sharing
+          this.updateSharingMetaTags(currentImageUrl);
+        }
+        
+        await window.farcasterSDK.actions.shareToFarcaster(message);
+        this.uiManager.updateStatus('✅ Shared to Farcaster!', 'success');
+      } else {
         // Fallback: copy to clipboard
         await navigator.clipboard.writeText(message);
         this.uiManager.updateStatus('✅ Message copied to clipboard!', 'success');

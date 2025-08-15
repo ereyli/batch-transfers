@@ -75,8 +75,8 @@
   <div class="container">
     <!-- Header with Wallet Button -->
     <div class="header fade-in" style="position: relative;">
-      <!-- Modern Wallet Button - Top Right -->
-      <div style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+      <!-- Modern Wallet Button - Top Right (Only shown in web browser) -->
+      <div id="walletButtonContainer" style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
         <button id="headerWalletBtn" onclick="window.openWalletModal()" style="
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
@@ -334,17 +334,16 @@
         window.farcasterSDK.actions.disableNativeGestures();
       }
       
+      // Hide wallet button in Farcaster Mini App
+      const walletButtonContainer = document.getElementById('walletButtonContainer');
+      if (walletButtonContainer) {
+        walletButtonContainer.style.display = 'none';
+      }
+      
       // Adjust header for mobile
       const header = document.querySelector('.header');
       if (header) {
         header.style.paddingTop = '60px'; // Account for Farcaster header
-      }
-      
-      // Make wallet button more prominent in Farcaster
-      const walletBtn = document.getElementById('headerWalletBtn');
-      if (walletBtn) {
-        walletBtn.style.fontSize = '16px';
-        walletBtn.style.padding = '14px 28px';
       }
       
       // Add Farcaster-specific styles

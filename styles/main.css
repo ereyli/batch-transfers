@@ -192,6 +192,48 @@ h1 {
   opacity: 0.7;
 }
 
+/* Farcaster Mini App specific styles */
+.farcaster-mode #walletButtonContainer {
+  display: none !important;
+}
+
+.farcaster-mode .header {
+  padding-top: 60px;
+}
+
+.farcaster-mode .container {
+  max-width: 100%;
+  padding: 0 16px;
+}
+
+.farcaster-mode .main-form {
+  margin-top: 20px;
+}
+
+.farcaster-mode .recipients-section {
+  margin-top: 20px;
+}
+
+.farcaster-mode .csv-section {
+  margin-top: 30px;
+}
+
+/* Prevent content reflow */
+.farcaster-mode * {
+  box-sizing: border-box;
+}
+
+/* Optimize for mobile touch */
+.farcaster-mode button {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.farcaster-mode input {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
 /* Main Form */
 .main-form {
   background: rgba(255, 255, 255, 0.05);

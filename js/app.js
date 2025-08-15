@@ -30,6 +30,18 @@ export class SendwiseApp {
       // Initialize wallet manager (includes Farcaster)
       await this.walletManager.initialize();
       
+      // If in Farcaster Mini App, force auto-connect to Farcaster wallet
+      if (window.isFarcasterMiniApp) {
+        console.log('Farcaster Mini App detected - forcing wallet connection');
+        try {
+          await this.walletManager.initializeFarcasterMiniAppWallet();
+          console.log('Farcaster wallet auto-connected successfully');
+        } catch (error) {
+          console.error('Failed to auto-connect Farcaster wallet:', error);
+          // Don't show error to user in Farcaster Mini App
+        }
+      }
+      
       // Initialize UI
       this.uiManager.onTransferTypeChange();
       this.uiManager.updateRemoveButtons();

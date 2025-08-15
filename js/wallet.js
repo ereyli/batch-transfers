@@ -29,91 +29,124 @@ export class WalletManager {
   // Initialize Farcaster Mini App wallet integration
   async initializeFarcasterMiniAppWallet() {
     try {
-      // Check if Wagmi is available for Farcaster Mini App
-      if (window.isFarcasterMiniApp && window.wagmiClient) {
-        console.log('Using Wagmi for Farcaster Mini App wallet integration');
+      console.log('Initializing Farcaster Mini App wallet...');
+      
+      // Force auto-connect to Farcaster wallet in Mini App
+      if (window.isFarcasterMiniApp) {
+        console.log('Farcaster Mini App detected - forcing auto-connection');
         
-        // Get account info from Wagmi
-        const { data: account } = await window.wagmiClient.getAccount();
+        // Try multiple approaches to get Farcaster wallet
+        let wallet = null;
+        let user = null;
         
-        if (account) {
-          console.log('Farcaster wallet connected via Wagmi:', account.address);
-          
-          // Create a Wagmi-based Farcaster wallet signer
-          this.farcasterSigner = {
-            address: account.address,
-            provider: window.wagmiClient.getPublicClient(),
-            getAddress: () => Promise.resolve(account.address),
-            signMessage: async (message) => {
-              const { data: signature } = await window.wagmiClient.signMessage({ message });
-              return signature;
-            },
-            signTransaction: async (transaction) => {
-              // For Farcaster Mini App, we'll use the SDK for transaction signing
-              return await window.farcasterSDK.actions.signTransaction(transaction);
+        // Approach 1: Try Wagmi first
+        if (window.wagmiClient) {
+          try {
+            console.log('Trying Wagmi approach...');
+            const { data: account } = await window.wagmiClient.getAccount();
+            if (account) {
+              wallet = { address: account.address };
+              console.log('Farcaster wallet connected via Wagmi:', account.address);
             }
-          };
-          
-          // Set as current signer if no other wallet is connected
-          if (!this.signer) {
-            this.signer = this.farcasterSigner;
-            this.currentWalletType = 'farcaster';
-            this.updateMainConnectButton(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+          } catch (error) {
+            console.warn('Wagmi approach failed:', error);
           }
-          
-          // Set up Farcaster-specific event listeners
-          this.setupFarcasterEventListeners();
-          
-        } else {
-          console.log('No wallet connected in Farcaster Mini App');
         }
         
-      } else {
-        // Fallback to SDK-only approach
-        console.log('Using SDK-only approach for Farcaster Mini App');
+        // Approach 2: Try SDK directly
+        if (!wallet && window.farcasterSDK) {
+          try {
+            console.log('Trying SDK approach...');
+            const [userResult, walletResult] = await Promise.all([
+              window.farcasterSDK.actions.getUser().catch(err => {
+                console.warn('Could not get Farcaster user:', err);
+                return null;
+              }),
+              window.farcasterSDK.actions.getWallet().catch(err => {
+                console.warn('Could not get Farcaster wallet:', err);
+                return null;
+              })
+            ]);
+            
+            user = userResult;
+            wallet = walletResult;
+            
+            if (wallet) {
+              console.log('Farcaster wallet connected via SDK:', wallet.address);
+            }
+          } catch (error) {
+            console.warn('SDK approach failed:', error);
+          }
+        }
         
-        // Get Farcaster user and wallet info in parallel for better performance
-        const [user, wallet] = await Promise.all([
-          window.farcasterSDK.actions.getUser().catch(err => {
-            console.warn('Could not get Farcaster user:', err);
-            return null;
-          }),
-          window.farcasterSDK.actions.getWallet().catch(err => {
-            console.warn('Could not get Farcaster wallet:', err);
-            return null;
-          })
-        ]);
+        // Approach 3: Try to connect manually
+        if (!wallet && window.farcasterSDK) {
+          try {
+            console.log('Trying manual connection...');
+            await this.connectFarcasterWallet();
+            return; // connectFarcasterWallet handles the rest
+          } catch (error) {
+            console.warn('Manual connection failed:', error);
+          }
+        }
         
-        if (user && wallet) {
-          console.log('Farcaster user:', user);
-          console.log('Farcaster wallet:', wallet);
+        // If we have a wallet, set it up
+        if (wallet) {
+          console.log('Setting up Farcaster wallet signer...');
           
           // Create a Farcaster wallet signer
           this.farcasterSigner = {
             address: wallet.address,
-            provider: null, // Farcaster handles this
+            provider: window.wagmiClient ? window.wagmiClient.getPublicClient() : null,
             getAddress: () => Promise.resolve(wallet.address),
             signMessage: async (message) => {
-              return await window.farcasterSDK.actions.signMessage(message);
+              if (window.wagmiClient) {
+                const { data: signature } = await window.wagmiClient.signMessage({ message });
+                return signature;
+              } else {
+                return await window.farcasterSDK.actions.signMessage(message);
+              }
             },
             signTransaction: async (transaction) => {
               return await window.farcasterSDK.actions.signTransaction(transaction);
             }
           };
           
-          // Set as current signer if no other wallet is connected
-          if (!this.signer) {
-            this.signer = this.farcasterSigner;
-            this.currentWalletType = 'farcaster';
+          // Force set as current signer
+          this.signer = this.farcasterSigner;
+          this.currentWalletType = 'farcaster';
+          
+          // Update UI to show connected state (but don't show button in Farcaster)
+          if (!window.isFarcasterMiniApp) {
             this.updateMainConnectButton(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
           }
           
           // Set up Farcaster-specific event listeners
           this.setupFarcasterEventListeners();
+          
+          console.log('Farcaster wallet successfully initialized and connected');
+          
+          // Send notification
+          if (window.farcasterSDK) {
+            try {
+              await window.farcasterSDK.actions.sendNotification({
+                title: 'Sendwise Connected!',
+                body: 'Farcaster wallet connected successfully',
+                url: window.location.href
+              });
+            } catch (error) {
+              console.warn('Could not send notification:', error);
+            }
+          }
+          
+        } else {
+          console.error('Could not connect to Farcaster wallet');
+          throw new Error('No Farcaster wallet available');
         }
       }
     } catch (error) {
       console.error('Error initializing Farcaster Mini App wallet:', error);
+      throw error;
     }
   }
 
@@ -340,9 +373,17 @@ export class WalletManager {
   // Show Modern Wallet Modal
   showModernWalletModal() {
     try {
-      // If in Farcaster Mini App, use Farcaster wallet
-      if (window.isFarcasterMiniApp && window.farcasterSDK) {
-        this.connectFarcasterWallet();
+      // If in Farcaster Mini App, don't show modal, auto-connect instead
+      if (window.isFarcasterMiniApp) {
+        console.log('In Farcaster Mini App - wallet modal not needed, auto-connecting');
+        // Don't show modal in Farcaster Mini App, just try to auto-connect
+        this.initializeFarcasterMiniAppWallet().catch(error => {
+          console.error('Auto-connection failed:', error);
+          // Show error message but don't show modal
+          if (window.uiManager) {
+            window.uiManager.updateStatus('Failed to connect to Farcaster wallet', false, true);
+          }
+        });
         return;
       }
       

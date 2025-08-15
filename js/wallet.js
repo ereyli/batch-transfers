@@ -812,7 +812,7 @@ export class WalletManager {
       return wallets;
     }
     
-    // For web browser, allow all wallets
+    // For web browser, allow all wallets but with timeout handling
     // Check for MetaMask and other ethereum providers
     if (window.ethereum) {
       // Check specific wallet types

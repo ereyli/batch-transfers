@@ -23,6 +23,8 @@
     "requiredCapabilities": [
       "actions.signIn",
       "wallet.getEthereumProvider"
-    ]
+    ],
+    "imageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
+    "buttonTitle": "🚀 Start Batch Transfer"
   }
 }

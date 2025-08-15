@@ -435,7 +435,7 @@ export class WalletManager {
       let walletOptionsHTML = '';
       
       // In Farcaster Mini App, only show Farcaster wallet
-      if (window.isFarcasterMiniApp && availableWallets.includes('farcaster')) {
+      if (window.isFarcasterMiniApp) {
         walletOptionsHTML += `
           <button class="wallet-option" data-wallet="farcaster" style="
             display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid #f0f0f0; 
@@ -572,6 +572,9 @@ export class WalletManager {
           const walletType = option.dataset.wallet;
           try {
             switch (walletType) {
+              case 'farcaster':
+                await this.connectFarcasterWallet();
+                break;
               case 'metamask':
                 await this.switchToMetaMask();
                 break;
@@ -657,7 +660,7 @@ export class WalletManager {
     const wallets = [];
     
     // Check for Farcaster Mini App environment first
-    if (window.isFarcasterMiniApp && window.farcasterSDK) {
+    if (window.isFarcasterMiniApp) {
       wallets.push('farcaster');
       console.log('Farcaster Mini App detected - ONLY Farcaster wallet allowed');
       // In Farcaster Mini App, ONLY allow Farcaster wallet

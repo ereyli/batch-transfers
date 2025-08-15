@@ -79,10 +79,20 @@
   </div>
 
   <div class="container">
-    <!-- Header with Wallet Button -->
-    <div class="header fade-in" style="position: relative;">
-      <!-- Modern Wallet Button - Top Right (Only shown in web browser) -->
-      <div id="walletButtonContainer" style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+    <!-- Header -->
+    <div class="header fade-in">
+      <div class="logo">
+        <img src="https://www.sendwise.xyz/.well-known/logo.png" alt="Sendwise Logo" />
+      </div>
+      <h1>Sendwise</h1>
+      <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
+      <div class="supported-networks">
+        <div class="network-icon"></div>
+        <span>Base • Optimism • Arbitrum • Ethereum</span>
+      </div>
+      
+      <!-- Wallet Button - Below Logo (Only shown in web browser) -->
+      <div id="walletButtonContainer" style="margin-top: 20px; text-align: center;">
         <button id="headerWalletBtn" onclick="window.openWalletModal()" style="
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
@@ -100,16 +110,6 @@
           <span style="font-size: 16px;">💳</span>
           <span>Connect Wallet</span>
         </button>
-      </div>
-      
-      <div class="logo">
-        <img src="https://www.sendwise.xyz/.well-known/logo.png" alt="Sendwise Logo" />
-      </div>
-      <h1>Sendwise</h1>
-      <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
-      <div class="supported-networks">
-        <div class="network-icon"></div>
-        <span>Base • Optimism • Arbitrum • Soneium • Unichain • Ink</span>
       </div>
     </div>
 

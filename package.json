@@ -7,8 +7,8 @@
     "start": "python -m http.server 8000",
     "dev": "python -m http.server 8000",
     "serve": "python -m http.server 8000",
-    "build": "echo 'Static HTML app - no build required'",
-    "vercel-build": "echo 'Static HTML app - no build required'",
+    "build": "echo 'Static HTML app - no build required' && mkdir -p public && cp -r . public/",
+    "vercel-build": "echo 'Static HTML app - no build required' && mkdir -p public && cp -r . public/",
     "test": "echo 'No tests specified'"
   },
   "keywords": [

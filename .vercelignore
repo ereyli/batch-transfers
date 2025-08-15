@@ -11,6 +11,8 @@ dist/
 build/
 .next/
 out/
+# Don't ignore public directory for Vercel
+# public/
 
 # Logs
 npm-debug.log*

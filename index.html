@@ -59,6 +59,7 @@
   <script src="https://cdn.jsdelivr.net/npm/viem@2.23.15/dist/viem.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/wagmi@2.5.7/dist/wagmi.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-wagmi-connector@0.1.0/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@0.1.0/dist/index.umd.js"></script>
   
   <!-- Fonts and Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -185,11 +186,9 @@
 
   <!-- Farcaster Mini App SDK -->
   <script type="module">
-    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
     import { SendwiseApp } from './js/app.js';
 
     // Global variables
-    window.farcasterSDK = sdk;
     window.isFarcasterMiniApp = false;
 
     // Global wallet modal function
@@ -210,23 +209,19 @@
         if (window.wagmi && window.viem && window.FarcasterMiniAppConnector) {
           console.log('Initializing Wagmi for Farcaster Mini App...');
           
-          // Create Wagmi config
+          // Create Wagmi config with Base as primary chain
           const config = window.wagmi.createConfig({
             chains: [
               { id: 8453, name: 'Base' },
               { id: 10, name: 'Optimism' },
               { id: 42161, name: 'Arbitrum' },
-              { id: 139, name: 'Soneium' },
-              { id: 140, name: 'Unichain' },
-              { id: 141, name: 'Ink' }
+              { id: 1, name: 'Ethereum' }
             ],
             transports: {
               8453: window.wagmi.http('https://mainnet.base.org'),
               10: window.wagmi.http('https://mainnet.optimism.io'),
               42161: window.wagmi.http('https://arb1.arbitrum.io/rpc'),
-              139: window.wagmi.http('https://rpc.soneium.com'),
-              140: window.wagmi.http('https://rpc.unichain.com'),
-              141: window.wagmi.http('https://rpc.ink.com')
+              1: window.wagmi.http('https://eth.llamarpc.com')
             },
             connectors: [
               window.FarcasterMiniAppConnector.farcasterMiniApp()
@@ -255,30 +250,31 @@
         
         // Check if we're in a Farcaster Mini App environment
         let isInFarcaster = false;
-        try {
-          // Try to detect Farcaster Mini App environment
+        
+        // Method 1: Check for Farcaster SDK
+        if (window.FarcasterMiniAppSDK) {
+          try {
+            const sdk = window.FarcasterMiniAppSDK;
+            const isInFarcasterEnv = await sdk.isInFarcaster();
+            if (isInFarcasterEnv) {
+              isInFarcaster = true;
+              window.farcasterSDK = sdk;
+              console.log('Farcaster SDK detected and environment confirmed');
+            }
+          } catch (error) {
+            console.log('Farcaster SDK check failed:', error.message);
+          }
+        }
+        
+        // Method 2: Check URL and user agent
+        if (!isInFarcaster) {
           if (window.location.href.includes('farcaster') || 
               window.location.href.includes('warpcast') ||
               window.navigator.userAgent.includes('Farcaster') ||
               window.navigator.userAgent.includes('Warpcast')) {
             isInFarcaster = true;
+            console.log('Farcaster environment detected via URL/User Agent');
           }
-          
-          // Also check if Farcaster SDK is available and working
-          if (sdk && sdk.actions) {
-            try {
-              // Try to get user info - if it works, we're in Farcaster
-              const user = await sdk.actions.getUser();
-              if (user) {
-                isInFarcaster = true;
-                console.log('Farcaster user detected:', user);
-              }
-            } catch (error) {
-              console.log('Not in Farcaster environment (user check failed):', error.message);
-            }
-          }
-        } catch (error) {
-          console.log('Farcaster detection failed:', error);
         }
         
         window.isFarcasterMiniApp = isInFarcaster;
@@ -298,54 +294,34 @@
           // Initialize Wagmi for Farcaster Mini App
           const wagmiInitialized = initializeWagmi();
           
-          // Get user and wallet info in parallel for better performance
-          const [user, wallet] = await Promise.all([
-            sdk.actions.getUser().catch(err => {
-              console.warn('Could not get Farcaster user:', err);
-              return null;
-            }),
-            sdk.actions.getWallet().catch(err => {
-              console.warn('Could not get Farcaster wallet:', err);
-              return null;
-            })
-          ]);
-          
-          console.log('Farcaster user:', user);
-          console.log('Farcaster wallet:', wallet);
-          
-          // If we have a wallet, update UI immediately
-          if (wallet && wallet.address) {
-            console.log('Wallet found, updating UI...');
-            // Update UI to show connected state
-            if (typeof updateWalletDisplay === 'function') {
-              updateWalletDisplay(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
-            }
-          }
-          
-          // If Wagmi is available, set up wallet connection
           if (wagmiInitialized && window.wagmiClient) {
-            // Auto-connect to wallet if available
+            console.log('Wagmi initialized successfully for Farcaster Mini App');
+            
+            // Check if user is already connected
             try {
               const { data: account } = await window.wagmiClient.getAccount();
               if (account && account.address) {
-                console.log('Auto-connected to wallet via Wagmi:', account.address);
+                console.log('User already connected:', account.address);
                 // Update UI to show connected state
                 if (typeof updateWalletDisplay === 'function') {
                   updateWalletDisplay(account.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
                 }
+              } else {
+                console.log('User not connected, will need to connect');
               }
             } catch (error) {
-              console.warn('Could not auto-connect to wallet via Wagmi:', error);
+              console.warn('Could not check account status:', error);
             }
           }
           
-          // Call ready() as soon as UI is set up
-          try {
-            await sdk.actions.ready();
-            console.log('Farcaster Mini App ready!');
-          } catch (readyError) {
-            console.warn('Error calling sdk.actions.ready():', readyError);
-            // Continue anyway, don't let this block the app
+          // Call ready() if SDK is available
+          if (window.farcasterSDK && window.farcasterSDK.actions) {
+            try {
+              await window.farcasterSDK.actions.ready();
+              console.log('Farcaster Mini App ready!');
+            } catch (readyError) {
+              console.warn('Error calling sdk.actions.ready():', readyError);
+            }
           }
           
         } else {
@@ -359,15 +335,6 @@
         
       } catch (error) {
         console.error('Error initializing Farcaster Mini App:', error);
-        // Always call ready() even if there's an error to prevent infinite loading
-        try {
-          if (sdk && sdk.actions && sdk.actions.ready) {
-            await sdk.actions.ready();
-            console.log('Farcaster Mini App ready (with errors)!');
-          }
-        } catch (readyError) {
-          console.error('Error calling sdk.actions.ready():', readyError);
-        }
       }
     }
 

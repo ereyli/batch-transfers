@@ -2,7 +2,7 @@
   "miniapp": {
     "version": "1",
     "name": "Sendwise",
-    "iconUrl": "https://www.sendwise.xyz/.well-known/logo.png",
+    "iconUrl": "https://www.sendwise.xyz/.well-known/icon.png",
     "homeUrl": "https://www.sendwise.xyz",
     "splashImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
     "splashBackgroundColor": "#1a1a1a",

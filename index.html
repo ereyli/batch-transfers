@@ -78,7 +78,7 @@
           });
           window.isFarcasterMiniApp = true;
           
-          // Suppress Farcaster/Warpcast analytics and framing errors
+          // Comprehensive error suppression for Farcaster analytics
           const originalConsoleError = console.error;
           console.error = function(...args) {
             const message = args.join(' ');
@@ -89,7 +89,17 @@
               'dd-proxy',
               'datadog',
               'X-Frame-Options',
-              'chromewebdata'
+              'chromewebdata',
+              'csp-report.browser-intake-datadoghq.com',
+              'warpcast.com/~/dd-proxy',
+              'farcaster.xyz/~/dd-proxy',
+              'Expected length',
+              'attribute width',
+              'attribute height',
+              'svg',
+              'Bad Request',
+              'Backpack',
+              'window.ethereum'
             ];
             
             if (suppressPatterns.some(pattern => message.includes(pattern))) {
@@ -97,6 +107,20 @@
               return;
             }
             originalConsoleError.apply(console, args);
+          };
+          
+          // Also suppress network errors
+          const originalFetch = window.fetch;
+          window.fetch = function(...args) {
+            const url = args[0];
+            if (typeof url === 'string' && (
+              url.includes('dd-proxy') || 
+              url.includes('datadog') || 
+              url.includes('csp-report')
+            )) {
+              return Promise.resolve(new Response('{}', { status: 200 }));
+            }
+            return originalFetch.apply(this, args);
           };
           
           // Try to call ready as soon as possible if SDK is available
@@ -124,13 +148,29 @@
         
         // Emergency loading hide for Farcaster
         if (isFarcaster) {
+          // Multiple fallback timers for white screen prevention
           setTimeout(() => {
             const loadingElement = document.getElementById('loading');
             if (loadingElement && loadingElement.style.display !== 'none') {
               loadingElement.style.display = 'none';
-              console.log('Emergency loading screen hide in Farcaster');
+              console.log('Emergency loading screen hide in Farcaster (2s)');
+              
+              // Force show main content
+              const mainContent = document.querySelector('.container');
+              if (mainContent) {
+                mainContent.style.display = 'block';
+                mainContent.style.visibility = 'visible';
+                mainContent.style.opacity = '1';
+              }
             }
-          }, 3000); // 3 second fallback
+          }, 2000); // 2 second fallback
+          
+          // Even more aggressive fallback
+          setTimeout(() => {
+            document.body.style.visibility = 'visible';
+            document.body.style.opacity = '1';
+            console.log('Emergency body visibility fix');
+          }, 1000);
         }
       })();
     </script>
@@ -494,18 +534,18 @@
           const sdkReady = await waitForFarcasterSDK();
           console.log('SDK initialization result:', sdkReady);
           
-          // Set up Farcaster-specific UI adjustments immediately
-          setupFarcasterUI();
-          
-          // Keep wallet button visible for manual connection
-          const walletButtonContainer = document.getElementById('walletButtonContainer');
-          if (walletButtonContainer) {
-            walletButtonContainer.style.display = 'block';
-          }
+                // Set up Farcaster-specific UI adjustments immediately
+      setupFarcasterUI();
+      
+      // Keep wallet button visible for manual connection
+      const walletButtonContainer = document.getElementById('walletButtonContainer');
+      if (walletButtonContainer) {
+        walletButtonContainer.style.display = 'block';
+      }
           
           // Initialize Wagmi for Farcaster Mini App if SDK is ready
           if (sdkReady) {
-            const wagmiInitialized = initializeWagmi();
+          const wagmiInitialized = initializeWagmi();
             console.log('Wagmi initialized:', wagmiInitialized);
           }
           
@@ -680,9 +720,9 @@
         console.log('Sendwise app initialized successfully');
         
         // Hide loading screen for all contexts
-        const loadingElement = document.getElementById('loading');
-        if (loadingElement) {
-          loadingElement.style.display = 'none';
+          const loadingElement = document.getElementById('loading');
+          if (loadingElement) {
+            loadingElement.style.display = 'none';
           console.log('Loading screen hidden after app initialization');
         }
         
@@ -690,9 +730,9 @@
         console.error('Failed to initialize app:', error);
         
         // Hide loading screen even on error
-        const loadingElement = document.getElementById('loading');
-        if (loadingElement) {
-          loadingElement.style.display = 'none';
+          const loadingElement = document.getElementById('loading');
+          if (loadingElement) {
+            loadingElement.style.display = 'none';
           console.log('Loading screen hidden after error');
         }
         
@@ -706,10 +746,44 @@
   
   <!-- Global Error Handler for SVG and other errors -->
   <script>
-    // Global error handler to suppress SVG attribute errors
+    // Comprehensive global error handler
     window.addEventListener('error', function(e) {
-      if (e.message && e.message.includes('Expected length') && e.message.includes('svg')) {
-        console.log('Suppressed SVG attribute error:', e.message);
+      const errorPatterns = [
+        'Expected length',
+        'svg',
+        'attribute width',
+        'attribute height',
+        'ERR_BLOCKED_BY_CLIENT',
+        'Bad Request',
+        'dd-proxy',
+        'datadog',
+        'csp-report',
+        'Backpack',
+        'window.ethereum'
+      ];
+      
+      if (e.message && errorPatterns.some(pattern => e.message.includes(pattern))) {
+        console.log('Suppressed error:', e.message);
+        e.preventDefault();
+        return false;
+      }
+    });
+    
+    // Unhandled promise rejection handler
+    window.addEventListener('unhandledrejection', function(e) {
+      const errorMessage = e.reason?.message || e.reason || '';
+      const errorPatterns = [
+        'ERR_BLOCKED_BY_CLIENT',
+        'Bad Request',
+        'dd-proxy',
+        'datadog',
+        'csp-report',
+        'Failed to fetch',
+        'analytics'
+      ];
+      
+      if (errorPatterns.some(pattern => errorMessage.includes(pattern))) {
+        console.log('Suppressed promise rejection:', errorMessage);
         e.preventDefault();
         return false;
       }

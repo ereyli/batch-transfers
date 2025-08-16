@@ -399,13 +399,32 @@ export class SendwiseApp {
       const checkSDK = () => {
         // Check for various SDK patterns
         const sdk = window.farcasterSDK || 
+                   window.farcaster ||
                    window.fc || 
                    window.parent?.farcasterSDK || 
+                   window.parent?.farcaster ||
                    window.parent?.fc;
         
         if (sdk) {
           console.log('Farcaster SDK found:', sdk);
-          resolve(sdk);
+          console.log('SDK type:', typeof sdk, 'Keys:', Object.keys(sdk));
+          
+          // If we found the raw injected SDK, wrap it
+          if (sdk === window.farcaster && !window.farcasterSDK) {
+            window.farcasterSDK = {
+              actions: {
+                ready: async () => {
+                  console.log('SDK ready() wrapper called');
+                  return true;
+                }
+              },
+              wallet: sdk.wallet || sdk,
+              context: sdk.context || sdk,
+              raw: sdk
+            };
+          }
+          
+          resolve(window.farcasterSDK || sdk);
           return;
         }
         

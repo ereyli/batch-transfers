@@ -125,15 +125,29 @@
           
           // Try to call ready as soon as possible if SDK is available
           const tryReady = () => {
-            const sdk = window.farcasterSDK || window.fc || window.parent?.farcasterSDK || window.parent?.fc;
-            if (sdk && sdk.actions && sdk.actions.ready) {
-              console.log('Early SDK ready() call');
-              sdk.actions.ready().catch(e => {
-                // Don't log CORS-related errors
-                if (!e.message?.includes('privy.farcaster.xyz')) {
-                  console.log('Early ready() error:', e);
+            const sdk = window.farcasterSDK || window.farcaster || window.fc || 
+                       window.parent?.farcasterSDK || window.parent?.farcaster || window.parent?.fc;
+            
+            if (sdk) {
+              console.log('Early SDK found:', typeof sdk, Object.keys(sdk));
+              
+              // If it's the raw farcaster SDK, try to use it directly
+              if (sdk === window.farcaster) {
+                console.log('Using raw Farcaster SDK');
+                try {
+                  // Just log that we have the SDK - no need to call ready() here
+                  console.log('Raw Farcaster SDK available, will initialize later');
+                } catch (e) {
+                  console.log('Early SDK error:', e);
                 }
-              });
+              } else if (sdk.actions && sdk.actions.ready) {
+                console.log('Early SDK ready() call');
+                sdk.actions.ready().catch(e => {
+                  if (!e.message?.includes('privy.farcaster.xyz')) {
+                    console.log('Early ready() error:', e);
+                  }
+                });
+              }
             }
           };
           
@@ -427,15 +441,22 @@
     
     // Wait for Farcaster SDK to load
     async function waitForFarcasterSDK() {
-      if (typeof window.FrameSDK !== 'undefined') {
-        console.log('Farcaster Frame SDK detected:', window.FrameSDK);
+      // Check for injected Farcaster SDK (most common)
+      if (typeof window.farcaster !== 'undefined') {
+        console.log('Farcaster SDK loaded:', window.farcaster);
         
         try {
-          // Initialize SDK
-          const sdk = window.FrameSDK;
-          await sdk.context.ready();
-          console.log('Farcaster SDK initialized and ready');
+          const sdk = window.farcaster;
           
+          // Check available methods
+          console.log('SDK methods available:', Object.keys(sdk));
+          
+          // Try to get context information
+          if (sdk.context) {
+            console.log('SDK context available:', sdk.context);
+          }
+          
+          // Setup SDK wrapper
           window.farcasterSDK = {
             actions: {
               ready: async () => {
@@ -443,8 +464,9 @@
                 return true;
               }
             },
-            wallet: sdk.wallet,
-            context: sdk.context
+            wallet: sdk.wallet || sdk,
+            context: sdk.context || sdk,
+            raw: sdk // Keep reference to raw SDK
           };
           
           return true;
@@ -454,7 +476,29 @@
         }
       }
       
-      // Check for alternative SDK patterns
+      // Check for Frame SDK
+      if (typeof window.FrameSDK !== 'undefined') {
+        console.log('Farcaster Frame SDK detected:', window.FrameSDK);
+        
+        try {
+          const sdk = window.FrameSDK;
+          await sdk.context.ready();
+          console.log('Frame SDK initialized and ready');
+          
+          window.farcasterSDK = {
+            actions: { ready: async () => true },
+            wallet: sdk.wallet,
+            context: sdk.context
+          };
+          
+          return true;
+        } catch (error) {
+          console.log('Frame SDK initialization error:', error);
+          return false;
+        }
+      }
+      
+      // Check for alternative patterns
       if (typeof window.fc !== 'undefined') {
         console.log('Alternative Farcaster SDK detected:', window.fc);
         window.farcasterSDK = window.fc;

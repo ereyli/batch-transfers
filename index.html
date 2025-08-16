@@ -43,6 +43,10 @@
     <!-- Farcaster Mini App Manifest -->
     <link rel="farcaster_manifest" href="https://www.sendwise.xyz/.well-known/farcaster.json" />
     
+    <!-- Meta tags for Farcaster Frame -->
+    <meta name="fc:frame:post_url" content="https://www.sendwise.xyz" />
+    <meta name="fc:frame:input:text" content="Enter amount..." />
+    
     <!-- Early Farcaster SDK Detection -->
     <script>
       // Early detection and SDK setup
@@ -374,11 +378,51 @@
 </div>
 
   <!-- Farcaster Mini App SDK -->
+  <script type="module" src="https://unpkg.com/@farcaster/frame-sdk@latest/dist/sdk.js" defer></script>
   <script type="module">
     import { SendwiseApp } from './js/app.js';
 
     // Global variables
     window.isFarcasterMiniApp = false;
+    
+    // Wait for Farcaster SDK to load
+    async function waitForFarcasterSDK() {
+      if (typeof window.FrameSDK !== 'undefined') {
+        console.log('Farcaster Frame SDK detected:', window.FrameSDK);
+        
+        try {
+          // Initialize SDK
+          const sdk = window.FrameSDK;
+          await sdk.context.ready();
+          console.log('Farcaster SDK initialized and ready');
+          
+          window.farcasterSDK = {
+            actions: {
+              ready: async () => {
+                console.log('SDK ready() called');
+                return true;
+              }
+            },
+            wallet: sdk.wallet,
+            context: sdk.context
+          };
+          
+          return true;
+        } catch (error) {
+          console.log('Farcaster SDK initialization error:', error);
+          return false;
+        }
+      }
+      
+      // Check for alternative SDK patterns
+      if (typeof window.fc !== 'undefined') {
+        console.log('Alternative Farcaster SDK detected:', window.fc);
+        window.farcasterSDK = window.fc;
+        return true;
+      }
+      
+      return false;
+    }
 
     // Global wallet modal function
     window.openWalletModal = () => {
@@ -446,19 +490,24 @@
         if (window.isFarcasterMiniApp) {
           console.log('Running in Farcaster Mini App environment');
           
-          // Farcaster environment detected - no extra UI needed
+          // First, try to initialize Farcaster SDK
+          const sdkReady = await waitForFarcasterSDK();
+          console.log('SDK initialization result:', sdkReady);
           
-                // Set up Farcaster-specific UI adjustments immediately
-      setupFarcasterUI();
-      
-      // Keep wallet button visible for manual connection
-      const walletButtonContainer = document.getElementById('walletButtonContainer');
-      if (walletButtonContainer) {
-        walletButtonContainer.style.display = 'block';
-      }
+          // Set up Farcaster-specific UI adjustments immediately
+          setupFarcasterUI();
           
-          // Initialize Wagmi for Farcaster Mini App
-          const wagmiInitialized = initializeWagmi();
+          // Keep wallet button visible for manual connection
+          const walletButtonContainer = document.getElementById('walletButtonContainer');
+          if (walletButtonContainer) {
+            walletButtonContainer.style.display = 'block';
+          }
+          
+          // Initialize Wagmi for Farcaster Mini App if SDK is ready
+          if (sdkReady) {
+            const wagmiInitialized = initializeWagmi();
+            console.log('Wagmi initialized:', wagmiInitialized);
+          }
           
           if (wagmiInitialized && window.wagmiClient) {
             console.log('Wagmi initialized successfully for Farcaster Mini App');

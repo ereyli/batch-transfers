@@ -24,18 +24,25 @@ export class SendwiseApp {
 
   async initialize() {
     try {
-      // Show loading screen only for web browser (not Farcaster Mini App)
-      if (!window.isFarcasterMiniApp) {
-        this.uiManager.showLoading();
-      }
+      // Always show loading initially, will be hidden by Farcaster SDK or timeout
+      this.uiManager.showLoading();
       
       // Enhanced Farcaster Mini App detection and initialization
       const isFarcasterContext = this.detectFarcasterContext();
+      console.log('Detection result:', isFarcasterContext);
+      
       window.isFarcasterMiniApp = isFarcasterContext;
       
       if (isFarcasterContext) {
         console.log('Farcaster context detected - initializing...');
-        await this.initializeFarcasterApp();
+        try {
+          await this.initializeFarcasterApp();
+          console.log('Farcaster app initialization completed');
+        } catch (error) {
+          console.error('Farcaster app initialization failed:', error);
+        }
+      } else {
+        console.log('Not Farcaster context - continuing with normal web initialization');
       }
       
       // Initialize wallet manager (includes Farcaster)
@@ -338,38 +345,49 @@ export class SendwiseApp {
     // Setup CORS error suppression for Farcaster analytics
     this.setupFarcasterErrorSuppression();
     
-    try {
-      // Wait for Farcaster SDK to be available with timeout
-      const sdk = await this.waitForFarcasterSDK(5000);
-      
-      if (sdk && sdk.actions && sdk.actions.ready) {
-        console.log('Calling Farcaster SDK ready() to hide splash screen...');
-        await sdk.actions.ready();
-        console.log('Farcaster SDK ready() called successfully');
-        
-        // Store SDK reference globally
-        window.farcasterSDK = sdk;
-        
-        // Dispatch custom event for components
-        window.dispatchEvent(new CustomEvent('farcasterSdkReady', { detail: sdk }));
-        
-      } else {
-        console.warn('Farcaster SDK ready() method not available');
-        // Still try to hide loading by dispatching ready event manually
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('farcasterSdkReady', { detail: null }));
-        }, 1000);
+    // Try multiple approaches to call ready()
+    let readyCalled = false;
+    
+    // Approach 1: Try immediate ready() call if SDK exists
+    if (window.farcasterSDK && window.farcasterSDK.actions && window.farcasterSDK.actions.ready) {
+      try {
+        console.log('Calling immediate Farcaster SDK ready()...');
+        await window.farcasterSDK.actions.ready();
+        console.log('Immediate ready() call successful');
+        readyCalled = true;
+      } catch (error) {
+        console.log('Immediate ready() failed:', error);
       }
-      
-    } catch (error) {
-      // Don't log CORS-related errors
-      if (!error.message?.includes('privy.farcaster.xyz') && !error.message?.includes('CORS')) {
-        console.error('Error initializing Farcaster app:', error);
+    }
+    
+    // Approach 2: Wait for SDK and try again
+    if (!readyCalled) {
+      try {
+        const sdk = await this.waitForFarcasterSDK(3000);
+        
+        if (sdk && sdk.actions && sdk.actions.ready) {
+          console.log('Calling Farcaster SDK ready() after wait...');
+          await sdk.actions.ready();
+          console.log('Farcaster SDK ready() called successfully');
+          readyCalled = true;
+          
+          // Store SDK reference globally
+          window.farcasterSDK = sdk;
+          
+          // Dispatch custom event for components
+          window.dispatchEvent(new CustomEvent('farcasterSdkReady', { detail: sdk }));
+        }
+      } catch (error) {
+        console.log('SDK wait and ready() failed:', error);
       }
-      // Fallback: dispatch ready event anyway to prevent infinite loading
+    }
+    
+    // Approach 3: Force ready event after timeout
+    if (!readyCalled) {
+      console.log('Force dispatching ready event as fallback...');
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('farcasterSdkReady', { detail: null }));
-      }, 2000);
+      }, 1000);
     }
   }
 

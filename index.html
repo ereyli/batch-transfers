@@ -117,6 +117,17 @@
           console.log('Early detection: Not in Farcaster Mini App (web context)');
           window.isFarcasterMiniApp = false;
         }
+        
+        // Emergency loading hide for Farcaster
+        if (isFarcaster) {
+          setTimeout(() => {
+            const loadingElement = document.getElementById('loading');
+            if (loadingElement && loadingElement.style.display !== 'none') {
+              loadingElement.style.display = 'none';
+              console.log('Emergency loading screen hide in Farcaster');
+            }
+          }, 3000); // 3 second fallback
+        }
       })();
     </script>
 
@@ -619,23 +630,21 @@
         
         console.log('Sendwise app initialized successfully');
         
-        // Hide loading screen only for web browser
-        if (!window.isFarcasterMiniApp) {
-          const loadingElement = document.getElementById('loading');
-          if (loadingElement) {
-            loadingElement.style.display = 'none';
-          }
+        // Hide loading screen for all contexts
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+          console.log('Loading screen hidden after app initialization');
         }
         
       } catch (error) {
         console.error('Failed to initialize app:', error);
         
-        // Hide loading screen even on error (only for web browser)
-        if (!window.isFarcasterMiniApp) {
-          const loadingElement = document.getElementById('loading');
-          if (loadingElement) {
-            loadingElement.style.display = 'none';
-          }
+        // Hide loading screen even on error
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+          console.log('Loading screen hidden after error');
         }
         
         // Show error message only in web browser

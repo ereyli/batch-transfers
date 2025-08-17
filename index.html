@@ -381,7 +381,9 @@
         <button class="network-tag" data-chain="8453" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Base</button>
         <button class="network-tag" data-chain="10" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Optimism</button>
         <button class="network-tag" data-chain="42161" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Arbitrum</button>
-        <button class="network-tag" data-chain="1" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Ethereum</button>
+        <button class="network-tag" data-chain="1868" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Soneium</button>
+        <button class="network-tag" data-chain="130" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Unichain</button>
+        <button class="network-tag" data-chain="57073" style="padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer;">Ink</button>
       </div>
       
       <!-- Wallet Button - Below Logo (Only shown in web browser) -->
@@ -583,13 +585,17 @@
               { id: 8453, name: 'Base' },
               { id: 10, name: 'Optimism' },
               { id: 42161, name: 'Arbitrum' },
-              { id: 1, name: 'Ethereum' }
+              { id: 1868, name: 'Soneium' },
+              { id: 130, name: 'Unichain' },
+              { id: 57073, name: 'Ink' }
             ],
             transports: {
               8453: window.wagmi.http('https://mainnet.base.org'),
               10: window.wagmi.http('https://mainnet.optimism.io'),
               42161: window.wagmi.http('https://arb1.arbitrum.io/rpc'),
-              1: window.wagmi.http('https://ethereum.publicnode.com')
+              1868: window.wagmi.http('https://rpc.soneium.com'),
+              130: window.wagmi.http('https://rpc.unichain.world'),
+              57073: window.wagmi.http('https://rpc.inkchain.io')
             },
             connectors: [
               window.FarcasterMiniAppConnector.farcasterMiniApp()
@@ -716,7 +722,7 @@
           // Inform managers if available
           if (window.walletManager && typeof window.walletManager.updateMainConnectButton === 'function') {
             const address = await (window.walletManager.getAddress?.() || Promise.resolve(''));
-            const networkNameMap = { 1: 'Ethereum', 10: 'Optimism', 42161: 'Arbitrum', 8453: 'Base' };
+            const networkNameMap = { 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum', 1868: 'Soneium', 130: 'Unichain', 57073: 'Ink' };
             const networkName = networkNameMap[chainId] || 'Network';
             window.walletManager.updateMainConnectButton(address || '', 'Farcaster Wallet', networkName, 'farcaster');
           }
@@ -1237,7 +1243,7 @@
                               console.log('Selected network:', window.selectedChainId || 8453);
                               
                               // Show custom confirmation dialog (since confirm() is blocked in iframe)
-                              const networkNames = { 1: 'Ethereum', 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum' };
+                              const networkNames = { 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum', 1868: 'Soneium', 130: 'Unichain', 57073: 'Ink' };
                               const networkName = networkNames[window.selectedChainId] || 'Unknown';
                               const totalAmount = recipients.reduce((sum, r) => sum + parseFloat(r.amount), 0);
                               const contractFee = 0.001;
@@ -1309,10 +1315,12 @@
                                   
                                   // Use batch transfer contract instead of individual transfers
                                   const contractAddresses = {
-                                    1: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",     // Ethereum
                                     8453: "0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784",   // Base
                                     10: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",     // Optimism
-                                    42161: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9"    // Arbitrum
+                                    42161: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",   // Arbitrum
+                                    1868: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",   // Soneium
+                                    130: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",    // Unichain
+                                    57073: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0"   // Ink
                                   };
                                   
                                   const contractAddress = contractAddresses[selectedChain];
@@ -1409,7 +1417,7 @@
                               console.log('Selected network:', window.selectedChainId || 8453);
                               
                               // Show custom confirmation dialog (since confirm() is blocked in iframe)
-                              const networkNames = { 1: 'Ethereum', 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum' };
+                              const networkNames = { 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum', 1868: 'Soneium', 130: 'Unichain', 57073: 'Ink' };
                               const networkName = networkNames[window.selectedChainId] || 'Unknown';
                               const totalAmount = recipients.reduce((sum, r) => sum + parseFloat(r.amount), 0);
                               const contractFee = 0.001;
@@ -1481,10 +1489,12 @@
                                   
                                   // Use batch transfer contract instead of individual transfers
                                   const contractAddresses = {
-                                    1: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",     // Ethereum
                                     8453: "0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784",   // Base
                                     10: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",     // Optimism
-                                    42161: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9"    // Arbitrum
+                                    42161: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",   // Arbitrum
+                                    1868: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",   // Soneium
+                                    130: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0",    // Unichain
+                                    57073: "0x84e4dd821c8f848470fc49def3b14fc870fa97f0"   // Ink
                                   };
                                   
                                   const contractAddress = contractAddresses[selectedChain];

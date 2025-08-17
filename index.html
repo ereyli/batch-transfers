@@ -83,6 +83,9 @@
           console.error = function(...args) {
             const message = args.join(' ');
             const suppressPatterns = [
+              'Failed to resolve module specifier',
+              '@farcaster/frame-core',
+              'Relative references must start with',
               'privy.farcaster.xyz',
               'CORS',
               'ERR_BLOCKED_BY_CLIENT',
@@ -116,6 +119,8 @@
               'Port connected',
               'Failed to set window.ethereum',
               'Missing catch or finally after try',
+              'Uncaught SyntaxError',
+              'SyntaxError',
               'MetaMask encountered an error',
               'setting the global Ethereum provider',
               'another Ethereum wallet extension',
@@ -828,6 +833,13 @@
     // Comprehensive global error handler
     window.addEventListener('error', function(e) {
       const errorPatterns = [
+        'Failed to resolve module specifier',
+        '@farcaster/frame-core',
+        'Relative references must start with',
+        'Unsupported APPLY for',
+        'Missing catch or finally after try',
+        'Uncaught SyntaxError',
+        'SyntaxError',
         'Expected length',
         'svg',
         'attribute width',
@@ -875,6 +887,13 @@
     window.addEventListener('unhandledrejection', function(e) {
       const errorMessage = e.reason?.message || e.reason || '';
       const errorPatterns = [
+        'Failed to resolve module specifier',
+        '@farcaster/frame-core',
+        'Relative references must start with',
+        'Unsupported APPLY for',
+        'Missing catch or finally after try',
+        'Uncaught SyntaxError',
+        'SyntaxError',
         'ERR_BLOCKED_BY_CLIENT',
         'Bad Request',
         'dd-proxy',
@@ -943,22 +962,20 @@
         console.log('Farcaster SDK loaded, setting up Mini App environment');
         window.isFarcasterMiniApp = true;
         
-        // Initialize SDK context - try different methods
+                // Try to call ready using actions.ready() method (most common in Frame SDK)
         try {
-          if (typeof sdk.context?.ready === 'function') {
-            await sdk.context.ready();
-            console.log('Farcaster SDK context ready called');
-          } else if (typeof sdk.initialize === 'function') {
-              await sdk.initialize();
-              console.log('Farcaster SDK initialized');
+          if (typeof sdk.actions?.ready === 'function') {
+            await sdk.actions.ready();
+            console.log('Farcaster SDK actions.ready() called successfully');
           } else if (typeof sdk.ready === 'function') {
             await sdk.ready();
-            console.log('Farcaster SDK ready called');
+            console.log('Farcaster SDK ready() called successfully');
           } else {
-            console.log('No initialization method found on SDK, proceeding anyway');
+            console.log('No ready method found on SDK, proceeding without calling ready');
+            console.log('Available SDK methods:', Object.keys(sdk));
           }
             } catch (e) {
-          console.log('SDK initialization failed, but continuing:', e);
+          console.log('SDK ready call failed, but continuing:', e.message);
         }
       } catch (error) {
         console.error('Error initializing Farcaster SDK:', error);

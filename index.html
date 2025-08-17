@@ -1227,7 +1227,68 @@
                               console.log('Batch transfer data:', recipients);
                               console.log('Selected network:', window.selectedChainId || 8453);
                               
-                              alert(`Ready to send to ${recipients.length} recipients on network ${window.selectedChainId || 8453}. Blockchain integration coming soon!`);
+                              // Show confirmation dialog
+                              const networkNames = { 1: 'Ethereum', 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum' };
+                              const networkName = networkNames[window.selectedChainId] || 'Unknown';
+                              const totalAmount = recipients.reduce((sum, r) => sum + parseFloat(r.amount), 0);
+                              
+                              const confirmed = confirm(`🚀 Send ${recipients.length} transactions on ${networkName}?\n\nTotal: ${totalAmount} ETH\nRecipients: ${recipients.length}\n\nClick OK to proceed with transactions.`);
+                              
+                              if (!confirmed) {
+                                console.log('User cancelled transaction');
+                                return;
+                              }
+                              
+                              // Try to get provider and execute real transactions
+                              if (window.farcasterSDK?.wallet) {
+                                try {
+                                  console.log('Getting Farcaster provider for transaction...');
+                                  const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                                  
+                                  if (!provider) {
+                                    throw new Error('No provider available');
+                                  }
+                                  
+                                  // Switch to selected network first
+                                  const selectedChain = window.selectedChainId || 8453;
+                                  try {
+                                    await provider.request({
+                                      method: 'wallet_switchEthereumChain',
+                                      params: [{ chainId: '0x' + selectedChain.toString(16) }],
+                                    });
+                                    console.log('Switched to network:', selectedChain);
+                                  } catch (switchError) {
+                                    console.log('Could not switch network:', switchError.message);
+                                  }
+                                  
+                                  // Create ethers provider
+                                  const ethersProvider = new ethers.providers.Web3Provider(provider);
+                                  const signer = ethersProvider.getSigner();
+                                  
+                                  console.log('Starting batch transfers...');
+                                  
+                                  for (let i = 0; i < recipients.length; i++) {
+                                    const recipient = recipients[i];
+                                    console.log(`Sending ${recipient.amount} ETH to ${recipient.address}...`);
+                                    
+                                    const tx = await signer.sendTransaction({
+                                      to: recipient.address,
+                                      value: ethers.utils.parseEther(recipient.amount),
+                                      gasLimit: 21000
+                                    });
+                                    
+                                    console.log(`Transaction ${i + 1} sent:`, tx.hash);
+                                  }
+                                  
+                                  alert(`✅ Successfully sent ${recipients.length} transactions!`);
+                                  
+                                } catch (providerError) {
+                                  console.error('Provider error:', providerError);
+                                  alert(`❌ Transaction failed: ${providerError.message}`);
+                                }
+                              } else {
+                                alert(`📋 Preview: Ready to send to ${recipients.length} recipients on network ${window.selectedChainId || 8453}`);
+                              }
                               
                             } catch (error) {
                               console.error('Error preparing batch transfer:', error);
@@ -1278,7 +1339,68 @@
                               console.log('Batch transfer data:', recipients);
                               console.log('Selected network:', window.selectedChainId || 8453);
                               
-                              alert(`Ready to send to ${recipients.length} recipients on network ${window.selectedChainId || 8453}. Blockchain integration coming soon!`);
+                              // Show confirmation dialog
+                              const networkNames = { 1: 'Ethereum', 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum' };
+                              const networkName = networkNames[window.selectedChainId] || 'Unknown';
+                              const totalAmount = recipients.reduce((sum, r) => sum + parseFloat(r.amount), 0);
+                              
+                              const confirmed = confirm(`🚀 Send ${recipients.length} transactions on ${networkName}?\n\nTotal: ${totalAmount} ETH\nRecipients: ${recipients.length}\n\nClick OK to proceed with transactions.`);
+                              
+                              if (!confirmed) {
+                                console.log('User cancelled transaction');
+                                return;
+                              }
+                              
+                              // Try to get provider and execute real transactions
+                              if (window.farcasterSDK?.wallet) {
+                                try {
+                                  console.log('Getting Farcaster provider for transaction...');
+                                  const provider = await window.farcasterSDK.wallet.getEthereumProvider();
+                                  
+                                  if (!provider) {
+                                    throw new Error('No provider available');
+                                  }
+                                  
+                                  // Switch to selected network first
+                                  const selectedChain = window.selectedChainId || 8453;
+                                  try {
+                                    await provider.request({
+                                      method: 'wallet_switchEthereumChain',
+                                      params: [{ chainId: '0x' + selectedChain.toString(16) }],
+                                    });
+                                    console.log('Switched to network:', selectedChain);
+                                  } catch (switchError) {
+                                    console.log('Could not switch network:', switchError.message);
+                                  }
+                                  
+                                  // Create ethers provider
+                                  const ethersProvider = new ethers.providers.Web3Provider(provider);
+                                  const signer = ethersProvider.getSigner();
+                                  
+                                  console.log('Starting batch transfers...');
+                                  
+                                  for (let i = 0; i < recipients.length; i++) {
+                                    const recipient = recipients[i];
+                                    console.log(`Sending ${recipient.amount} ETH to ${recipient.address}...`);
+                                    
+                                    const tx = await signer.sendTransaction({
+                                      to: recipient.address,
+                                      value: ethers.utils.parseEther(recipient.amount),
+                                      gasLimit: 21000
+                                    });
+                                    
+                                    console.log(`Transaction ${i + 1} sent:`, tx.hash);
+                                  }
+                                  
+                                  alert(`✅ Successfully sent ${recipients.length} transactions!`);
+                                  
+                                } catch (providerError) {
+                                  console.error('Provider error:', providerError);
+                                  alert(`❌ Transaction failed: ${providerError.message}`);
+                                }
+                              } else {
+                                alert(`📋 Preview: Ready to send to ${recipients.length} recipients on network ${window.selectedChainId || 8453}`);
+                              }
                               
                             } catch (error) {
                               console.error('Error preparing batch transfer:', error);

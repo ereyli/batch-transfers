@@ -115,7 +115,18 @@
               'preloadListings',
               'Port connected',
               'Failed to set window.ethereum',
-              'Missing catch or finally after try'
+              'Missing catch or finally after try',
+              'MetaMask encountered an error',
+              'setting the global Ethereum provider',
+              'another Ethereum wallet extension',
+              'Cannot set property ethereum',
+              'which has only a getter',
+              'Uncaught (in promise) TypeError',
+              'Cannot redefine property',
+              'override `window.ethereum`',
+              'Access to script at',
+              'has been blocked by CORS policy',
+              'No \'Access-Control-Allow-Origin\' header'
             ];
             
             if (suppressPatterns.some(pattern => message.includes(pattern))) {
@@ -456,7 +467,7 @@
 </div>
 
   <!-- Farcaster Mini App SDK -->
-  <script type="module" src="https://unpkg.com/@farcaster/frame-sdk@latest/dist/sdk.js" defer></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@farcaster/frame-sdk@latest/dist/sdk.js" defer></script>
   <script type="module">
     import { SendwiseApp } from './js/app.js';
 
@@ -842,7 +853,15 @@
         'getRecomendedWallets',
         'preloadListings',
         'Port connected',
-        'Failed to set window.ethereum'
+        'Failed to set window.ethereum',
+        'MetaMask encountered an error',
+        'setting the global Ethereum provider',
+        'another Ethereum wallet extension',
+        'which has only a getter',
+        'override `window.ethereum`',
+        'Access to script at',
+        'has been blocked by CORS policy',
+        'No \'Access-Control-Allow-Origin\' header'
       ];
       
       if (e.message && errorPatterns.some(pattern => e.message.includes(pattern))) {
@@ -873,7 +892,15 @@
         'Cannot redefine property',
         'getDesktopListings',
         'getRecomendedWallets',
-        'preloadListings'
+        'preloadListings',
+        'MetaMask encountered an error',
+        'setting the global Ethereum provider',
+        'another Ethereum wallet extension',
+        'which has only a getter',
+        'override `window.ethereum`',
+        'Access to script at',
+        'has been blocked by CORS policy',
+        'No \'Access-Control-Allow-Origin\' header'
       ];
       
       if (errorPatterns.some(pattern => errorMessage.includes(pattern))) {
@@ -912,40 +939,26 @@
         console.log('Farcaster SDK loaded:', sdk);
         
         // Check if we're in Farcaster environment
-        if (typeof sdk.isInFarcaster === 'function') {
-          const isInFarcaster = await sdk.isInFarcaster();
-          window.isFarcasterMiniApp = !!isInFarcaster;
-          
-          if (isInFarcaster) {
-            console.log('Farcaster Mini App environment detected');
-            
-            // Initialize SDK
-            if (typeof sdk.initialize === 'function') {
+        // Since we already detected Farcaster context in early detection, proceed with setup
+        console.log('Farcaster SDK loaded, setting up Mini App environment');
+        window.isFarcasterMiniApp = true;
+        
+        // Initialize SDK context - try different methods
+        try {
+          if (typeof sdk.context?.ready === 'function') {
+            await sdk.context.ready();
+            console.log('Farcaster SDK context ready called');
+          } else if (typeof sdk.initialize === 'function') {
               await sdk.initialize();
               console.log('Farcaster SDK initialized');
-            }
-            
-            // Don't call ready() here - let the app do it when ready
+          } else if (typeof sdk.ready === 'function') {
+            await sdk.ready();
+            console.log('Farcaster SDK ready called');
           } else {
-            console.log('Running in web browser environment');
+            console.log('No initialization method found on SDK, proceeding anyway');
           }
-        } else {
-          console.log('Farcaster SDK isInFarcaster method not available');
-          // Fallback heuristic detection
-          const ref = document.referrer || '';
-          const looksLikeFarcaster = (window.top !== window) && (
-            ref.includes('warpcast.com') || ref.includes('miniapps.farcaster') || ref.includes('farcaster')
-          );
-          window.isFarcasterMiniApp = looksLikeFarcaster;
-          
-          if (looksLikeFarcaster && typeof sdk.initialize === 'function') {
-            try {
-              await sdk.initialize();
-              console.log('Farcaster SDK initialized (fallback)');
             } catch (e) {
-              console.log('Farcaster initialize failed:', e);
-            }
-          }
+          console.log('SDK initialization failed, but continuing:', e);
         }
       } catch (error) {
         console.error('Error initializing Farcaster SDK:', error);

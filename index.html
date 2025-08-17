@@ -99,7 +99,23 @@
               'svg',
               'Bad Request',
               'Backpack',
-              'window.ethereum'
+              'window.ethereum',
+              'ERR_TIMED_OUT',
+              'Failed to fetch',
+              'ERR_CONNECTION_CLOSED',
+              'ERR_INTERNET_DISCONNECTED',
+              'ERR_NAME_NOT_RESOLVED',
+              'WebSocket connection',
+              'Farcaster API Error',
+              'Cannot set property ethereum',
+              'Cannot redefine property',
+              'isZerion',
+              'getDesktopListings',
+              'getRecomendedWallets',
+              'preloadListings',
+              'Port connected',
+              'Failed to set window.ethereum',
+              'Missing catch or finally after try'
             ];
             
             if (suppressPatterns.some(pattern => message.includes(pattern))) {
@@ -158,6 +174,14 @@
           // Explicitly set as false for web context
           console.log('Early detection: Not in Farcaster Mini App (web context)');
           window.isFarcasterMiniApp = false;
+          
+          // Additional check for injected Farcaster SDK in web context
+          setTimeout(() => {
+            if (window.farcaster && !window.isFarcasterMiniApp) {
+              console.log('Farcaster SDK detected in web context, but keeping web mode');
+              // Don't change isFarcasterMiniApp, just acknowledge the SDK exists
+            }
+          }, 1000);
         }
         
         // Emergency loading hide for Farcaster
@@ -803,7 +827,22 @@
         'datadog',
         'csp-report',
         'Backpack',
-        'window.ethereum'
+        'window.ethereum',
+        'ERR_TIMED_OUT',
+        'Failed to fetch',
+        'ERR_CONNECTION_CLOSED',
+        'ERR_INTERNET_DISCONNECTED',
+        'ERR_NAME_NOT_RESOLVED',
+        'WebSocket connection',
+        'Farcaster API Error',
+        'Cannot set property ethereum',
+        'Cannot redefine property',
+        'isZerion',
+        'getDesktopListings',
+        'getRecomendedWallets',
+        'preloadListings',
+        'Port connected',
+        'Failed to set window.ethereum'
       ];
       
       if (e.message && errorPatterns.some(pattern => e.message.includes(pattern))) {
@@ -823,7 +862,18 @@
         'datadog',
         'csp-report',
         'Failed to fetch',
-        'analytics'
+        'analytics',
+        'ERR_TIMED_OUT',
+        'ERR_CONNECTION_CLOSED',
+        'ERR_INTERNET_DISCONNECTED',
+        'ERR_NAME_NOT_RESOLVED',
+        'WebSocket connection',
+        'Farcaster API Error',
+        'Cannot set property ethereum',
+        'Cannot redefine property',
+        'getDesktopListings',
+        'getRecomendedWallets',
+        'preloadListings'
       ];
       
       if (errorPatterns.some(pattern => errorMessage.includes(pattern))) {

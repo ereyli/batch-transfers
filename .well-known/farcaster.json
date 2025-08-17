@@ -4,34 +4,28 @@
     "payload": "eyJkb21haW4iOiJzZW5kd2lzZS54eXoifQ",
     "signature": "CYSG7k83/8rsQOzENEGddNJm74qImwGBoB3VQw8BqPtesgKtaNeijY+SpjmI4sObO8q24PanKxOIAQk5UHYqbRs="
   },
-  "miniapp": {
-    "version": "1",
+  "frame": {
     "name": "Sendwise",
-    "iconUrl": "https://www.sendwise.xyz/.well-known/icon.png",
+    "version": "1",
+    "iconUrl": "https://www.sendwise.xyz/icon.png",
     "homeUrl": "https://www.sendwise.xyz",
-    "imageUrl": "https://www.sendwise.xyz/.well-known/image.png",
-    "buttonTitle": "🚀 Start Batch Transfer",
-    "splashImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
+    "imageUrl": "https://www.sendwise.xyz/image.png",
+    "buttonTitle": "Open Sendwise",
+    "splashImageUrl": "https://www.sendwise.xyz/splash.png",
     "splashBackgroundColor": "#6366f1",
-    "subtitle": "Smart Batch Transfers",
+    "webhookUrl": "https://www.sendwise.xyz/api/webhook",
+    "subtitle": "Start Batch Transfer",
     "description": "Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers.",
-    "tagline": "Smart Batch Transfers",
     "primaryCategory": "finance",
-    "tags": ["batch-transfer", "ethereum", "defi", "wallet", "gas-savings"],
-    "heroImageUrl": "https://www.sendwise.xyz/.well-known/image.png",
-    "ogTitle": "Sendwise - Batch Transfers",
-    "ogDescription": "Send ETH and ERC20 tokens to multiple addresses in a single transaction.",
-    "ogImageUrl": "https://www.sendwise.xyz/.well-known/image.png",
-    "screenshotUrls": [
-      "https://www.sendwise.xyz/.well-known/image.png"
+    "tags": [
+      "base",
+      "sendwise",
+      "batchtransfer",
+      "crypto",
+      "tools"
     ],
-    "canonicalDomain": "www.sendwise.xyz",
-    "requiredChains": ["eip155:8453", "eip155:10", "eip155:42161", "eip155:1868", "eip155:130", "eip155:57073"],
-    "requiredCapabilities": [
-      "actions.signIn",
-      "wallet.getEthereumProvider"
-    ],
-    "webhookUrl": "https://www.sendwise.xyz",
-    "castShareUrl": "https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise"
+    "tagline": "Sendwise, batch transfers",
+    "ogTitle": "Sendwise",
+    "ogDescription": "Sendwise, batch transfers"
   }
 }

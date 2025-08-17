@@ -1031,7 +1031,8 @@
                     }
                     
                     // Show send button if hidden
-                    const sendButton = document.getElementById('sendButton');
+                    const sendButton = document.getElementById('sendBtn');
+                    console.log('Send button found:', sendButton);
                     if (sendButton) {
                       sendButton.style.display = 'block';
                       console.log('Send button shown via direct DOM');
@@ -1041,7 +1042,8 @@
                     if (typeof window.addInput === 'undefined') {
                       window.addInput = () => {
                         console.log('Direct addInput called - adding recipient row');
-                        const recipientsContainer = document.getElementById('recipients');
+                        const recipientsContainer = document.getElementById('inputContainer');
+                        console.log('Recipients container found:', recipientsContainer);
                         if (recipientsContainer) {
                           const newRow = document.createElement('div');
                           newRow.className = 'recipient-row';
@@ -1112,7 +1114,8 @@
                       }
                       
                       // Show send button if hidden
-                      const sendButton = document.getElementById('sendButton');
+                      const sendButton = document.getElementById('sendBtn');
+                      console.log('Send button found:', sendButton);
                       if (sendButton) {
                         sendButton.style.display = 'block';
                         console.log('Send button shown via direct DOM');
@@ -1122,7 +1125,8 @@
                       if (typeof window.addInput === 'undefined') {
                         window.addInput = () => {
                           console.log('Direct addInput called - adding recipient row');
-                          const recipientsContainer = document.getElementById('recipients');
+                          const recipientsContainer = document.getElementById('inputContainer');
+                          console.log('Recipients container found:', recipientsContainer);
                           if (recipientsContainer) {
                             const newRow = document.createElement('div');
                             newRow.className = 'recipient-row';

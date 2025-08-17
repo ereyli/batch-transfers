@@ -6,6 +6,12 @@
       "use": "@vercel/static"
     }
   ],
+  "redirects": [
+    {
+      "source": "/share",
+      "destination": "/share.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

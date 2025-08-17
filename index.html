@@ -810,10 +810,76 @@
       console.log('Add to Collection function called');
     }
 
+    // Check for pending batch transfer from share
+    function checkPendingBatchTransfer() {
+      try {
+        const pendingData = localStorage.getItem('pendingBatchTransfer');
+        if (pendingData) {
+          const data = JSON.parse(pendingData);
+          console.log('Found pending batch transfer from cast share:', data);
+          
+          // Clear the stored data
+          localStorage.removeItem('pendingBatchTransfer');
+          
+          // Set selected network
+          window.selectedChainId = data.chainId;
+          
+          // Populate recipients
+          if (data.recipients && data.recipients.length > 0) {
+            // Clear existing recipients
+            const container = document.getElementById('recipientsContainer');
+            if (container) {
+              container.innerHTML = '';
+              
+              // Add recipients from shared cast
+              data.recipients.forEach((recipient, index) => {
+                if (typeof window.addInput === 'function') {
+                  window.addInput();
+                  
+                  // Fill in the data
+                  setTimeout(() => {
+                    const rows = container.querySelectorAll('.recipient-row');
+                    if (rows[index]) {
+                      const addressInput = rows[index].querySelector('.recipient-address');
+                      const amountInput = rows[index].querySelector('.recipient-amount');
+                      
+                      if (addressInput) addressInput.value = recipient.address;
+                      if (amountInput) amountInput.value = recipient.amount;
+                    }
+                  }, 100);
+                }
+              });
+              
+              // Show success message
+              setTimeout(() => {
+                console.log('✅ Imported ' + data.recipients.length + ' recipients from shared cast');
+              }, 500);
+            }
+          }
+          
+          // Update network selection
+          setTimeout(() => {
+            const networkTags = document.querySelectorAll('.network-tag');
+            networkTags.forEach(tag => {
+              tag.classList.remove('selected');
+              if (Number(tag.dataset.chain) === data.chainId) {
+                tag.classList.add('selected');
+              }
+            });
+          }, 100);
+        }
+      } catch (error) {
+        console.log('Error checking pending batch transfer:', error);
+      }
+    }
+
     // Initialize app when DOM is loaded
     window.addEventListener('DOMContentLoaded', async function() {
       try {
         console.log('Initializing Sendwise app...');
+        
+        // Check for pending batch transfers from share
+        setTimeout(checkPendingBatchTransfer, 1000);
         
         // Initialize Farcaster Mini App first
         await initializeFarcasterMiniApp();

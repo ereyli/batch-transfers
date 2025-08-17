@@ -122,6 +122,7 @@
               'Uncaught SyntaxError',
               'SyntaxError',
               'openWalletModal is not a function',
+              'addInput is not defined',
               'MetaMask encountered an error',
               'setting the global Ethereum provider',
               'another Ethereum wallet extension',
@@ -846,6 +847,7 @@
         'attribute height',
         'svg',
         'openWalletModal is not a function',
+        'addInput is not defined',
         'ERR_BLOCKED_BY_CLIENT',
         'Bad Request',
         'dd-proxy',
@@ -897,6 +899,7 @@
         'Uncaught SyntaxError',
         'SyntaxError',
         'openWalletModal is not a function',
+        'addInput is not defined',
         'ERR_BLOCKED_BY_CLIENT',
         'Bad Request',
         'dd-proxy',
@@ -1023,6 +1026,33 @@
                       mainContent.style.display = 'block';
                       console.log('Main content shown via direct DOM');
                     }
+                    
+                    // Show send button if hidden
+                    const sendButton = document.getElementById('sendButton');
+                    if (sendButton) {
+                      sendButton.style.display = 'block';
+                      console.log('Send button shown via direct DOM');
+                    }
+                    
+                    // Define addInput function if not available
+                    if (typeof window.addInput === 'undefined') {
+                      window.addInput = () => {
+                        console.log('Direct addInput called - adding recipient row');
+                        const recipientsContainer = document.getElementById('recipients');
+                        if (recipientsContainer) {
+                          const newRow = document.createElement('div');
+                          newRow.className = 'recipient-row';
+                          newRow.innerHTML = \`
+                            <input type="text" class="form-input" placeholder="Recipient Address" style="background: #2a2a2a !important; color: white !important;">
+                            <input type="number" class="form-input" placeholder="Amount" step="0.000001" style="background: #2a2a2a !important; color: white !important;">
+                            <button onclick="this.parentElement.remove()" class="recipient-action-btn remove-recipient-btn" title="Remove Recipient">×</button>
+                          \`;
+                          recipientsContainer.appendChild(newRow);
+                          console.log('Recipient row added via direct DOM');
+                        }
+                      };
+                      console.log('Direct addInput function defined');
+                    }
                   }
                   
                   // Also try to set the wallet in wallet manager if available
@@ -1078,6 +1108,33 @@
                       if (mainContent) {
                         mainContent.style.display = 'block';
                         console.log('Main content shown via direct DOM');
+                      }
+                      
+                      // Show send button if hidden
+                      const sendButton = document.getElementById('sendButton');
+                      if (sendButton) {
+                        sendButton.style.display = 'block';
+                        console.log('Send button shown via direct DOM');
+                      }
+                      
+                      // Define addInput function if not available
+                      if (typeof window.addInput === 'undefined') {
+                        window.addInput = () => {
+                          console.log('Direct addInput called - adding recipient row');
+                          const recipientsContainer = document.getElementById('recipients');
+                          if (recipientsContainer) {
+                            const newRow = document.createElement('div');
+                            newRow.className = 'recipient-row';
+                            newRow.innerHTML = \`
+                              <input type="text" class="form-input" placeholder="Recipient Address" style="background: #2a2a2a !important; color: white !important;">
+                              <input type="number" class="form-input" placeholder="Amount" step="0.000001" style="background: #2a2a2a !important; color: white !important;">
+                              <button onclick="this.parentElement.remove()" class="recipient-action-btn remove-recipient-btn" title="Remove Recipient">×</button>
+                            \`;
+                            recipientsContainer.appendChild(newRow);
+                            console.log('Recipient row added via direct DOM');
+                          }
+                        };
+                        console.log('Direct addInput function defined');
                       }
                     }
                     

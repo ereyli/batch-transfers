@@ -182,7 +182,18 @@
                 }
               } else if (sdk.actions && sdk.actions.ready) {
                 console.log('Early SDK ready() call');
-                sdk.actions.ready().catch(e => {
+                sdk.actions.ready().then(() => {
+                  console.log('✅ Early SDK ready() successful - splash screen hidden');
+                  // Hide loading screen after early ready
+                  const loadingScreen = document.getElementById('loadingScreen');
+                  if (loadingScreen) {
+                    loadingScreen.style.display = 'none';
+                  }
+                  const mainContent = document.getElementById('mainContent');
+                  if (mainContent) {
+                    mainContent.style.display = 'block';
+                  }
+                }).catch(e => {
                   if (!e.message?.includes('privy.farcaster.xyz')) {
                     console.log('Early ready() error:', e);
                   }
@@ -215,7 +226,7 @@
             const loadingElement = document.getElementById('loading');
             if (loadingElement && loadingElement.style.display !== 'none') {
               loadingElement.style.display = 'none';
-              console.log('Emergency loading screen hide in Farcaster (2s)');
+              console.log('⚠️ Emergency loading screen hide - SDK ready() may not have been called properly');
               
               // Force show main content
               const mainContent = document.querySelector('.container');
@@ -225,7 +236,7 @@
                 mainContent.style.opacity = '1';
               }
             }
-          }, 2000); // 2 second fallback
+          }, 1500); // 1.5 second fallback (reduced since we call ready())
           
           // Even more aggressive fallback
           setTimeout(() => {
@@ -996,13 +1007,27 @@
         try {
           if (typeof sdk.actions?.ready === 'function') {
             await sdk.actions.ready();
-            console.log('Farcaster SDK actions.ready() called successfully');
+            console.log('✅ Farcaster SDK actions.ready() called - splash screen hidden');
           } else if (typeof sdk.ready === 'function') {
             await sdk.ready();
-            console.log('Farcaster SDK ready() called successfully');
+            console.log('✅ Farcaster SDK ready() called - splash screen hidden');
           } else {
             console.log('No ready method found on SDK, proceeding without calling ready');
             console.log('Available SDK methods:', Object.keys(sdk));
+          }
+          
+          // Hide our internal loading screen after SDK ready
+          const loadingScreen = document.getElementById('loadingScreen');
+          if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+            console.log('Internal loading screen hidden after SDK ready');
+          }
+          
+          // Show main content
+          const mainContent = document.getElementById('mainContent');
+          if (mainContent) {
+            mainContent.style.display = 'block';
+            console.log('Main content shown after SDK ready');
           }
           
           // Now that SDK is ready, trigger wallet auto-connection with retries
@@ -1084,7 +1109,7 @@
                         if (typeof setupNetworkTags === 'function') {
                           setupNetworkTags();
                           console.log('Network tags setup completed');
-          } else {
+        } else {
                           console.log('setupNetworkTags function not available, implementing direct network selection...');
                           
                           // Direct implementation of network selection

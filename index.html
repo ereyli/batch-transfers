@@ -993,12 +993,36 @@
                 if (wallet && wallet.address) {
                   console.log('Direct wallet connection successful:', wallet.address);
                   
-                  // Update UI immediately with the connected wallet
+                                    // Update UI immediately with the connected wallet
                   if (window.uiManager && typeof window.uiManager.updateWalletDisplay === 'function') {
                     window.uiManager.updateWalletDisplay(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
                     console.log('UI updated with Farcaster wallet address');
           } else {
-                    console.log('UI Manager not available for wallet display update');
+                    console.log('UI Manager not available - using direct DOM update');
+                    
+                    // Direct DOM update for wallet display
+                    const walletBtn = document.getElementById('headerWalletBtn');
+                    if (walletBtn) {
+                      const shortAddress = wallet.address.slice(0, 6) + '...' + wallet.address.slice(-4);
+                      walletBtn.innerHTML = `
+                        <span style="color: white; font-size: 14px;">🟣 ${shortAddress}</span>
+                      `;
+                      walletBtn.style.background = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+                      console.log('Direct DOM wallet update successful');
+                    }
+                    
+                    // Hide loading and show main content
+                    const loadingScreen = document.getElementById('loadingScreen');
+                    if (loadingScreen) {
+                      loadingScreen.style.display = 'none';
+                      console.log('Loading screen hidden via direct DOM');
+                    }
+                    
+                    const mainContent = document.getElementById('mainContent');
+                    if (mainContent) {
+                      mainContent.style.display = 'block';
+                      console.log('Main content shown via direct DOM');
+                    }
                   }
                   
                   // Also try to set the wallet in wallet manager if available
@@ -1025,12 +1049,36 @@
                   if (accounts && accounts.length > 0) {
                     console.log('Direct provider connection successful:', accounts[0]);
                     
-                    // Update UI immediately with the connected wallet
+                                        // Update UI immediately with the connected wallet
                     if (window.uiManager && typeof window.uiManager.updateWalletDisplay === 'function') {
                       window.uiManager.updateWalletDisplay(accounts[0], 'Farcaster Wallet', 'Farcaster', 'farcaster');
                       console.log('UI updated with Farcaster wallet address');
         } else {
-                      console.log('UI Manager not available for wallet display update');
+                      console.log('UI Manager not available - using direct DOM update');
+                      
+                      // Direct DOM update for wallet display
+                      const walletBtn = document.getElementById('headerWalletBtn');
+                      if (walletBtn) {
+                        const shortAddress = accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
+                        walletBtn.innerHTML = `
+                          <span style="color: white; font-size: 14px;">🟣 ${shortAddress}</span>
+                        `;
+                        walletBtn.style.background = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+                        console.log('Direct DOM wallet update successful');
+                      }
+                      
+                      // Hide loading and show main content
+                      const loadingScreen = document.getElementById('loadingScreen');
+                      if (loadingScreen) {
+                        loadingScreen.style.display = 'none';
+                        console.log('Loading screen hidden via direct DOM');
+                      }
+                      
+                      const mainContent = document.getElementById('mainContent');
+                      if (mainContent) {
+                        mainContent.style.display = 'block';
+                        console.log('Main content shown via direct DOM');
+                      }
                     }
                     
                     // Also try to set the wallet in wallet manager if available

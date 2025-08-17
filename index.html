@@ -1240,6 +1240,8 @@
                               const networkNames = { 1: 'Ethereum', 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum' };
                               const networkName = networkNames[window.selectedChainId] || 'Unknown';
                               const totalAmount = recipients.reduce((sum, r) => sum + parseFloat(r.amount), 0);
+                              const contractFee = 0.001;
+                              const totalWithFee = totalAmount + contractFee;
                               
                               console.log('Ready to send ' + recipients.length + ' transactions on ' + networkName + ', total: ' + totalAmount + ' ETH');
                               
@@ -1247,10 +1249,12 @@
                               const modal = document.createElement('div');
                               modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000;';
                               modal.innerHTML = '<div style="background: #2a2a2a; padding: 30px; border-radius: 15px; max-width: 400px; text-align: center; color: white;">' +
-                                '<h3 style="margin: 0 0 20px 0; color: #6366f1;">🚀 Confirm Batch Transfer</h3>' +
+                                '<h3 style="margin: 0 0 20px 0; color: #6366f1;">🚀 Batch Transfer via Contract</h3>' +
                                 '<p style="margin: 10px 0; font-size: 16px;">Network: <strong>' + networkName + '</strong></p>' +
                                 '<p style="margin: 10px 0; font-size: 16px;">Recipients: <strong>' + recipients.length + '</strong></p>' +
-                                '<p style="margin: 10px 0; font-size: 18px; color: #10b981;">Total: <strong>' + totalAmount + ' ETH</strong></p>' +
+                                '<p style="margin: 10px 0; font-size: 16px;">Transfer: <strong>' + totalAmount + ' ETH</strong></p>' +
+                                '<p style="margin: 10px 0; font-size: 14px; color: #6b7280;">Contract Fee: <strong>' + contractFee + ' ETH</strong></p>' +
+                                '<p style="margin: 10px 0; font-size: 18px; color: #10b981;">Total: <strong>' + totalWithFee + ' ETH</strong></p>' +
                                 '<div style="margin-top: 25px; display: flex; gap: 15px; justify-content: center;">' +
                                 '<button id="confirmYes" style="background: #10b981; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">✅ Send</button>' +
                                 '<button id="confirmNo" style="background: #ef4444; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">❌ Cancel</button>' +
@@ -1303,20 +1307,49 @@
                                   
                                   console.log('Starting batch transfers...');
                                   
-                                  for (let i = 0; i < recipients.length; i++) {
-                                    const recipient = recipients[i];
-                                    console.log(`Sending ${recipient.amount} ETH to ${recipient.address}...`);
-                                    
-                                    const tx = await signer.sendTransaction({
-                                      to: recipient.address,
-                                      value: ethers.utils.parseEther(recipient.amount),
-                                      gasLimit: 21000
-                                    });
-                                    
-                                    console.log(`Transaction ${i + 1} sent:`, tx.hash);
+                                  // Use batch transfer contract instead of individual transfers
+                                  const contractAddresses = {
+                                    1: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",     // Ethereum
+                                    8453: "0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784",   // Base
+                                    10: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",     // Optimism
+                                    42161: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9"    // Arbitrum
+                                  };
+                                  
+                                  const contractAddress = contractAddresses[selectedChain];
+                                  if (!contractAddress) {
+                                    throw new Error('Batch contract not available for this network');
                                   }
                                   
-                                  console.log('✅ Successfully sent ' + recipients.length + ' transactions!');
+                                  // Prepare contract call data
+                                  const addresses = recipients.map(r => r.address);
+                                  const amounts = recipients.map(r => ethers.utils.parseEther(r.amount));
+                                  const totalValue = amounts.reduce((sum, amount) => sum.add(amount), ethers.BigNumber.from(0));
+                                  const fee = ethers.utils.parseEther("0.001"); // Contract fee
+                                  const totalWithFee = totalValue.add(fee);
+                                  
+                                  console.log('Contract address:', contractAddress);
+                                  console.log('Recipients:', addresses);
+                                  console.log('Amounts:', amounts.map(a => ethers.utils.formatEther(a)));
+                                  console.log('Total value:', ethers.utils.formatEther(totalValue));
+                                  console.log('Total with fee:', ethers.utils.formatEther(totalWithFee));
+                                  
+                                  // Create contract instance
+                                  const batchContract = new ethers.Contract(
+                                    contractAddress,
+                                    ["function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"],
+                                    signer
+                                  );
+                                  
+                                  // Execute batch transfer
+                                  console.log('Executing batch transfer...');
+                                  const tx = await batchContract.batchSend(addresses, amounts, {
+                                    value: totalWithFee,
+                                    gasLimit: 500000
+                                  });
+                                  
+                                  console.log('Batch transaction sent:', tx.hash);
+                                  
+                                  console.log('✅ Batch transfer successful! Sent to ' + recipients.length + ' recipients in 1 transaction: ' + tx.hash);
                                   
                                 } catch (providerError) {
                                   console.error('Provider error:', providerError);
@@ -1379,6 +1412,8 @@
                               const networkNames = { 1: 'Ethereum', 8453: 'Base', 10: 'Optimism', 42161: 'Arbitrum' };
                               const networkName = networkNames[window.selectedChainId] || 'Unknown';
                               const totalAmount = recipients.reduce((sum, r) => sum + parseFloat(r.amount), 0);
+                              const contractFee = 0.001;
+                              const totalWithFee = totalAmount + contractFee;
                               
                               console.log('Ready to send ' + recipients.length + ' transactions on ' + networkName + ', total: ' + totalAmount + ' ETH');
                               
@@ -1386,10 +1421,12 @@
                               const modal = document.createElement('div');
                               modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000;';
                               modal.innerHTML = '<div style="background: #2a2a2a; padding: 30px; border-radius: 15px; max-width: 400px; text-align: center; color: white;">' +
-                                '<h3 style="margin: 0 0 20px 0; color: #6366f1;">🚀 Confirm Batch Transfer</h3>' +
+                                '<h3 style="margin: 0 0 20px 0; color: #6366f1;">🚀 Batch Transfer via Contract</h3>' +
                                 '<p style="margin: 10px 0; font-size: 16px;">Network: <strong>' + networkName + '</strong></p>' +
                                 '<p style="margin: 10px 0; font-size: 16px;">Recipients: <strong>' + recipients.length + '</strong></p>' +
-                                '<p style="margin: 10px 0; font-size: 18px; color: #10b981;">Total: <strong>' + totalAmount + ' ETH</strong></p>' +
+                                '<p style="margin: 10px 0; font-size: 16px;">Transfer: <strong>' + totalAmount + ' ETH</strong></p>' +
+                                '<p style="margin: 10px 0; font-size: 14px; color: #6b7280;">Contract Fee: <strong>' + contractFee + ' ETH</strong></p>' +
+                                '<p style="margin: 10px 0; font-size: 18px; color: #10b981;">Total: <strong>' + totalWithFee + ' ETH</strong></p>' +
                                 '<div style="margin-top: 25px; display: flex; gap: 15px; justify-content: center;">' +
                                 '<button id="confirmYes" style="background: #10b981; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">✅ Send</button>' +
                                 '<button id="confirmNo" style="background: #ef4444; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">❌ Cancel</button>' +
@@ -1442,20 +1479,49 @@
                                   
                                   console.log('Starting batch transfers...');
                                   
-                                  for (let i = 0; i < recipients.length; i++) {
-                                    const recipient = recipients[i];
-                                    console.log(`Sending ${recipient.amount} ETH to ${recipient.address}...`);
-                                    
-                                    const tx = await signer.sendTransaction({
-                                      to: recipient.address,
-                                      value: ethers.utils.parseEther(recipient.amount),
-                                      gasLimit: 21000
-                                    });
-                                    
-                                    console.log(`Transaction ${i + 1} sent:`, tx.hash);
+                                  // Use batch transfer contract instead of individual transfers
+                                  const contractAddresses = {
+                                    1: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",     // Ethereum
+                                    8453: "0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784",   // Base
+                                    10: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9",     // Optimism
+                                    42161: "0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9"    // Arbitrum
+                                  };
+                                  
+                                  const contractAddress = contractAddresses[selectedChain];
+                                  if (!contractAddress) {
+                                    throw new Error('Batch contract not available for this network');
                                   }
                                   
-                                  console.log('✅ Successfully sent ' + recipients.length + ' transactions!');
+                                  // Prepare contract call data
+                                  const addresses = recipients.map(r => r.address);
+                                  const amounts = recipients.map(r => ethers.utils.parseEther(r.amount));
+                                  const totalValue = amounts.reduce((sum, amount) => sum.add(amount), ethers.BigNumber.from(0));
+                                  const fee = ethers.utils.parseEther("0.001"); // Contract fee
+                                  const totalWithFee = totalValue.add(fee);
+                                  
+                                  console.log('Contract address:', contractAddress);
+                                  console.log('Recipients:', addresses);
+                                  console.log('Amounts:', amounts.map(a => ethers.utils.formatEther(a)));
+                                  console.log('Total value:', ethers.utils.formatEther(totalValue));
+                                  console.log('Total with fee:', ethers.utils.formatEther(totalWithFee));
+                                  
+                                  // Create contract instance
+                                  const batchContract = new ethers.Contract(
+                                    contractAddress,
+                                    ["function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable"],
+                                    signer
+                                  );
+                                  
+                                  // Execute batch transfer
+                                  console.log('Executing batch transfer...');
+                                  const tx = await batchContract.batchSend(addresses, amounts, {
+                                    value: totalWithFee,
+                                    gasLimit: 500000
+                                  });
+                                  
+                                  console.log('Batch transaction sent:', tx.hash);
+                                  
+                                  console.log('✅ Batch transfer successful! Sent to ' + recipients.length + ' recipients in 1 transaction: ' + tx.hash);
                                   
                                 } catch (providerError) {
                                   console.error('Provider error:', providerError);

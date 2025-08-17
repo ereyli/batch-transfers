@@ -124,6 +124,7 @@
               'Invalid or unexpected token',
               'openWalletModal is not a function',
               'addInput is not defined',
+              'sendBatch is not defined',
               'MetaMask encountered an error',
               'setting the global Ethereum provider',
               'another Ethereum wallet extension',
@@ -850,6 +851,7 @@
         'svg',
         'openWalletModal is not a function',
         'addInput is not defined',
+        'sendBatch is not defined',
         'ERR_BLOCKED_BY_CLIENT',
         'Bad Request',
         'dd-proxy',
@@ -903,6 +905,7 @@
         'Invalid or unexpected token',
         'openWalletModal is not a function',
         'addInput is not defined',
+        'sendBatch is not defined',
         'ERR_BLOCKED_BY_CLIENT',
         'Bad Request',
         'dd-proxy',
@@ -1057,15 +1060,23 @@
                                               console.log('Direct addInput function defined');
                       }
                       
-                      // Setup network selection functionality
+                      // Setup network selection functionality immediately
                       setTimeout(() => {
+                        console.log('Attempting to setup network tags...');
                         if (typeof setupNetworkTags === 'function') {
                           setupNetworkTags();
                           console.log('Network tags setup completed');
           } else {
-                          console.log('setupNetworkTags function not available');
+                          console.log('setupNetworkTags function not available, trying to call it directly...');
+                          // Try to find and call the function from the page
+                          try {
+                            eval('setupNetworkTags()');
+                            console.log('Network tags setup via eval completed');
+                          } catch (e) {
+                            console.log('Could not setup network tags:', e.message);
+                          }
                         }
-                      }, 1000);
+                      }, 100); // Much earlier
                     }
                     
                     // Also try to set the wallet in wallet manager if available
@@ -1150,15 +1161,63 @@
                         console.log('Direct addInput function defined');
                       }
                       
-                      // Setup network selection functionality
+                      // Define sendBatch function if not available
+                      if (typeof window.sendBatch === 'undefined') {
+                        window.sendBatch = async () => {
+                          console.log('Direct sendBatch called');
+                          if (window.blockchainManager && typeof window.blockchainManager.sendBatch === 'function') {
+                            try {
+                              await window.blockchainManager.sendBatch();
+                              console.log('Batch transfer completed via blockchain manager');
+                            } catch (error) {
+                              console.error('Batch transfer failed:', error);
+                              alert('Transfer failed: ' + error.message);
+                            }
+                          } else {
+                            console.log('Blockchain manager not available for sendBatch');
+                            alert('Blockchain manager not ready. Please wait and try again.');
+                          }
+                        };
+                        console.log('Direct sendBatch function defined');
+                      }
+                      
+                      // Define sendBatch function if not available
+                      if (typeof window.sendBatch === 'undefined') {
+                        window.sendBatch = async () => {
+                          console.log('Direct sendBatch called');
+                          if (window.blockchainManager && typeof window.blockchainManager.sendBatch === 'function') {
+                            try {
+                              await window.blockchainManager.sendBatch();
+                              console.log('Batch transfer completed via blockchain manager');
+                            } catch (error) {
+                              console.error('Batch transfer failed:', error);
+                              alert('Transfer failed: ' + error.message);
+                            }
+                          } else {
+                            console.log('Blockchain manager not available for sendBatch');
+                            alert('Blockchain manager not ready. Please wait and try again.');
+                          }
+                        };
+                        console.log('Direct sendBatch function defined');
+                      }
+                      
+                      // Setup network selection functionality immediately
                       setTimeout(() => {
+                        console.log('Attempting to setup network tags...');
                         if (typeof setupNetworkTags === 'function') {
                           setupNetworkTags();
                           console.log('Network tags setup completed');
                         } else {
-                          console.log('setupNetworkTags function not available');
+                          console.log('setupNetworkTags function not available, trying to call it directly...');
+                          // Try to find and call the function from the page
+                          try {
+                            eval('setupNetworkTags()');
+                            console.log('Network tags setup via eval completed');
+            } catch (e) {
+                            console.log('Could not setup network tags:', e.message);
+                          }
                         }
-                      }, 1000);
+                      }, 100); // Much earlier
                     }
                     
                     // Also try to set the wallet in wallet manager if available

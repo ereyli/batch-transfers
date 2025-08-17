@@ -121,6 +121,7 @@
               'Missing catch or finally after try',
               'Uncaught SyntaxError',
               'SyntaxError',
+              'Invalid or unexpected token',
               'openWalletModal is not a function',
               'addInput is not defined',
               'MetaMask encountered an error',
@@ -842,6 +843,7 @@
         'Missing catch or finally after try',
         'Uncaught SyntaxError',
         'SyntaxError',
+        'Invalid or unexpected token',
         'Expected length',
         'attribute width',
         'attribute height',
@@ -898,6 +900,7 @@
         'Missing catch or finally after try',
         'Uncaught SyntaxError',
         'SyntaxError',
+        'Invalid or unexpected token',
         'openWalletModal is not a function',
         'addInput is not defined',
         'ERR_BLOCKED_BY_CLIENT',
@@ -1042,11 +1045,9 @@
                         if (recipientsContainer) {
                           const newRow = document.createElement('div');
                           newRow.className = 'recipient-row';
-                          newRow.innerHTML = \`
-                            <input type="text" class="form-input" placeholder="Recipient Address" style="background: #2a2a2a !important; color: white !important;">
-                            <input type="number" class="form-input" placeholder="Amount" step="0.000001" style="background: #2a2a2a !important; color: white !important;">
-                            <button onclick="this.parentElement.remove()" class="recipient-action-btn remove-recipient-btn" title="Remove Recipient">×</button>
-                          \`;
+                          newRow.innerHTML = '<input type="text" class="form-input" placeholder="Recipient Address" style="background: #2a2a2a !important; color: white !important;">' +
+                            '<input type="number" class="form-input" placeholder="Amount" step="0.000001" style="background: #2a2a2a !important; color: white !important;">' +
+                            '<button onclick="this.parentElement.remove()" class="recipient-action-btn remove-recipient-btn" title="Remove Recipient">×</button>';
                           recipientsContainer.appendChild(newRow);
                           console.log('Recipient row added via direct DOM');
                         }
@@ -1125,11 +1126,9 @@
                           if (recipientsContainer) {
                             const newRow = document.createElement('div');
                             newRow.className = 'recipient-row';
-                            newRow.innerHTML = \`
-                              <input type="text" class="form-input" placeholder="Recipient Address" style="background: #2a2a2a !important; color: white !important;">
-                              <input type="number" class="form-input" placeholder="Amount" step="0.000001" style="background: #2a2a2a !important; color: white !important;">
-                              <button onclick="this.parentElement.remove()" class="recipient-action-btn remove-recipient-btn" title="Remove Recipient">×</button>
-                            \`;
+                            newRow.innerHTML = '<input type="text" class="form-input" placeholder="Recipient Address" style="background: #2a2a2a !important; color: white !important;">' +
+                              '<input type="number" class="form-input" placeholder="Amount" step="0.000001" style="background: #2a2a2a !important; color: white !important;">' +
+                              '<button onclick="this.parentElement.remove()" class="recipient-action-btn remove-recipient-btn" title="Remove Recipient">×</button>';
                             recipientsContainer.appendChild(newRow);
                             console.log('Recipient row added via direct DOM');
                           }

@@ -584,7 +584,7 @@
               8453: window.wagmi.http('https://mainnet.base.org'),
               10: window.wagmi.http('https://mainnet.optimism.io'),
               42161: window.wagmi.http('https://arb1.arbitrum.io/rpc'),
-              1: window.wagmi.http('https://eth.llamarpc.com')
+              1: window.wagmi.http('https://ethereum.publicnode.com')
             },
             connectors: [
               window.FarcasterMiniAppConnector.farcasterMiniApp()
@@ -1054,11 +1054,21 @@
                           console.log('Recipient row added via direct DOM');
                         }
                       };
-                      console.log('Direct addInput function defined');
+                                              console.log('Direct addInput function defined');
+                      }
+                      
+                      // Setup network selection functionality
+                      setTimeout(() => {
+                        if (typeof setupNetworkTags === 'function') {
+                          setupNetworkTags();
+                          console.log('Network tags setup completed');
+          } else {
+                          console.log('setupNetworkTags function not available');
+                        }
+                      }, 1000);
                     }
-                  }
-                  
-                  // Also try to set the wallet in wallet manager if available
+                    
+                    // Also try to set the wallet in wallet manager if available
                     if (window.walletManager) {
                       window.walletManager.currentWalletType = 'farcaster';
                       console.log('Wallet manager updated with Farcaster type');
@@ -1139,6 +1149,16 @@
                         };
                         console.log('Direct addInput function defined');
                       }
+                      
+                      // Setup network selection functionality
+                      setTimeout(() => {
+                        if (typeof setupNetworkTags === 'function') {
+                          setupNetworkTags();
+                          console.log('Network tags setup completed');
+                        } else {
+                          console.log('setupNetworkTags function not available');
+                        }
+                      }, 1000);
                     }
                     
                     // Also try to set the wallet in wallet manager if available

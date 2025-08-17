@@ -978,15 +978,76 @@
             console.log('Available SDK methods:', Object.keys(sdk));
           }
           
-          // Now that SDK is ready, trigger wallet auto-connection
+          // Now that SDK is ready, trigger wallet auto-connection with retries
           console.log('SDK ready - triggering Farcaster wallet auto-connection');
-          setTimeout(() => {
-            if (window.walletManager && typeof window.walletManager.initializeFarcasterMiniAppWallet === 'function') {
-              window.walletManager.initializeFarcasterMiniAppWallet();
-            } else {
-              console.log('Wallet manager not available yet, will retry through app initialization');
+          
+          // Direct wallet connection after SDK ready
+          const tryDirectWalletConnection = async () => {
+            console.log('Attempting direct wallet connection with SDK');
+            
+            try {
+              // Try to get wallet directly from the ready SDK
+              if (typeof sdk.wallet?.getWallet === 'function') {
+                const wallet = await sdk.wallet.getWallet();
+                console.log('Direct SDK wallet:', wallet);
+                if (wallet && wallet.address) {
+                  console.log('Direct wallet connection successful:', wallet.address);
+                  return true;
+                }
+              }
+              
+              // Try to get provider from SDK
+              if (typeof sdk.wallet?.getEthereumProvider === 'function') {
+                const provider = await sdk.wallet.getEthereumProvider();
+                if (provider) {
+                  const accounts = await provider.request({ method: 'eth_accounts' });
+                  if (accounts && accounts.length > 0) {
+                    console.log('Direct provider connection successful:', accounts[0]);
+                    return true;
+                  }
+                }
+              }
+            } catch (error) {
+              console.log('Direct wallet connection failed:', error.message);
             }
-          }, 500);
+            
+            return false;
+          };
+          
+          // Try direct connection first
+          const directSuccess = await tryDirectWalletConnection();
+          
+          if (!directSuccess) {
+            // Fallback to wallet manager when available
+            const tryWalletManager = async (attempt = 1, maxAttempts = 8) => {
+              console.log(`Wallet manager attempt ${attempt}/${maxAttempts}`);
+              
+              if (window.walletManager && typeof window.walletManager.initializeFarcasterMiniAppWallet === 'function') {
+                console.log('Wallet manager found - initializing Farcaster wallet');
+                try {
+                  await window.walletManager.initializeFarcasterMiniAppWallet();
+                  console.log('Wallet manager initialization successful');
+                  return true;
+                } catch (error) {
+                  console.log('Wallet manager initialization failed:', error.message);
+                }
+              } else {
+                console.log('Wallet manager not available yet...');
+              }
+              
+              if (attempt < maxAttempts) {
+                setTimeout(() => tryWalletManager(attempt + 1, maxAttempts), 1000);
+              } else {
+                console.log('Max wallet manager attempts reached');
+              }
+              return false;
+            };
+            
+            // Start wallet manager attempts
+            setTimeout(() => tryWalletManager(), 200);
+            setTimeout(() => tryWalletManager(), 800);
+            setTimeout(() => tryWalletManager(), 2000);
+          }
           
         } catch (e) {
           console.log('SDK ready call failed, but continuing:', e.message);

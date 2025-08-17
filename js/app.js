@@ -13,6 +13,8 @@ export class SendwiseApp {
     window.walletManager = this.walletManager;
     window.blockchainManager = this.blockchainManager;
     
+    console.log('SendwiseApp: Global wallet manager exposed immediately for Farcaster SDK access');
+    
     // Setup global handlers immediately
     this.setupGlobalHandlers();
     

@@ -9,7 +9,7 @@
     "version": "1",
     "iconUrl": "https://www.sendwise.xyz/icon.png",
     "homeUrl": "https://www.sendwise.xyz",
-    "imageUrl": "https://www.sendwise.xyz/image.png",
+    "imageUrl": "https://www.sendwise.xyz/image.png?v=2",
     "buttonTitle": "Open Sendwise",
     "splashImageUrl": "https://www.sendwise.xyz/splash.png",
     "splashBackgroundColor": "#6366f1",

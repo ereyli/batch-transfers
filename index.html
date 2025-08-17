@@ -418,30 +418,54 @@
         </button>
       </div>
 
-      <!-- Share Button - Below Wallet Button -->
-      <div id="shareButtonContainer" style="margin-top: 15px; text-align: center;">
-        <button id="shareBtn" onclick="window.shareToTwitter()" style="
-          background: linear-gradient(135deg, #1DA1F2 0%, #0d8bd9 100%);
+      <!-- Share Buttons - Below Wallet Button -->
+      <div id="shareButtonContainer" style="margin-top: 15px; text-align: center; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button id="shareXBtn" onclick="window.shareToX()" style="
+          background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%);
           color: white;
           border: none;
-          border-radius: 10px;
-          padding: 10px 20px;
-          font-size: 14px;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 13px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
-          box-shadow: 0 3px 12px rgba(29, 161, 242, 0.3);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
           font-family: 'Inter', sans-serif;
-          min-width: 160px;
+          min-width: 120px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
-        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 16px rgba(29, 161, 242, 0.4)';" onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 3px 12px rgba(29, 161, 242, 0.3)';">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+          gap: 6px;
+        " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.4)';" onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.3)';">
+          <svg width="14" height="14" viewBox="0 0 1200 1227" fill="currentColor">
+            <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
           </svg>
-          Share on Twitter
+          Share on X
+        </button>
+        
+        <button id="shareFarcasterBtn" onclick="window.shareToFarcaster()" style="
+          background: linear-gradient(135deg, #8A63D2 0%, #7C3AED 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+          font-family: 'Inter', sans-serif;
+          min-width: 120px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+        " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(124, 58, 237, 0.4)';" onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 2px 8px rgba(124, 58, 237, 0.3)';">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          Share on Farcaster
         </button>
       </div>
     </div>
@@ -1777,16 +1801,16 @@
       }
     })();
 
-    // Twitter Share Function
-    window.shareToTwitter = function() {
-      console.log('Share to Twitter button clicked');
+    // X (Twitter) Share Function
+    window.shareToX = function() {
+      console.log('Share to X button clicked');
       
       try {
-        // Prepare tweet content
+        // Prepare post content
         const appUrl = 'https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise';
         const hashtags = 'Sendwise,BatchTransfer,DeFi,Ethereum,GasSaver';
         
-        const tweetText = `🚀 Just discovered Sendwise - the smartest way to send crypto to multiple addresses! 
+        const postText = `🚀 Just discovered Sendwise - the smartest way to send crypto to multiple addresses! 
 
 💰 Batch transfers save gas & time
 🔗 Multi-chain support (Base, Optimism, Arbitrum & more)
@@ -1796,39 +1820,100 @@ Try it out: ${appUrl}
 
 #${hashtags.split(',').join(' #')}`;
         
-        // Create Twitter share URL
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+        // Create X share URL
+        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(postText)}`;
         
-        console.log('Opening Twitter share URL:', twitterUrl);
+        console.log('Opening X share URL:', xUrl);
         
-        // Open Twitter in new window/tab
-        window.open(twitterUrl, '_blank', 'width=550,height=420,scrollbars=yes,resizable=yes');
+        // Open X in new window/tab
+        window.open(xUrl, '_blank', 'width=550,height=420,scrollbars=yes,resizable=yes');
         
         // Track share event if analytics available
         if (window.gtag) {
           window.gtag('event', 'share', {
-            method: 'twitter',
+            method: 'x',
             content_type: 'application',
             content_id: 'sendwise_app'
           });
         }
         
-        console.log('Twitter share initiated successfully');
+        console.log('X share initiated successfully');
         
       } catch (error) {
-        console.error('Error sharing to Twitter:', error);
+        console.error('Error sharing to X:', error);
         
         // Fallback: copy URL to clipboard
         try {
           const fallbackUrl = 'https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise';
           navigator.clipboard.writeText(fallbackUrl).then(() => {
-            alert('App URL copied to clipboard! Share it manually on Twitter.');
+            alert('App URL copied to clipboard! Share it manually on X.');
           }).catch(() => {
-            alert('Please share this URL on Twitter: ' + fallbackUrl);
+            alert('Please share this URL on X: ' + fallbackUrl);
           });
         } catch (clipboardError) {
           console.error('Clipboard fallback failed:', clipboardError);
-          alert('Please share this URL on Twitter: https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise');
+          alert('Please share this URL on X: https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise');
+        }
+      }
+    };
+
+    // Farcaster Share Function
+    window.shareToFarcaster = function() {
+      console.log('Share to Farcaster button clicked');
+      
+      try {
+        // Prepare cast content
+        const appUrl = 'https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise';
+        
+        const castText = `🚀 Sendwise makes batch crypto transfers a breeze!
+
+💰 Send to multiple addresses in one transaction
+⚡️ Save gas fees and time
+🔗 Multi-chain: Base, Optimism, Arbitrum & more
+
+Try it: ${appUrl}
+
+#BatchTransfer #DeFi #GasSaver`;
+
+        // Check if we're in Farcaster Mini App
+        if (window.isFarcasterMiniApp && window.farcasterSDK && window.farcasterSDK.actions) {
+          console.log('Using Farcaster SDK for native sharing');
+          
+          // Use native Farcaster sharing
+          window.farcasterSDK.actions.openUrl(`https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}`);
+          
+        } else {
+          // Fallback to Warpcast web compose
+          console.log('Using Warpcast web compose');
+          const warpcastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(castText)}`;
+          window.open(warpcastUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
+        }
+        
+        // Track share event if analytics available
+        if (window.gtag) {
+          window.gtag('event', 'share', {
+            method: 'farcaster',
+            content_type: 'application',
+            content_id: 'sendwise_app'
+          });
+        }
+        
+        console.log('Farcaster share initiated successfully');
+        
+      } catch (error) {
+        console.error('Error sharing to Farcaster:', error);
+        
+        // Fallback: copy URL to clipboard
+        try {
+          const fallbackUrl = 'https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise';
+          navigator.clipboard.writeText(fallbackUrl).then(() => {
+            alert('App URL copied to clipboard! Share it manually on Farcaster.');
+          }).catch(() => {
+            alert('Please share this URL on Farcaster: ' + fallbackUrl);
+          });
+        } catch (clipboardError) {
+          console.error('Clipboard fallback failed:', clipboardError);
+          alert('Please share this URL on Farcaster: https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise');
         }
       }
     };

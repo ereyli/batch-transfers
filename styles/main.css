@@ -198,7 +198,16 @@ h1 {
 }
 
 .farcaster-mode #shareButtonContainer {
+  display: flex !important;
+  justify-content: center;
+}
+
+.farcaster-mode #shareXBtn {
   display: none !important;
+}
+
+.farcaster-mode #shareFarcasterBtn {
+  display: flex !important;
 }
 
 .farcaster-mode .header {

@@ -32,6 +32,6 @@
       "wallet.getEthereumProvider"
     ],
     "webhookUrl": "https://www.sendwise.xyz",
-    "castShareUrl": "https://www.sendwise.xyz/share"
+    "castShareUrl": "https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise"
   }
 }

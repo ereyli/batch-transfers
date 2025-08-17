@@ -12,7 +12,7 @@
     "imageUrl": "https://www.sendwise.xyz/.well-known/hero-image.png",
     "buttonTitle": "🚀 Start Batch Transfer",
     "splashImageUrl": "https://www.sendwise.xyz/.well-known/logo.png",
-    "splashBackgroundColor": "#1a1a1a",
+    "splashBackgroundColor": "#6366f1",
     "subtitle": "Smart Batch Transfers",
     "description": "Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers.",
     "tagline": "Smart Batch Transfers",
@@ -26,7 +26,7 @@
       "https://www.sendwise.xyz/.well-known/hero-image.png"
     ],
     "canonicalDomain": "www.sendwise.xyz",
-    "requiredChains": ["eip155:8453", "eip155:10", "eip155:42161"],
+    "requiredChains": ["eip155:8453", "eip155:10", "eip155:42161", "eip155:1868", "eip155:130", "eip155:57073"],
     "requiredCapabilities": [
       "actions.signIn",
       "wallet.getEthereumProvider"

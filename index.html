@@ -992,7 +992,28 @@
                 console.log('Direct SDK wallet:', wallet);
                 if (wallet && wallet.address) {
                   console.log('Direct wallet connection successful:', wallet.address);
-                  return true;
+                  
+                  // Update UI immediately with the connected wallet
+                  if (window.uiManager && typeof window.uiManager.updateWalletDisplay === 'function') {
+                    window.uiManager.updateWalletDisplay(wallet.address, 'Farcaster Wallet', 'Farcaster', 'farcaster');
+                    console.log('UI updated with Farcaster wallet address');
+          } else {
+                    console.log('UI Manager not available for wallet display update');
+                  }
+                  
+                  // Also try to set the wallet in wallet manager if available
+                    if (window.walletManager) {
+                      window.walletManager.currentWalletType = 'farcaster';
+                      console.log('Wallet manager updated with Farcaster type');
+                    }
+                    
+                    // Hide loading screen since wallet is connected
+                    if (window.uiManager && typeof window.uiManager.hideLoading === 'function') {
+                      window.uiManager.hideLoading();
+                      console.log('Loading screen hidden after wallet connection');
+                    }
+                    
+                    return true;
                 }
               }
               
@@ -1003,6 +1024,27 @@
                   const accounts = await provider.request({ method: 'eth_accounts' });
                   if (accounts && accounts.length > 0) {
                     console.log('Direct provider connection successful:', accounts[0]);
+                    
+                    // Update UI immediately with the connected wallet
+                    if (window.uiManager && typeof window.uiManager.updateWalletDisplay === 'function') {
+                      window.uiManager.updateWalletDisplay(accounts[0], 'Farcaster Wallet', 'Farcaster', 'farcaster');
+                      console.log('UI updated with Farcaster wallet address');
+        } else {
+                      console.log('UI Manager not available for wallet display update');
+                    }
+                    
+                    // Also try to set the wallet in wallet manager if available
+                    if (window.walletManager) {
+                      window.walletManager.currentWalletType = 'farcaster';
+                      console.log('Wallet manager updated with Farcaster type');
+                    }
+                    
+                    // Hide loading screen since wallet is connected
+                    if (window.uiManager && typeof window.uiManager.hideLoading === 'function') {
+                      window.uiManager.hideLoading();
+                      console.log('Loading screen hidden after wallet connection');
+                    }
+                    
                     return true;
                   }
                 }

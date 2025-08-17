@@ -26,13 +26,6 @@
     ],
     "tagline": "Sendwise, batch transfers",
     "ogTitle": "Sendwise",
-    "ogDescription": "Sendwise, batch transfers",
-    "castShareUrl": "https://farcaster.xyz/miniapps/hkVHvP2VMNsW/sendwise",
-    "canonicalDomain": "www.sendwise.xyz",
-    "requiredChains": ["eip155:8453", "eip155:10", "eip155:42161", "eip155:1868", "eip155:130", "eip155:57073"],
-    "requiredCapabilities": [
-      "actions.signIn",
-      "wallet.getEthereumProvider"
-    ]
+    "ogDescription": "Sendwise, batch transfers"
   }
 }

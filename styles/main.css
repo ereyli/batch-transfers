@@ -197,6 +197,10 @@ h1 {
   display: none !important;
 }
 
+.farcaster-mode #shareButtonContainer {
+  display: none !important;
+}
+
 .farcaster-mode .header {
   padding-top: 60px;
 }

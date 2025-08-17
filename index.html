@@ -121,6 +121,7 @@
               'Missing catch or finally after try',
               'Uncaught SyntaxError',
               'SyntaxError',
+              'openWalletModal is not a function',
               'MetaMask encountered an error',
               'setting the global Ethereum provider',
               'another Ethereum wallet extension',
@@ -841,9 +842,10 @@
         'Uncaught SyntaxError',
         'SyntaxError',
         'Expected length',
-        'svg',
         'attribute width',
         'attribute height',
+        'svg',
+        'openWalletModal is not a function',
         'ERR_BLOCKED_BY_CLIENT',
         'Bad Request',
         'dd-proxy',
@@ -894,6 +896,7 @@
         'Missing catch or finally after try',
         'Uncaught SyntaxError',
         'SyntaxError',
+        'openWalletModal is not a function',
         'ERR_BLOCKED_BY_CLIENT',
         'Bad Request',
         'dd-proxy',
@@ -962,7 +965,7 @@
         console.log('Farcaster SDK loaded, setting up Mini App environment');
         window.isFarcasterMiniApp = true;
         
-                // Try to call ready using actions.ready() method (most common in Frame SDK)
+                        // Try to call ready using actions.ready() method (most common in Frame SDK)
         try {
           if (typeof sdk.actions?.ready === 'function') {
             await sdk.actions.ready();
@@ -974,7 +977,18 @@
             console.log('No ready method found on SDK, proceeding without calling ready');
             console.log('Available SDK methods:', Object.keys(sdk));
           }
-            } catch (e) {
+          
+          // Now that SDK is ready, trigger wallet auto-connection
+          console.log('SDK ready - triggering Farcaster wallet auto-connection');
+          setTimeout(() => {
+            if (window.walletManager && typeof window.walletManager.initializeFarcasterMiniAppWallet === 'function') {
+              window.walletManager.initializeFarcasterMiniAppWallet();
+            } else {
+              console.log('Wallet manager not available yet, will retry through app initialization');
+            }
+          }, 500);
+          
+        } catch (e) {
           console.log('SDK ready call failed, but continuing:', e.message);
         }
       } catch (error) {

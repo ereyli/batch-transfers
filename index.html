@@ -605,16 +605,32 @@
     // Global wallet modal function - setup immediately
     window.openWalletModal = () => {
       console.log('openWalletModal called');
+      console.log('Current state:', {
+        walletManager: !!window.walletManager,
+        sendwiseApp: !!window.sendwiseApp,
+        appWalletManager: !!(window.sendwiseApp && window.sendwiseApp.getWalletManager()),
+        isFarcaster: window.isFarcasterMiniApp
+      });
       
-      if (window.walletManager) {
-        console.log('Using WalletManager...');
+      if (window.walletManager && typeof window.walletManager.showModernWalletModal === 'function') {
+        console.log('Using global WalletManager...');
         window.walletManager.showModernWalletModal();
       } else if (window.sendwiseApp && window.sendwiseApp.getWalletManager()) {
         console.log('Using SendwiseApp WalletManager...');
         window.sendwiseApp.getWalletManager().showModernWalletModal();
       } else {
-        console.error('WalletManager not available');
-        alert('Wallet connection system loading. Please try again in a moment.');
+        console.error('WalletManager not available. Retrying in 1 second...');
+        
+        // Retry once after a short delay
+        setTimeout(() => {
+          if (window.walletManager && typeof window.walletManager.showModernWalletModal === 'function') {
+            console.log('Retry successful - using WalletManager');
+            window.walletManager.showModernWalletModal();
+          } else {
+            console.error('WalletManager still not available after retry');
+            alert('Wallet connection system loading. Please refresh the page and try again.');
+          }
+        }, 1000);
       }
     };
 
@@ -936,9 +952,35 @@
         setupNetworkTags();
         
         // Initialize Sendwise app
+        console.log('Creating SendwiseApp...');
+        console.log('Available classes:', {
+          SendwiseApp: typeof window.SendwiseApp,
+          WalletManager: typeof window.WalletManager,
+          UIManager: typeof window.UIManager,
+          BlockchainManager: typeof window.BlockchainManager
+        });
+        
+        if (typeof window.SendwiseApp !== 'function') {
+          console.error('SendwiseApp class not loaded!');
+          throw new Error('SendwiseApp class not available');
+        }
+        
         const app = new window.SendwiseApp();
         window.sendwiseApp = app;
-        window.walletManager = app.getWalletManager();
+        
+        // Ensure wallet manager is available
+        const walletManager = app.getWalletManager();
+        if (walletManager) {
+          window.walletManager = walletManager;
+          console.log('WalletManager successfully assigned');
+        } else {
+          console.error('Failed to get WalletManager from app');
+        }
+        
+        console.log('WalletManager assigned:', {
+          walletManager: !!window.walletManager,
+          appWalletManager: !!app.getWalletManager()
+        });
         
         // Ensure wallet button is still visible after app initialization
         setTimeout(ensureWalletButtonVisible, 100);

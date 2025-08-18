@@ -14,8 +14,8 @@
     "webhookUrl": "https://www.sendwise.xyz/api/webhook",
     "subtitle": "Smart Batch Transfers",
     "description": "Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers.",
-    "imageUrl": "https://www.sendwise.xyz/image.png",
-    "buttonTitle": "🚀 Open Sendwise",
+    "imageUrl": "https://www.sendwise.xyz/image.png?v=3",
+    "buttonTitle": "💸 Start Batch Transfer",
     "primaryCategory": "finance",
     "tags": [
       "base",
@@ -24,14 +24,14 @@
       "crypto",
       "tools"
     ],
-    "heroImageUrl": "https://www.sendwise.xyz/image.png",
-    "embedImageUrl": "https://www.sendwise.xyz/image.png",
+    "heroImageUrl": "https://www.sendwise.xyz/image.png?v=3",
+    "embedImageUrl": "https://www.sendwise.xyz/image.png?v=3",
     "tagline": "Sendwise, batch transfers",
     "ogTitle": "Sendwise Batch Transfers",
     "ogDescription": "Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time.",
-    "ogImageUrl": "https://www.sendwise.xyz/image.png",
+    "ogImageUrl": "https://www.sendwise.xyz/image.png?v=3",
     "screenshotUrls": [
-      "https://www.sendwise.xyz/image.png"
+      "https://www.sendwise.xyz/image.png?v=3"
     ],
     "requiredCapabilities": [
       "actions.signIn",

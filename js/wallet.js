@@ -47,8 +47,10 @@ window.WalletManager = class WalletManager {
       }
       
       console.log('Farcaster Mini App detected - setting up wallet connection');
-        
-                // Get Farcaster wallet using SDK and Wagmi
+      
+      // Check if SDK is available and get wallet
+      if (window.farcasterSDK) {
+        // Get Farcaster wallet using SDK and Wagmi
         try {
           // Method 1: Try to get wallet directly from SDK
           let wallet = null;

@@ -42,7 +42,11 @@
     <meta name="fc:frame:button:1:target" content="https://www.sendwise.xyz" />
     
     <!-- Farcaster Mini App Manifest -->
-    <link rel="farcaster_manifest" href="https://www.sendwise.xyz/.well-known/farcaster.json" />
+    <meta name="farcaster_manifest" content="https://www.sendwise.xyz/.well-known/farcaster.json" />
+    
+    <!-- Mini App Detection -->
+    <meta name="miniapp" content="true" />
+    <meta name="miniapp:version" content="1" />
     
     <!-- Meta tags for Farcaster Frame -->
     <meta name="fc:frame:post_url" content="https://www.sendwise.xyz" />
@@ -1116,22 +1120,36 @@
       try {
         console.log('Farcaster SDK loaded:', sdk);
         
-        // Check if we're in Farcaster environment
-        // Since we already detected Farcaster context in early detection, proceed with setup
+        // Always try to set up Mini App environment
         console.log('Farcaster SDK loaded, setting up Mini App environment');
         window.isFarcasterMiniApp = true;
         
-                        // Try to call ready using actions.ready() method (most common in Frame SDK)
+        // Try to call ready using actions.ready() method (most common in Frame SDK)
         try {
+          // Multiple ready() method attempts for compatibility
+          let readySuccess = false;
+          
           if (typeof sdk.actions?.ready === 'function') {
             await sdk.actions.ready();
             console.log('✅ Farcaster SDK actions.ready() called - splash screen hidden');
+            readySuccess = true;
           } else if (typeof sdk.ready === 'function') {
             await sdk.ready();
             console.log('✅ Farcaster SDK ready() called - splash screen hidden');
+            readySuccess = true;
+          } else if (typeof sdk.context?.ready === 'function') {
+            await sdk.context.ready();
+            console.log('✅ Farcaster SDK context.ready() called - splash screen hidden');
+            readySuccess = true;
           } else {
-            console.log('No ready method found on SDK, proceeding without calling ready');
+            console.log('No ready method found on SDK, manually triggering ready state');
             console.log('Available SDK methods:', Object.keys(sdk));
+            readySuccess = true; // Proceed anyway
+          }
+          
+          if (readySuccess) {
+            // Dispatch ready event for other parts of the app
+            window.dispatchEvent(new CustomEvent('farcasterready', { detail: { sdk } }));
           }
           
           // Hide our internal loading screen after SDK ready

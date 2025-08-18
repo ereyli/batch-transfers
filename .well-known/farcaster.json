@@ -23,6 +23,8 @@
       "tools"
     ],
     "heroImageUrl": "https://www.sendwise.xyz/image.png?v=3",
+    "imageUrl": "https://www.sendwise.xyz/image.png?v=3",
+    "buttonTitle": "💸 Start Batch Transfer",
     "tagline": "Multi-chain batch transfers",
     "ogTitle": "Sendwise Batch Transfers",
     "ogDescription": "Send crypto to multiple addresses in one transaction. Save 80 percent on gas fees.",

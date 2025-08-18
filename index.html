@@ -560,94 +560,61 @@
   <script src="js/app.js"></script>
   
   <!-- Farcaster Mini App SDK -->
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@farcaster/frame-sdk@latest/dist/sdk.js" defer></script>
-  <script type="module">
-    // No imports needed, scripts loaded directly
-
+  <script src="https://sdk.farcaster.xyz/v0.1.0/sdk.js"></script>
+  <script>
     // Global variables
     window.isFarcasterMiniApp = false;
     
-    // Wait for Farcaster SDK to load
-    async function waitForFarcasterSDK() {
-      // Check for injected Farcaster SDK (most common)
-      if (typeof window.farcaster !== 'undefined') {
-        console.log('Farcaster SDK loaded:', window.farcaster);
-        
-        try {
-          const sdk = window.farcaster;
-          
-          // Check available methods
-          console.log('SDK methods available:', Object.keys(sdk));
-          
-          // Try to get context information
-          if (sdk.context) {
-            console.log('SDK context available:', sdk.context);
-          }
-          
-          // Setup SDK wrapper
-          window.farcasterSDK = {
-            actions: {
-              ready: async () => {
-                console.log('SDK ready() called');
-                return true;
-              }
-            },
-            wallet: sdk.wallet || sdk,
-            context: sdk.context || sdk,
-            raw: sdk // Keep reference to raw SDK
-          };
-          
-          return true;
-        } catch (error) {
-          console.log('Farcaster SDK initialization error:', error);
-          return false;
-        }
-      }
-      
-      // Check for Frame SDK
-      if (typeof window.FrameSDK !== 'undefined') {
-        console.log('Farcaster Frame SDK detected:', window.FrameSDK);
-        
-        try {
-          const sdk = window.FrameSDK;
-          await sdk.context.ready();
-          console.log('Frame SDK initialized and ready');
-          
-          window.farcasterSDK = {
-            actions: { ready: async () => true },
-            wallet: sdk.wallet,
-            context: sdk.context
-          };
-          
-          return true;
-        } catch (error) {
-          console.log('Frame SDK initialization error:', error);
-          return false;
-        }
-      }
-      
-      // Check for alternative patterns
+    // Initialize Farcaster SDK
+    async function initializeFarcasterSDK() {
       if (typeof window.fc !== 'undefined') {
-        console.log('Alternative Farcaster SDK detected:', window.fc);
-        window.farcasterSDK = window.fc;
-        return true;
+        console.log('Farcaster SDK detected');
+        window.isFarcasterMiniApp = true;
+        
+        try {
+          // Initialize the SDK
+          await window.fc.init();
+          console.log('Farcaster SDK initialized successfully');
+          
+          // Setup global Farcaster SDK reference
+          window.farcasterSDK = window.fc;
+          
+          return true;
+        } catch (error) {
+          console.error('Failed to initialize Farcaster SDK:', error);
+          return false;
+        }
       }
-      
       return false;
     }
 
-    // Global wallet modal function
+    // Wallet connection for Farcaster
+    async function connectFarcasterWallet() {
+      if (!window.farcasterSDK) return null;
+      
+      try {
+        const wallet = await window.farcasterSDK.wallet.getEthereumProvider();
+        console.log('Farcaster wallet connected:', wallet);
+        return wallet;
+      } catch (error) {
+        console.error('Failed to connect Farcaster wallet:', error);
+        return null;
+      }
+    }
+
+    // Global wallet modal function - setup immediately
     window.openWalletModal = () => {
       console.log('openWalletModal called');
       
       if (window.walletManager) {
+        console.log('Using WalletManager...');
         window.walletManager.showModernWalletModal();
+      } else if (window.sendwiseApp && window.sendwiseApp.getWalletManager()) {
+        console.log('Using SendwiseApp WalletManager...');
+        window.sendwiseApp.getWalletManager().showModernWalletModal();
       } else {
         console.error('WalletManager not available');
-        // Avoid alert in sandboxed iframe
-        if (window.uiManager) {
-          window.uiManager.updateStatus('Wallet system not initialized. Please refresh the page.', false, true);
-        }
+        alert('Wallet connection system loading. Please try again in a moment.');
       }
     };
 
@@ -962,8 +929,8 @@
         // Check for pending batch transfers from share
         setTimeout(checkPendingBatchTransfer, 1000);
         
-        // Initialize Farcaster Mini App first
-        await initializeFarcasterMiniApp();
+        // Initialize Farcaster SDK first
+        await initializeFarcasterSDK();
 
         // Setup network tag handlers
         setupNetworkTags();

@@ -13,7 +13,7 @@
     "splashBackgroundColor": "#6366f1",
     "webhookUrl": "https://www.sendwise.xyz/api/webhook",
     "subtitle": "Smart Batch Transfers",
-    "description": "Send ETH and ERC20 tokens to multiple addresses in one transaction. Save up to 80% on gas fees with smart batch transfers on Base, Optimism and Arbitrum.",
+    "description": "Send ETH and ERC20 tokens to multiple addresses in one transaction. Save up to 80 percent on gas fees with smart batch transfers on Base, Optimism and Arbitrum.",
     "primaryCategory": "finance",
     "tags": [
       "base",
@@ -25,7 +25,7 @@
     "heroImageUrl": "https://www.sendwise.xyz/image.png?v=3",
     "tagline": "Multi-chain batch transfers",
     "ogTitle": "Sendwise Batch Transfers",
-    "ogDescription": "Send crypto to multiple addresses in one transaction. Save 80% on gas fees.",
+    "ogDescription": "Send crypto to multiple addresses in one transaction. Save 80 percent on gas fees.",
     "ogImageUrl": "https://www.sendwise.xyz/image.png?v=3",
     "screenshotUrls": [
       "https://www.sendwise.xyz/image.png?v=3"

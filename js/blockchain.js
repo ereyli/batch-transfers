@@ -225,6 +225,28 @@ window.BlockchainManager = class BlockchainManager {
   showSharingOptions(recipientCount, amounts, transferType) {
     const totalAmount = amounts.reduce((sum, amount) => sum + parseFloat(amount || 0), 0);
     const networkInfo = this.walletManager.getNetworkInfo();
+    
+    // Show achievement modal - Monad Dog style
+    setTimeout(() => {
+      if (window.showAchievementModal) {
+        const achievement = {
+          icon: '💸',
+          title: 'Batch Transfer Complete!',
+          description: `Successfully sent ${transferType || 'tokens'} to ${recipientCount} recipients on ${networkInfo.name}. Gas fees optimized with smart batching!`,
+          type: 'transfer',
+          data: {
+            recipients: recipientCount,
+            totalAmount: totalAmount.toFixed(4),
+            network: networkInfo.name,
+            transferType: transferType,
+            gasSaved: '80%' // Estimated gas savings
+          }
+        };
+        
+        window.showAchievementModal(achievement);
+        console.log('🎉 Achievement shown for successful transfer');
+      }
+    }, 1500); // Show after UI updates
     const networkName = networkInfo ? networkInfo.name : 'Unknown Network';
     
     // Create dynamic image URL

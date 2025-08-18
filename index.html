@@ -10,24 +10,42 @@
 
     <title>Sendwise - Smart Batch Transfers</title>
 
-    <!-- Farcaster Mini App Open Graph Metadata -->
-    <meta property="og:title" content="Sendwise - Smart Batch Transfers" />
-    <meta property="og:description" content="Send ETH & ERC20 tokens to multiple addresses in one transaction. Save gas fees with smart batch transfers on Base, Optimism & Arbitrum." />
-    <meta property="og:image" content="https://www.sendwise.xyz/image.png?v=2" />
+    <!-- Farcaster Frame Meta Tags -->
+    <meta name="fc:frame" content='{
+      "version": "next",
+      "imageUrl": "https://www.sendwise.xyz/image.png?v=3",
+      "button": {
+        "title": "💸 Start Batch Transfer",
+        "action": {
+          "type": "launch_frame",
+          "url": "https://www.sendwise.xyz",
+          "name": "Sendwise",
+          "splashImageUrl": "https://www.sendwise.xyz/splash.png",
+          "splashBackgroundColor": "#6366f1"
+        }
+      }
+    }' />
+
+    <!-- Enhanced Open Graph Metadata -->
+    <meta property="og:title" content="Sendwise - Smart Batch Transfers on Multi-Chain" />
+    <meta property="og:description" content="Revolutionary Farcaster Mini App for batch transfers. Send ETH & ERC20 tokens to multiple addresses in one transaction. Save 80% gas fees on Base, Optimism & Arbitrum!" />
+    <meta property="og:image" content="https://www.sendwise.xyz/image.png?v=3" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.sendwise.xyz/" />
     <meta property="og:site_name" content="Sendwise" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:determiner" content="the" />
 
-    <!-- Twitter Meta Tags -->
+    <!-- Twitter/X Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sendwise - Smart Batch Transfers" />
-    <meta name="twitter:description" content="Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers." />
-    <meta name="twitter:url" content="https://www.sendwise.xyz/" />
-    <meta name="twitter:image" content="https://www.sendwise.xyz/.well-known/image.png" />
+    <meta name="twitter:description" content="Revolutionary batch transfer Mini App. Send to multiple addresses, save 80% gas fees. Base, Optimism & Arbitrum supported!" />
+    <meta name="twitter:image" content="https://www.sendwise.xyz/image.png?v=3" />
+    <meta name="twitter:site" content="@sendwise" />
+    <meta name="twitter:creator" content="@sendwise" />
+
+
 
     <meta name="description" content="Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers." />
     <meta name="keywords" content="batch transfer, ethereum, defi, wallet, gas savings, airdrop, payroll, bulk payments, sendwise" />
@@ -328,6 +346,99 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
+
+      /* Achievement Modal & Sharing System - inspired by Monad Dog */
+      .achievement-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .achievement-content {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 350px;
+        border: 2px solid #6366f1;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        color: white;
+      }
+
+      .achievement-icon {
+        font-size: 60px;
+        margin-bottom: 15px;
+        animation: bounce 0.6s ease;
+      }
+
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        width: auto;
+        padding: 5px;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+      }
+      
+      .close-modal:hover {
+        opacity: 1;
+      }
+
+      .share-button {
+        background: linear-gradient(45deg, #6366f1, #8b5cf6);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 10px 5px;
+        width: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .share-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+      }
+
+      .share-section {
+        text-align: center;
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
     </style>
     
     <!-- Structured Data for SEO -->
@@ -352,11 +463,7 @@
   }
   </script>
   
-  <!-- Twitter Card Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Sendwise - Smart Batch Transfers" />
-  <meta name="twitter:description" content="Send ETH & ERC20 tokens to multiple addresses in a single transaction. Save gas, save time!" />
-      <meta name="twitter:image" content="https://www.sendwise.xyz/.well-known/image.png" />
+
   
 
   
@@ -531,6 +638,20 @@
       </div>
 
       <div id="status" class="status" style="display:none;"></div>
+      
+      <!-- Share Section - Monad Dog Style -->
+      <div class="share-section">
+        <h3 style="margin-bottom: 15px; color: #6366f1;">📢 Share Sendwise</h3>
+        <p style="margin-bottom: 15px; font-size: 14px; opacity: 0.8;">
+          Help friends discover the smartest way to send crypto!
+        </p>
+        <button class="share-button" onclick="shareAppWithFriends()">
+          🚀 Share with Friends
+        </button>
+        <button class="share-button" onclick="showMultiChainAchievement()" style="background: linear-gradient(45deg, #10b981, #059669);">
+          🌐 Show Multi-Chain Power
+        </button>
+      </div>
     </div>
 
     <!-- CSV Import Section -->
@@ -2023,6 +2144,164 @@ Try it: ${appUrl}
         }
       }
     };
+
+    // Achievement Modal Functions - Monad Dog inspired
+    window.showAchievementModal = function(achievement) {
+      const modal = document.getElementById('achievementModal');
+      const icon = document.getElementById('achievementIcon');
+      const title = document.getElementById('achievementTitle');
+      const description = document.getElementById('achievementDescription');
+      
+      if (!modal || !icon || !title || !description) {
+        console.error('Achievement modal elements not found');
+        return;
+      }
+      
+      icon.textContent = achievement.icon || '🎉';
+      title.textContent = achievement.title || 'Achievement!';
+      description.textContent = achievement.description || '';
+      
+      modal.style.display = 'flex';
+      
+      // Store current achievement for sharing
+      window.currentAchievement = achievement;
+      
+      console.log('🎉 Achievement modal shown:', achievement);
+    };
+
+    window.closeAchievementModal = function() {
+      const modal = document.getElementById('achievementModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+      window.currentAchievement = null;
+      console.log('Modal closed');
+    };
+
+    window.shareCurrentAchievement = function() {
+      if (window.currentAchievement) {
+        try {
+          const content = generateShareableContent(window.currentAchievement.type, window.currentAchievement.data);
+          shareOnFarcaster(content);
+          
+          // Close modal after sharing
+          setTimeout(() => {
+            closeAchievementModal();
+          }, 500);
+        } catch (error) {
+          console.error('Error sharing achievement:', error);
+          closeAchievementModal();
+        }
+      }
+    };
+
+    // Generate shareable content based on achievement type
+    function generateShareableContent(type, data = {}) {
+      const baseUrl = window.location.origin;
+      
+      const shareTemplates = {
+        transfer: {
+          text: `Just completed a batch transfer on Sendwise! 💸\\n\\nSent to ${data.recipients || 'multiple'} addresses\\nGas saved: ${data.gasSaved || '80%'}\\nNetwork: ${data.network || 'Base'}\\n\\nTry Sendwise for gas-efficient batch transfers!`,
+          url: `${baseUrl}?ref=transfer&recipients=${data.recipients || 1}`,
+          image: "💸"
+        },
+        gasOptimization: {
+          text: `Sendwise saved me ${data.gasSaved || '80%'} on gas fees! ⛽💰\\n\\nBatch transfer: ${data.recipients || 'Multiple'} recipients\\nNetwork: ${data.network || 'Base'}\\nOriginal cost: ${data.originalCost || 'High'}\\nActual cost: ${data.actualCost || 'Low'}\\n\\nSmart contracts are amazing!`,
+          url: `${baseUrl}?ref=gas&saved=${data.gasSaved}`,
+          image: "⛽"
+        },
+        multichain: {
+          text: `Using Sendwise across multiple chains! 🌐⛓️\\n\\n✅ Base, Optimism, Arbitrum\\n💸 Batch transfers everywhere\\n⛽ Gas optimization on all chains\\n🚀 One interface, all networks\\n\\nMulti-chain DeFi made easy!`,
+          url: `${baseUrl}?ref=multichain`,
+          image: "🌐"
+        },
+        invite: {
+          text: `Discover Sendwise - the smartest way to send crypto! 💸⚡\\n\\n✨ Batch transfer to multiple addresses\\n⛽ Save up to 80% on gas fees\\n🌐 Base, Optimism, Arbitrum support\\n🔐 Built on Farcaster Mini Apps\\n\\nRevolutionize your crypto transfers!`,
+          url: `${baseUrl}?ref=invite`,
+          image: "🚀"
+        }
+      };
+      
+      return shareTemplates[type] || shareTemplates.invite;
+    }
+
+    function shareOnFarcaster(content) {
+      try {
+        if (window.farcasterSDK && window.farcasterSDK.actions && window.farcasterSDK.actions.openUrl) {
+          // Use Farcaster SDK for sharing
+          const shareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(content.text)}&embeds[]=${encodeURIComponent(content.url)}`;
+          window.farcasterSDK.actions.openUrl(shareUrl);
+          console.log('🚀 Shared via Farcaster SDK');
+        } else {
+          // Fallback to direct URL
+          const shareUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(content.text)}&embeds[]=${encodeURIComponent(content.url)}`;
+          window.open(shareUrl, '_blank');
+          console.log('🚀 Shared via direct URL');
+        }
+      } catch (error) {
+        console.error('❌ Share error:', error);
+        alert('Failed to open share dialog');
+      }
+    }
+
+    // Share functions for main UI
+    window.shareAppWithFriends = function() {
+      const achievement = {
+        icon: '🚀',
+        title: 'Invite Friends to Sendwise!',
+        description: 'Share the smartest way to send crypto with your friends. Multi-chain batch transfers with 80% gas savings!',
+        type: 'invite',
+        data: {}
+      };
+      
+      window.showAchievementModal(achievement);
+    };
+
+    window.showMultiChainAchievement = function() {
+      const achievement = {
+        icon: '🌐',
+        title: 'Multi-Chain DeFi Power!',
+        description: 'Sendwise supports Base, Optimism, and Arbitrum. One interface for all your batch transfer needs across chains!',
+        type: 'multichain',
+        data: {}
+      };
+      
+      window.showAchievementModal(achievement);
+    };
+
+    window.showGasOptimizationAchievement = function(gasSaved, network) {
+      const achievement = {
+        icon: '⛽',
+        title: 'Gas Optimization Master!',
+        description: `You saved ${gasSaved} on gas fees using Sendwise smart contracts on ${network}. Efficiency at its finest!`,
+        type: 'gasOptimization',
+        data: {
+          gasSaved: gasSaved,
+          network: network
+        }
+      };
+      
+      window.showAchievementModal(achievement);
+    };
   </script>
+
+  <!-- Achievement Modal -->
+  <div id="achievementModal" class="achievement-modal" onclick="if(event.target === this) closeAchievementModal()">
+    <div class="achievement-content">
+      <button class="close-modal" onclick="closeAchievementModal()">×</button>
+      <div id="achievementIcon" class="achievement-icon">🎉</div>
+      <h3 id="achievementTitle">Achievement Unlocked!</h3>
+      <p id="achievementDescription">You did something awesome!</p>
+      <div style="margin-top: 20px;">
+        <button class="share-button" onclick="shareCurrentAchievement()">
+          📢 Share on Farcaster
+        </button>
+        <button class="share-button" onclick="closeAchievementModal()" style="background: rgba(255,255,255,0.2);">
+          ✨ Continue Using
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

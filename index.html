@@ -565,27 +565,50 @@
     // Global variables
     window.isFarcasterMiniApp = false;
     
-    // Initialize Farcaster SDK
+    // Initialize Farcaster SDK - only if truly in Farcaster environment
     async function initializeFarcasterSDK() {
-      if (typeof window.fc !== 'undefined') {
-        console.log('Farcaster SDK detected');
+      // More strict Farcaster detection
+      const userAgent = navigator.userAgent || '';
+      const referrer = document.referrer || '';
+      const isInFrame = window !== window.top;
+      
+      const isFarcasterUA = userAgent.toLowerCase().includes('warpcast') || 
+                           userAgent.toLowerCase().includes('farcaster');
+      const isFarcasterReferrer = referrer.includes('warpcast.com') || 
+                                 referrer.includes('farcaster.xyz');
+      
+      // Only consider it Farcaster if we have strong indicators
+      const isActuallyFarcaster = (isFarcasterUA || isFarcasterReferrer) && isInFrame;
+      
+      console.log('Farcaster environment check:', {
+        userAgent: userAgent,
+        referrer: referrer,
+        isInFrame: isInFrame,
+        isFarcasterUA: isFarcasterUA,
+        isFarcasterReferrer: isFarcasterReferrer,
+        isActuallyFarcaster: isActuallyFarcaster,
+        hasSDK: typeof window.fc !== 'undefined'
+      });
+      
+      if (isActuallyFarcaster && typeof window.fc !== 'undefined') {
+        console.log('Confirmed Farcaster environment - initializing SDK');
         window.isFarcasterMiniApp = true;
         
         try {
-          // Initialize the SDK
           await window.fc.init();
           console.log('Farcaster SDK initialized successfully');
-          
-          // Setup global Farcaster SDK reference
           window.farcasterSDK = window.fc;
-          
           return true;
         } catch (error) {
           console.error('Failed to initialize Farcaster SDK:', error);
+          window.isFarcasterMiniApp = false;
           return false;
         }
+      } else {
+        console.log('Not in Farcaster environment - staying in web mode');
+        window.isFarcasterMiniApp = false;
+        return false;
       }
-      return false;
     }
 
     // Wallet connection for Farcaster
@@ -945,8 +968,13 @@
         // Check for pending batch transfers from share
         setTimeout(checkPendingBatchTransfer, 1000);
         
-        // Initialize Farcaster SDK first
-        await initializeFarcasterSDK();
+        // Initialize Farcaster SDK first (this will set window.isFarcasterMiniApp correctly)
+        const isFarcasterInitialized = await initializeFarcasterSDK();
+        
+        console.log('Environment determined:', {
+          isFarcaster: window.isFarcasterMiniApp,
+          sdkInitialized: isFarcasterInitialized
+        });
 
         // Setup network tag handlers
         setupNetworkTags();
@@ -968,13 +996,18 @@
         const app = new window.SendwiseApp();
         window.sendwiseApp = app;
         
-        // Ensure wallet manager is available
-        const walletManager = app.getWalletManager();
-        if (walletManager) {
-          window.walletManager = walletManager;
-          console.log('WalletManager successfully assigned');
+        // For web mode, ensure direct wallet manager assignment
+        if (!window.isFarcasterMiniApp) {
+          console.log('Web mode - setting up wallet manager directly');
+          const walletManager = app.getWalletManager();
+          if (walletManager) {
+            window.walletManager = walletManager;
+            console.log('WalletManager successfully assigned for web');
+          } else {
+            console.error('Failed to get WalletManager from app');
+          }
         } else {
-          console.error('Failed to get WalletManager from app');
+          console.log('Farcaster mode - wallet manager will be setup by Farcaster logic');
         }
         
         console.log('WalletManager assigned:', {

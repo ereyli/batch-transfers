@@ -814,10 +814,10 @@
     // Setup Farcaster-specific UI adjustments (SDK-free)
     function setupFarcasterUI() {
       
-      // Hide wallet button in Farcaster Mini App
+      // Keep wallet button visible in Farcaster Mini App for manual connection
       const walletButtonContainer = document.getElementById('walletButtonContainer');
       if (walletButtonContainer) {
-        walletButtonContainer.style.display = 'none';
+        walletButtonContainer.style.display = 'block';
       }
       
       // Adjust header for mobile
@@ -940,10 +940,24 @@
       }
     }
 
+    // Ensure wallet button is always visible
+    function ensureWalletButtonVisible() {
+      const walletButtonContainer = document.getElementById('walletButtonContainer');
+      if (walletButtonContainer) {
+        walletButtonContainer.style.display = 'block';
+        console.log('Wallet button made visible');
+      } else {
+        console.error('Wallet button container not found');
+      }
+    }
+
     // Initialize app when DOM is loaded
     window.addEventListener('DOMContentLoaded', async function() {
       try {
         console.log('Initializing Sendwise app...');
+        
+        // Ensure wallet button is visible immediately
+        ensureWalletButtonVisible();
         
         // Check for pending batch transfers from share
         setTimeout(checkPendingBatchTransfer, 1000);
@@ -958,6 +972,9 @@
         const app = new window.SendwiseApp();
         window.sendwiseApp = app;
         window.walletManager = app.getWalletManager();
+        
+        // Ensure wallet button is still visible after app initialization
+        setTimeout(ensureWalletButtonVisible, 100);
         
         console.log('Sendwise app initialized successfully');
         

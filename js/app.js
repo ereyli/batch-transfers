@@ -181,12 +181,18 @@ window.SendwiseApp = class SendwiseApp {
   setupGlobalHandlers() {
     // Global wallet modal function
     window.openWalletModal = () => {
+      console.log('openWalletModal clicked!');
       if (this.walletManager) {
+        console.log('Wallet manager found, showing modal...');
         this.walletManager.showModernWalletModal();
       } else {
         console.error('Wallet manager not initialized');
+        // Fallback: try to create a basic wallet selection
+        alert('Wallet connection feature loading. Please try again in a moment.');
       }
     };
+    
+    console.log('Global handlers setup completed - openWalletModal available');
 
 
 

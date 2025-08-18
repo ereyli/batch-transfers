@@ -4,13 +4,11 @@
     "payload": "eyJkb21haW4iOiJzZW5kd2lzZS54eXoifQ",
     "signature": "CYSG7k83/8rsQOzENEGddNJm74qImwGBoB3VQw8BqPtesgKtaNeijY+SpjmI4sObO8q24PanKxOIAQk5UHYqbRs="
   },
-  "frame": {
-    "name": "Sendwise",
+  "miniapp": {
     "version": "1",
+    "name": "Sendwise",
     "iconUrl": "https://www.sendwise.xyz/icon.png",
     "homeUrl": "https://www.sendwise.xyz",
-    "imageUrl": "https://www.sendwise.xyz/image.png?v=2",
-    "buttonTitle": "Open Sendwise",
     "splashImageUrl": "https://www.sendwise.xyz/splash.png",
     "splashBackgroundColor": "#6366f1",
     "webhookUrl": "https://www.sendwise.xyz/api/webhook",
@@ -24,8 +22,22 @@
       "crypto",
       "tools"
     ],
+    "heroImageUrl": "https://www.sendwise.xyz/image.png",
     "tagline": "Sendwise, batch transfers",
     "ogTitle": "Sendwise",
-    "ogDescription": "Sendwise, batch transfers"
+    "ogDescription": "Sendwise, batch transfers",
+    "ogImageUrl": "https://www.sendwise.xyz/image.png",
+    "requiredChains": [
+      "eip155:8453",
+      "eip155:10",
+      "eip155:42161",
+      "eip155:1868",
+      "eip155:130",
+      "eip155:57073"
+    ],
+    "requiredCapabilities": [
+      "actions.signIn",
+      "wallet.getEthereumProvider"
+    ]
   }
 }

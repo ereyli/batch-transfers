@@ -45,7 +45,7 @@
     <meta property="og:description" content="Revolutionary Farcaster Mini App for batch transfers. Send ETH & ERC20 tokens to multiple addresses in one transaction. Save 80% gas fees on Base, Optimism & Arbitrum!" />
     <meta property="og:image" content="https://www.sendwise.xyz/image.png?v=3" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.sendwise.xyz/" />
+    <meta property="og:url" content="https://www.sendwise.xyz" />
     <meta property="og:site_name" content="Sendwise" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -69,9 +69,9 @@
 
     <!-- Farcaster Frame Meta Tags -->
     <meta name="fc:frame" content="vNext" />
-    <meta name="fc:frame:image" content="https://www.sendwise.xyz/image.png?v=2" />
+    <meta name="fc:frame:image" content="https://www.sendwise.xyz/image.png?v=3" />
     <meta name="fc:frame:image:aspect_ratio" content="1.91:1" />
-    <meta name="fc:frame:button:1" content="Open Sendwise" />
+    <meta name="fc:frame:button:1" content="💸 Start Batch Transfer" />
     <meta name="fc:frame:button:1:action" content="link" />
     <meta name="fc:frame:button:1:target" content="https://www.sendwise.xyz" />
     
@@ -477,7 +477,7 @@
   }
   </script>
   
-
+  
   
 
   
@@ -498,7 +498,7 @@
     <div id="loading" class="loading" style="display: none;">
       <div class="loading-content">
         <div class="loading-logo">
-          <img src="https://www.sendwise.xyz/.well-known/logo.png" alt="Sendwise Logo" />
+          <img src="https://www.sendwise.xyz/icon.png" alt="Sendwise Logo" />
         </div>
         <div class="loading-spinner"></div>
         <h3>🚀 Sendwise</h3>
@@ -511,7 +511,7 @@
     <!-- Header -->
     <div class="header fade-in">
       <div class="logo">
-        <img src="https://www.sendwise.xyz/.well-known/logo.png" alt="Sendwise Logo" />
+        <img src="https://www.sendwise.xyz/icon.png" alt="Sendwise Logo" />
       </div>
       <h1>Sendwise</h1>
       <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
@@ -759,10 +759,10 @@
       } else {
         console.log('Not in Farcaster environment - staying in web mode');
         window.isFarcasterMiniApp = false;
-        return false;
+          return false;
+        }
       }
-    }
-
+      
     // Wallet connection for Farcaster
     async function connectFarcasterWallet() {
       if (!window.farcasterSDK) return null;
@@ -771,7 +771,7 @@
         const wallet = await window.farcasterSDK.wallet.getEthereumProvider();
         console.log('Farcaster wallet connected:', wallet);
         return wallet;
-      } catch (error) {
+        } catch (error) {
         console.error('Failed to connect Farcaster wallet:', error);
         return null;
       }

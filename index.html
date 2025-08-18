@@ -549,15 +549,31 @@
 </div>
 
   <!-- Ethers.js -->
-  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" integrity="sha512-FDcVY+g7vc5CXANbrTSg1K5qLyriCsGDYCE02Li1tXEYdNQNvqKtIcSQL3hCqVoNVlqJJcIh2fvo23+5FbU6oQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   
   <!-- Load JavaScript files directly -->
-  <script src="js/config.js"></script>
-  <script src="js/farcaster.js"></script>
-  <script src="js/wallet.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/blockchain.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/config.js" onload="console.log('✅ config.js loaded')" onerror="console.error('❌ config.js failed')"></script>
+  <script src="js/farcaster.js" onload="console.log('✅ farcaster.js loaded')" onerror="console.error('❌ farcaster.js failed')"></script>
+  <script src="js/wallet.js" onload="console.log('✅ wallet.js loaded')" onerror="console.error('❌ wallet.js failed')"></script>
+  <script src="js/ui.js" onload="console.log('✅ ui.js loaded')" onerror="console.error('❌ ui.js failed')"></script>
+  <script src="js/blockchain.js" onload="console.log('✅ blockchain.js loaded')" onerror="console.error('❌ blockchain.js failed')"></script>
+  <script src="js/app.js" onload="console.log('✅ app.js loaded')" onerror="console.error('❌ app.js failed')"></script>
+  
+  <!-- Class availability check -->
+  <script>
+    // Check if all classes are loaded
+    setTimeout(() => {
+      console.log('📊 Class loading check:', {
+        ethers: typeof window.ethers !== 'undefined',
+        CONTRACTS: typeof window.CONTRACTS !== 'undefined',
+        FarcasterManager: typeof window.FarcasterManager === 'function',
+        WalletManager: typeof window.WalletManager === 'function',
+        UIManager: typeof window.UIManager === 'function',
+        BlockchainManager: typeof window.BlockchainManager === 'function',
+        SendwiseApp: typeof window.SendwiseApp === 'function'
+      });
+    }, 100);
+  </script>
   
   <!-- Farcaster Mini App SDK -->
   <script src="https://sdk.farcaster.xyz/v0.1.0/sdk.js"></script>

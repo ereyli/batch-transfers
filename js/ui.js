@@ -1,4 +1,4 @@
-export class UIManager {
+window.UIManager = class UIManager {
   constructor() {
     this.initializeEventListeners();
   }

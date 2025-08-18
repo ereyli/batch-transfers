@@ -1,12 +1,8 @@
-import { WalletManager } from './wallet.js';
-import { UIManager } from './ui.js';
-import { BlockchainManager } from './blockchain.js';
-
-export class SendwiseApp {
+window.SendwiseApp = class SendwiseApp {
   constructor() {
-    this.walletManager = new WalletManager();
-    this.uiManager = new UIManager();
-    this.blockchainManager = new BlockchainManager(this.walletManager, this.uiManager);
+    this.walletManager = new window.WalletManager();
+    this.uiManager = new window.UIManager();
+    this.blockchainManager = new window.BlockchainManager(this.walletManager, this.uiManager);
     
     // Global references for HTML onclick handlers
     window.uiManager = this.uiManager;

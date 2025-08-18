@@ -1,11 +1,8 @@
-import { FarcasterManager } from './farcaster.js';
-import { RPC_ENDPOINTS, NETWORK_NAMES, CONTRACTS } from './config.js';
-
-export class WalletManager {
+window.WalletManager = class WalletManager {
   constructor() {
     this.signer = null;
     this.currentWalletType = 'metamask';
-    this.farcasterManager = new FarcasterManager();
+    this.farcasterManager = new window.FarcasterManager();
     this.availableWallets = [];
   }
 
@@ -538,7 +535,7 @@ export class WalletManager {
         const chainName = this.getChainName(updatedNetwork.chainId);
         
         // Get balance using the correct RPC endpoint
-        const rpcUrl = RPC_ENDPOINTS[updatedNetwork.chainId];
+        const rpcUrl = window.RPC_ENDPOINTS[updatedNetwork.chainId];
         if (rpcUrl) {
           const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
           const balance = await rpcProvider.getBalance(addr);
@@ -959,17 +956,17 @@ export class WalletManager {
 
   // Get chain name
   getChainName(chainId) {
-    return NETWORK_NAMES[chainId] || 'Unknown';
+    return window.NETWORK_NAMES[chainId] || 'Unknown';
   }
 
   // Check if network is supported
   isNetworkSupported(chainId) {
-    return CONTRACTS.hasOwnProperty(chainId);
+    return window.CONTRACTS.hasOwnProperty(chainId);
   }
 
   // Get supported networks
   getSupportedNetworks() {
-    return Object.keys(CONTRACTS).map(Number);
+    return Object.keys(window.CONTRACTS).map(Number);
   }
 
   // Switch to supported network

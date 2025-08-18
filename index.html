@@ -548,10 +548,21 @@
   </div>
 </div>
 
+  <!-- Ethers.js -->
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+  
+  <!-- Load JavaScript files directly -->
+  <script src="js/config.js"></script>
+  <script src="js/farcaster.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/blockchain.js"></script>
+  <script src="js/app.js"></script>
+  
   <!-- Farcaster Mini App SDK -->
   <script type="module" src="https://cdn.jsdelivr.net/npm/@farcaster/frame-sdk@latest/dist/sdk.js" defer></script>
   <script type="module">
-    import { SendwiseApp } from './js/app.js';
+    // No imports needed, scripts loaded directly
 
     // Global variables
     window.isFarcasterMiniApp = false;
@@ -944,7 +955,7 @@
         setupNetworkTags();
         
         // Initialize Sendwise app
-        const app = new SendwiseApp();
+        const app = new window.SendwiseApp();
         window.sendwiseApp = app;
         window.walletManager = app.getWalletManager();
         

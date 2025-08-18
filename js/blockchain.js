@@ -1,6 +1,4 @@
-import { CONTRACTS, CONTRACTS_ERC20, ABI_TOKEN, ABI_APPROVE, ABI_BATCH_ETH, ABI_BATCH_ERC20, APP_CONFIG, RPC_ENDPOINTS } from './config.js';
-
-export class BlockchainManager {
+window.BlockchainManager = class BlockchainManager {
   constructor(walletManager, uiManager) {
     this.walletManager = walletManager;
     this.uiManager = uiManager;
@@ -20,16 +18,16 @@ export class BlockchainManager {
     try {
       const provider = signer.provider || new ethers.providers.Web3Provider(window.ethereum);
       const network = await provider.getNetwork();
-      const spender = CONTRACTS_ERC20[network.chainId];
+      const spender = window.window.CONTRACTS_ERC20[network.chainId];
       
       // Use the correct RPC endpoint for the current network
-      const rpcUrl = RPC_ENDPOINTS[network.chainId];
+      const rpcUrl = window.RPC_ENDPOINTS[network.chainId];
       if (!rpcUrl) {
         throw new Error(`Network ${network.chainId} not supported`);
       }
       
       const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
-      const token = new ethers.Contract(tokenAddress, ABI_TOKEN, rpcProvider);
+      const token = new ethers.Contract(tokenAddress, window.ABI_TOKEN, rpcProvider);
       const user = await this.walletManager.getAddress();
       
       const [name, symbol, decimals, balance, allowance] = await Promise.all([
@@ -66,8 +64,8 @@ export class BlockchainManager {
     }
 
     try {
-      const tokenContract = new ethers.Contract(tokenAddress, ABI_TOKEN, signer);
-      const approveContract = new ethers.Contract(tokenAddress, ABI_APPROVE, signer);
+      const tokenContract = new ethers.Contract(tokenAddress, window.ABI_TOKEN, signer);
+      const approveContract = new ethers.Contract(tokenAddress, window.ABI_APPROVE, signer);
       
       const balance = await tokenContract.balanceOf(await this.walletManager.getAddress());
       if (balance.isZero()) {
@@ -79,7 +77,7 @@ export class BlockchainManager {
       
       const provider = signer.provider || new ethers.providers.Web3Provider(window.ethereum);
       const network = await provider.getNetwork();
-      const spender = CONTRACTS_ERC20[network.chainId];
+      const spender = window.window.CONTRACTS_ERC20[network.chainId];
       
       const tx = await approveContract.approve(spender, balance);
       this.uiManager.updateStatus('Approval transaction sent: ' + tx.hash, false, false);
@@ -144,18 +142,18 @@ export class BlockchainManager {
         parsedAmounts.push(parsedAmount);
       }
       
-      const fee = ethers.utils.parseEther(APP_CONFIG.fee);
-      let contractAddress, abi, args, overrides = { gasLimit: APP_CONFIG.gasLimit };
+      const fee = ethers.utils.parseEther(window.APP_CONFIG.fee);
+      let contractAddress, abi, args, overrides = { gasLimit: window.APP_CONFIG.gasLimit };
       
       if (transferType === 'eth') {
-        contractAddress = CONTRACTS[chainId];
-        abi = ABI_BATCH_ETH;
+        contractAddress = window.CONTRACTS[chainId];
+        abi = window.ABI_BATCH_ETH;
         const total = parsedAmounts.reduce((sum, amount) => sum.add(amount), ethers.BigNumber.from(0));
         overrides.value = total.add(fee);
         args = [recipients, parsedAmounts];
       } else {
-        contractAddress = CONTRACTS_ERC20[chainId];
-        abi = ABI_BATCH_ERC20;
+        contractAddress = window.window.CONTRACTS_ERC20[chainId];
+        abi = window.ABI_BATCH_ERC20;
         const tokenAddress = this.uiManager.getTokenAddress();
         overrides.value = fee;
         args = [tokenAddress, recipients, parsedAmounts];
@@ -210,7 +208,7 @@ export class BlockchainManager {
 
   // Check if network is supported
   isNetworkSupported(chainId) {
-    return CONTRACTS.hasOwnProperty(chainId);
+    return window.CONTRACTS.hasOwnProperty(chainId);
   }
 
   // Get contract address for current network
@@ -219,8 +217,8 @@ export class BlockchainManager {
     if (!networkInfo) return null;
     
     return transferType === 'eth' 
-      ? CONTRACTS[networkInfo.chainId]
-      : CONTRACTS_ERC20[networkInfo.chainId];
+      ? window.CONTRACTS[networkInfo.chainId]
+      : window.window.CONTRACTS_ERC20[networkInfo.chainId];
   }
 
   // Show sharing options after successful transfer
@@ -566,7 +564,7 @@ export class BlockchainManager {
       let chainId = window.selectedChainId ? Number(window.selectedChainId) : 8453;
       
       // Get contract addresses
-      const contractAddress = transferType === 'eth' ? CONTRACTS[chainId] : CONTRACTS_ERC20[chainId];
+      const contractAddress = transferType === 'eth' ? window.CONTRACTS[chainId] : window.window.CONTRACTS_ERC20[chainId];
       if (!contractAddress) {
         this.uiManager.updateStatus('Unsupported network', false, true);
         return;
@@ -577,7 +575,7 @@ export class BlockchainManager {
       // Create contract instance
       const contract = new window.ethers.Contract(
         contractAddress,
-        transferType === 'eth' ? ABI_BATCH_ETH : ABI_BATCH_ERC20,
+        transferType === 'eth' ? window.ABI_BATCH_ETH : window.ABI_BATCH_ERC20,
         signer
       );
       
@@ -586,7 +584,7 @@ export class BlockchainManager {
       if (transferType === 'eth') {
         // For ETH transfers
         const total = parsedAmounts.reduce((sum, amount) => sum.add(amount), window.ethers.BigNumber.from(0));
-        const fee = window.ethers.utils.parseEther(APP_CONFIG.fee);
+        const fee = window.ethers.utils.parseEther(window.APP_CONFIG.fee);
         
         // For Farcaster wallet, use manual gas limit to avoid eth_estimateGas
         const gasLimit = 500000; // Conservative gas limit for batch transfers
@@ -604,7 +602,7 @@ export class BlockchainManager {
       } else {
         // For ERC20 transfers
         const tokenAddress = this.uiManager.getTokenAddress();
-        const fee = window.ethers.utils.parseEther(APP_CONFIG.fee);
+        const fee = window.ethers.utils.parseEther(window.APP_CONFIG.fee);
         
         // First approve the contract to spend tokens
         const tokenContract = new window.ethers.Contract(
@@ -671,7 +669,7 @@ export class BlockchainManager {
       }
       
       // Get contract addresses
-      const contractAddress = transferType === 'eth' ? CONTRACTS[chainId] : CONTRACTS_ERC20[chainId];
+      const contractAddress = transferType === 'eth' ? window.CONTRACTS[chainId] : window.window.CONTRACTS_ERC20[chainId];
       if (!contractAddress) {
         this.uiManager.updateStatus('Unsupported network', false, true);
         return;
@@ -685,13 +683,13 @@ export class BlockchainManager {
       if (transferType === 'eth') {
         // For ETH transfers, we need to send to the batch contract
         const total = parsedAmounts.reduce((sum, amount) => sum + amount, 0n);
-        const fee = window.viem.parseEther(APP_CONFIG.fee);
+        const fee = window.viem.parseEther(window.APP_CONFIG.fee);
         
         calls.push({
           to: contractAddress,
           value: total + fee,
           data: window.viem.encodeFunctionData({
-            abi: ABI_BATCH_ETH,
+            abi: window.ABI_BATCH_ETH,
             functionName: 'batchSend',
             args: [recipients, parsedAmounts]
           })
@@ -699,7 +697,7 @@ export class BlockchainManager {
       } else {
         // For ERC20 transfers, we need to approve and then batch send
         const tokenAddress = this.uiManager.getTokenAddress();
-        const fee = window.viem.parseEther(APP_CONFIG.fee);
+        const fee = window.viem.parseEther(window.APP_CONFIG.fee);
         
         // First approve the contract to spend tokens
         calls.push({
@@ -727,7 +725,7 @@ export class BlockchainManager {
           to: contractAddress,
           value: fee,
           data: window.viem.encodeFunctionData({
-            abi: ABI_BATCH_ERC20,
+            abi: window.ABI_BATCH_ERC20,
             functionName: 'batchSendERC20',
             args: [tokenAddress, recipients, parsedAmounts]
           })

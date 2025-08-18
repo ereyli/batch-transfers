@@ -1,5 +1,5 @@
 // Farcaster Mini App SDK Integration
-export class FarcasterManager {
+window.FarcasterManager = class FarcasterManager {
   constructor() {
     this.isFarcasterMode = false;
     this.sdk = null;

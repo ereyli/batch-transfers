@@ -39,7 +39,6 @@
       "actions.signIn",
       "wallet.getEthereumProvider"
     ],
-    "noindex": false,
     "canonicalDomain": "sendwise.xyz"
   }
 }

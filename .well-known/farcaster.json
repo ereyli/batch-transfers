@@ -5,9 +5,11 @@
     "signature": "MHhhZmFkYjhmZWVlZGEzOTBjOTdjODNkNzg4ZDMwNjhhNjQxZjhhYjJmZGY0YmUwYTdkNWFkNDYxYTVmNTQ1MWZhN2ZlOGIzYjA4ZTU2NTdiZjQ0NWYxNjFmZGJhZGRjZTY0MDFkMDcwZWIzOWZjNWIyOTA3ZTAzNGNkMjg3YTBlZjFj"
   },
   "baseBuilder": {
-    "allowedAddresses": ["0xcF1B5d6CD8e0bfd6B1a8B2c2ceAb0bc165EEE5B3"]
+    "allowedAddresses": [
+      "0xcF1B5d6CD8e0bfd6B1a8B2c2ceAb0bc165EEE5B3"
+    ]
   },
-  "frame": {
+  "miniapp": {
     "version": "1",
     "name": "Sendwise",
     "iconUrl": "https://www.sendwise.xyz/icon.png",
@@ -18,19 +20,12 @@
     "subtitle": "Smart Batch Transfers",
     "description": "Send ERC20 tokens to multiple addresses in one transaction",
     "primaryCategory": "finance",
-    "tags": [
-      "base",
-      "sendwise",
-      "batchtransfer",
-      "crypto",
-      "tools"
-    ],
+    "tags": ["base", "sendwise", "batchtransfer", "crypto", "tools"],
     "heroImageUrl": "https://www.sendwise.xyz/image.png",
     "imageUrl": "https://www.sendwise.xyz/image.png",
-    "buttonTitle": " Start Batch Transfer",
     "tagline": "Multi-chain batch transfers",
     "ogTitle": "Sendwise Batch Transfers",
-    "ogDescription": "Send crypto to multiple addresses ",
+    "ogDescription": "Send crypto to multiple addresses",
     "ogImageUrl": "https://www.sendwise.xyz/image.png",
     "screenshotUrls": [
       "https://www.sendwise.xyz/image.png"
@@ -39,6 +34,7 @@
       "actions.signIn",
       "wallet.getEthereumProvider"
     ],
-    "canonicalDomain": "sendwise.xyz"
+    "canonicalDomain": "sendwise.xyz",
+    "noindex": false
   }
 }

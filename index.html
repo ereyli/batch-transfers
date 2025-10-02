@@ -1330,67 +1330,38 @@
     };
   </script>
 
-  <!-- Farcaster Mini App SDK - Must be at the bottom of HTML file -->
+  <!-- Farcaster Mini App SDK - Simplified per official docs -->
   <script type="module">
     import { sdk } from '@farcaster/miniapp-sdk'
     
     // Global SDK reference
     window.farcasterSDK = sdk;
     
-    // Initialize SDK immediately
+    // Simple SDK initialization per official docs
     (async () => {
       try {
-        console.log('Farcaster SDK loaded:', sdk);
+        console.log('Farcaster SDK loaded');
         
-        // Always try to set up Mini App environment
-        console.log('Farcaster SDK loaded, setting up Mini App environment');
+        // Call ready() as required by official docs
+        await sdk.actions.ready();
+        console.log('✅ SDK ready() called - app is ready');
+        
+        // Hide loading screen and show content
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+          loadingScreen.style.display = 'none';
+        }
+        
+        const mainContent = document.getElementById('mainContent');
+        if (mainContent) {
+          mainContent.style.display = 'block';
+        }
+        
+        // Set Farcaster mode
         window.isFarcasterMiniApp = true;
         
-        // Call ready() as required by Base docs
-        await sdk.actions.ready();
-        console.log('SDK ready() called successfully');
-        
-        // Try to call ready using actions.ready() method (most common in Frame SDK)
-        try {
-          // Multiple ready() method attempts for compatibility
-          let readySuccess = false;
-          
-          if (typeof sdk.actions?.ready === 'function') {
-            await sdk.actions.ready();
-            console.log('✅ Farcaster SDK actions.ready() called - splash screen hidden');
-            readySuccess = true;
-          } else if (typeof sdk.ready === 'function') {
-            await sdk.ready();
-            console.log('✅ Farcaster SDK ready() called - splash screen hidden');
-            readySuccess = true;
-          } else if (typeof sdk.context?.ready === 'function') {
-            await sdk.context.ready();
-            console.log('✅ Farcaster SDK context.ready() called - splash screen hidden');
-            readySuccess = true;
-          } else {
-            console.log('No ready method found on SDK, manually triggering ready state');
-            console.log('Available SDK methods:', Object.keys(sdk));
-            readySuccess = true; // Proceed anyway
-          }
-          
-          if (readySuccess) {
-            // Dispatch ready event for other parts of the app
-            window.dispatchEvent(new CustomEvent('farcasterready', { detail: { sdk } }));
-          }
-          
-          // Hide our internal loading screen after SDK ready
-          const loadingScreen = document.getElementById('loadingScreen');
-          if (loadingScreen) {
-            loadingScreen.style.display = 'none';
-            console.log('Internal loading screen hidden after SDK ready');
-          }
-          
-          // Show main content
-          const mainContent = document.getElementById('mainContent');
-          if (mainContent) {
-            mainContent.style.display = 'block';
-            console.log('Main content shown after SDK ready');
-          }
+        // Dispatch ready event
+        window.dispatchEvent(new CustomEvent('farcasterready', { detail: { sdk } }));
           
           // Now that SDK is ready, trigger wallet auto-connection with retries
           console.log('SDK ready - triggering Farcaster wallet auto-connection');

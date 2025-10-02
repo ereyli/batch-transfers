@@ -31,7 +31,7 @@
       "button": {
         "title": "💸 Start Batch Transfer",
         "action": {
-          "type": "launch_frame",
+          "type": "launch_miniapp",
           "name": "Sendwise",
           "url": "https://www.sendwise.xyz",
           "splashImageUrl": "https://www.sendwise.xyz/splash.png",
@@ -1332,7 +1332,7 @@
 
   <!-- Farcaster Mini App SDK - Must be at the bottom of HTML file -->
   <script type="module">
-    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
+    import { sdk } from '@farcaster/miniapp-sdk'
     
     // Global SDK reference
     window.farcasterSDK = sdk;
@@ -1345,6 +1345,10 @@
         // Always try to set up Mini App environment
         console.log('Farcaster SDK loaded, setting up Mini App environment');
         window.isFarcasterMiniApp = true;
+        
+        // Call ready() as required by Base docs
+        await sdk.actions.ready();
+        console.log('SDK ready() called successfully');
         
         // Try to call ready using actions.ready() method (most common in Frame SDK)
         try {

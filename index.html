@@ -13,9 +13,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no, shrink-to-fit=no" />
   <meta name="theme-color" content="#6366f1" />
   <meta name="format-detection" content="telephone=no" />
-  
+
   <title>Sendwise - Smart Batch Transfers</title>
-  
+
   <!-- Farcaster Mini App Meta Tags -->
   <meta name="fc:miniapp" content='{
     "version": "1",
@@ -31,7 +31,7 @@
       }
     }
   }' />
-  
+
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="Sendwise - Smart Batch Transfers on Multi-Chain" />
   <meta property="og:description" content="Revolutionary Farcaster Mini App for batch transfers. Send ETH & ERC20 tokens to multiple addresses in one transaction. Save 80% gas fees on Base, Optimism & Arbitrum!" />
@@ -39,13 +39,13 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.sendwise.xyz" />
   <meta property="og:site_name" content="Sendwise" />
-  
+
   <!-- Twitter Meta Tags -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Sendwise - Smart Batch Transfers" />
   <meta name="twitter:description" content="Revolutionary batch transfer Mini App. Send to multiple addresses, save 80% gas fees. Base, Optimism & Arbitrum supported!" />
   <meta name="twitter:image" content="https://www.sendwise.xyz/image.png" />
-  
+
   <!-- SEO Meta Tags -->
   <meta name="description" content="Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers." />
   <meta name="keywords" content="batch transfer, ethereum, defi, wallet, gas savings, airdrop, payroll, bulk payments, sendwise" />
@@ -110,7 +110,7 @@
         <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
         
         <!-- Network Tags -->
-        <div class="supported-networks" id="networkTags" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+        <div class="supported-networks" id="networkTags">
           <button class="network-tag" data-chain="8453">Base</button>
           <button class="network-tag" data-chain="10">Optimism</button>
           <button class="network-tag" data-chain="42161">Arbitrum</button>
@@ -120,15 +120,15 @@
         </div>
         
         <!-- Wallet Button -->
-        <div id="walletButtonContainer" style="margin-top: 20px; text-align: center;">
+        <div id="walletButtonContainer" class="wallet-container">
           <button id="headerWalletBtn" onclick="window.openWalletModal()" class="wallet-btn">
-            <span style="font-size: 16px;">💳</span>
+            <span class="wallet-icon">💳</span>
             <span>Connect Wallet</span>
           </button>
         </div>
 
         <!-- Share Buttons -->
-        <div id="shareButtonContainer" style="margin-top: 15px; text-align: center; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <div id="shareButtonContainer" class="share-container">
           <button id="shareXBtn" onclick="window.shareToX()" class="share-btn share-x">
             <svg width="14" height="14" viewBox="0 0 1200 1227" fill="currentColor">
               <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>

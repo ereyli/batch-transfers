@@ -346,22 +346,6 @@ h1 {
 }
 
 /* Network Badge */
-.supported-networks {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e2e8f0;
-  padding: 12px 20px;
-  border-radius: 50px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin: 0 auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
 .network-icon {
   width: 16px;
   height: 16px;
@@ -385,34 +369,6 @@ h1 {
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
-}
-
-.wallet-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e2e8f0;
-  padding: 12px 24px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  backdrop-filter: blur(10px);
-}
-
-.wallet-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.wallet-btn.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 .farcaster-info {
@@ -883,82 +839,7 @@ h1 {
   transform: translateY(-2px);
 }
 
-/* Loading */
-.loading {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 50%, #1a1a1a 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  transition: opacity 0.3s ease;
-}
-
-.loading-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  max-width: 300px;
-}
-
-.loading-logo {
-  margin-bottom: 24px;
-}
-
-.loading-logo img {
-  width: 80px;
-  height: 80px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-}
-
-.loading.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.loading-spinner {
-  width: 60px;
-  height: 60px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top: 3px solid #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 24px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading h3 {
-  color: #ffffff;
-  margin-bottom: 8px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-}
-
-.loading p {
-  color: #e2e8f0;
-  font-size: 1.1rem;
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-
-.loading-subtitle {
-  color: #a0aec0;
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
+/* Loading - Removed duplicate, keeping original definition above */
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {

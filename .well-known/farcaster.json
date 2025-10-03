@@ -12,18 +12,22 @@
   "frame": {
     "version": "1",
     "name": "Sendwise",
-    "iconUrl": "https://sendwise.xyz/icon.png",
     "homeUrl": "https://sendwise.xyz",
+    "iconUrl": "https://sendwise.xyz/icon.png",
     "splashImageUrl": "https://sendwise.xyz/splash.png",
     "splashBackgroundColor": "#6366f1",
-    "buttonTitle": "Start Batch Transfer",
     "subtitle": "Smart Batch Transfers",
     "description": "Send ETH & ERC20 tokens to multiple addresses in one transaction. Multi-chain support for Base, Optimism, Arbitrum, Soneium, Unichain & Ink.",
     "primaryCategory": "finance",
-    "tags": ["base", "sendwise", "batchtransfer", "crypto", "tools", "defi"],
+    "tags": ["base", "sendwise", "batchtransfer", "crypto", "defi"],
     "imageUrl": "https://sendwise.xyz/image.png",
-    "requiredCapabilities": [
-      "wallet.getEthereumProvider"
+    "heroImageUrl": "https://sendwise.xyz/image.png",
+    "tagline": "Multi-chain batch transfers",
+    "ogTitle": "Sendwise - Smart Batch Transfers",
+    "ogDescription": "Send crypto to multiple addresses in one transaction. Save gas fees!",
+    "ogImageUrl": "https://sendwise.xyz/image.png",
+    "screenshotUrls": [
+      "https://sendwise.xyz/image.png"
     ]
   }
 }

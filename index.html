@@ -1207,7 +1207,7 @@
                                     window.connectedAddress = newAccounts[0];
                                     const newShortAddress = newAccounts[0].slice(0, 6) + '...' + newAccounts[0].slice(-4);
                                     walletBtn.innerHTML = '<span>💳</span><span>' + newShortAddress + '</span>';
-                          } else {
+        } else {
                                     window.connectedAddress = null;
                                     walletBtn.innerHTML = '<span>💳</span><span>Connect Wallet</span>';
                                 }
@@ -1225,7 +1225,7 @@
                         if (isMobile) {
                             // Try WalletConnect or deep links
                             alert('Please use a Web3 wallet browser like MetaMask mobile, Rainbow, or Coinbase Wallet.');
-                          } else {
+        } else {
                             // Desktop - suggest installing MetaMask
                             const installMetaMask = confirm(
                                 'No Web3 wallet detected!\n\n' +
@@ -1238,11 +1238,11 @@
                             }
                 }
               }
-            } catch (error) {
+                            } catch (error) {
                     if (error.code === 4001) {
                         // User rejected the request
                         alert('Wallet connection cancelled. Please try again.');
-              } else {
+                          } else {
                         console.error('Wallet connection failed:', error);
                         alert('Failed to connect wallet. Please try again.');
                     }
@@ -1256,8 +1256,216 @@
             alert('Token approval will be implemented with smart contract integration.');
         }
         
-        function sendBatch() {
-            alert('Batch transfer will be implemented with smart contract integration.');
+        async function sendBatch() {
+            try {
+                // Check if wallet is connected
+                if (!window.connectedAddress) {
+                    alert('❌ Please connect your wallet first!');
+                    return;
+                }
+                
+                // Get all recipient rows
+                const recipientRows = document.querySelectorAll('.recipient-row');
+                const recipients = [];
+                const amounts = [];
+                
+                // Validate and collect data
+                for (let row of recipientRows) {
+                    const addressInput = row.querySelector('.address');
+                    const amountInput = row.querySelector('.amount');
+                    
+                    const address = addressInput?.value?.trim();
+                    const amount = amountInput?.value?.trim();
+                    
+                    if (!address || !amount) {
+                        continue; // Skip empty rows
+                    }
+                    
+                    // Validate address
+                    if (!address.startsWith('0x') || address.length !== 42) {
+                        alert('❌ Invalid address: ' + address);
+                        return;
+                    }
+                    
+                    // Validate amount
+                    if (isNaN(amount) || parseFloat(amount) <= 0) {
+                        alert('❌ Invalid amount: ' + amount);
+                        return;
+                    }
+                    
+                    recipients.push(address);
+                    amounts.push(amount);
+                }
+                
+                // Check if we have any recipients
+                              if (recipients.length === 0) {
+                    alert('❌ Please add at least one recipient!');
+                                return;
+                              }
+                              
+                // Calculate totals
+                const totalAmount = amounts.reduce((sum, amt) => sum + parseFloat(amt), 0);
+                const contractFee = 0.001; // Contract fee
+                              const totalWithFee = totalAmount + contractFee;
+                              
+                // Get network name
+                const networkNames = {
+                    8453: 'Base',
+                    10: 'Optimism', 
+                    42161: 'Arbitrum',
+                    1868: 'Soneium',
+                    130: 'Unichain',
+                    57073: 'Ink'
+                };
+                const networkName = networkNames[window.selectedChainId] || 'Unknown Network';
+                
+                // Show confirmation modal
+                const confirmed = confirm(
+                    '🚀 Batch Transfer Confirmation\n\n' +
+                    '═══════════════════════════\n' +
+                    '📊 Network: ' + networkName + '\n' +
+                    '👥 Recipients: ' + recipients.length + '\n' +
+                    '💰 Transfer Amount: ' + totalAmount.toFixed(6) + ' ETH\n' +
+                    '💳 Contract Fee: ' + contractFee + ' ETH\n' +
+                    '═══════════════════════════\n' +
+                    '💸 Total Cost: ' + totalWithFee.toFixed(6) + ' ETH\n\n' +
+                    'Do you want to proceed?'
+                );
+                              
+                              if (!confirmed) {
+                    console.log('❌ User cancelled transaction');
+                                return;
+                              }
+                              
+                // Get provider (Farcaster or Web)
+                let provider;
+                
+                if (window.isFarcasterMiniApp && window.farcasterSDK) {
+                    // Use Farcaster wallet provider
+                    provider = await window.farcasterSDK.wallet.ethProvider;
+                    console.log('✅ Using Farcaster wallet provider');
+                } else if (window.ethereum) {
+                    // Use Web3 wallet provider
+                    provider = window.ethereum;
+                    console.log('✅ Using Web3 wallet provider');
+                } else {
+                    alert('❌ No wallet provider available!');
+                    return;
+                }
+                
+                // Check current chain
+                const currentChainId = await provider.request({ method: 'eth_chainId' });
+                const currentChainDecimal = parseInt(currentChainId, 16);
+                
+                // Switch chain if needed
+                if (currentChainDecimal !== window.selectedChainId) {
+                                  try {
+                                    await provider.request({
+                                      method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x' + window.selectedChainId.toString(16) }]
+                                    });
+                        console.log('✅ Switched to network:', window.selectedChainId);
+                                  } catch (switchError) {
+                        alert('❌ Please switch to ' + networkName + ' network in your wallet!');
+                        return;
+                    }
+                }
+                
+                // Batch contract addresses for each network
+                                  const contractAddresses = {
+                    8453: '0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784',   // Base
+                    10: '0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9',     // Optimism
+                    42161: '0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9',   // Arbitrum
+                    1868: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0',   // Soneium
+                    130: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0',    // Unichain
+                    57073: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0'   // Ink
+                };
+                
+                const contractAddress = contractAddresses[window.selectedChainId];
+                
+                                  if (!contractAddress) {
+                    alert('❌ Batch contract not available for ' + networkName);
+                    return;
+                }
+                
+                // Use ethers.js to encode the transaction
+                if (typeof ethers === 'undefined') {
+                    alert('❌ Ethers library not loaded. Please refresh the page.');
+                    return;
+                }
+                
+                // Convert amounts to wei
+                const amountsInWei = amounts.map(amt => 
+                    ethers.utils.parseEther(amt.toString()).toHexString()
+                );
+                
+                // Calculate total value in wei
+                const totalValueWei = ethers.utils.parseEther(totalAmount.toString());
+                const feeWei = ethers.utils.parseEther(contractFee.toString());
+                const totalWithFeeWei = totalValueWei.add(feeWei);
+                
+                // Encode function call
+                const iface = new ethers.utils.Interface([
+                    'function batchSend(address[] calldata recipients, uint256[] calldata amounts) external payable'
+                ]);
+                
+                const data = iface.encodeFunctionData('batchSend', [recipients, amountsInWei]);
+                
+                // Send transaction
+                console.log('📤 Sending batch transfer transaction...');
+                console.log('Contract:', contractAddress);
+                console.log('Recipients:', recipients);
+                console.log('Amounts (ETH):', amounts);
+                console.log('Total value:', totalWithFeeWei.toString());
+                
+                const txHash = await provider.request({
+                    method: 'eth_sendTransaction',
+                    params: [{
+                        from: window.connectedAddress,
+                        to: contractAddress,
+                        value: totalWithFeeWei.toHexString(),
+                        data: data,
+                        gas: '0x7A120' // 500,000 gas limit
+                    }]
+                });
+                
+                console.log('✅ Transaction sent! Hash:', txHash);
+                
+                // Show success message
+                alert(
+                    '✅ Batch Transfer Successful!\n\n' +
+                    'Transaction Hash:\n' + txHash + '\n\n' +
+                    '📊 ' + recipients.length + ' transfers completed\n' +
+                    '💰 Total: ' + totalWithFee.toFixed(6) + ' ETH\n\n' +
+                    'View on Explorer: https://basescan.org/tx/' + txHash
+                );
+                
+                // Clear inputs after success
+                const container = document.getElementById('inputContainer');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="recipient-row">
+                            <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
+                            <input type="text" placeholder="Amount" class="form-input amount" />
+                            <div class="recipient-actions">
+                                <button onclick="addInput()" class="action-btn add-btn" title="Add Recipient">➕</button>
+                                <button onclick="removeLast()" class="action-btn remove-btn" title="Remove Last" disabled>❌</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('❌ Batch transfer failed:', error);
+                
+                if (error.code === 4001) {
+                    alert('❌ Transaction cancelled by user');
+                } else if (error.code === -32603) {
+                    alert('❌ Transaction failed: Insufficient funds or gas');
+              } else {
+                    alert('❌ Transaction failed: ' + (error.message || error));
+                }
+            }
         }
         
         function importWallets() {

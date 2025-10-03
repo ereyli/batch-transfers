@@ -9,7 +9,7 @@
       "0xcF1B5d6CD8e0bfd6B1a8B2c2ceAb0bc165EEE5B3"
     ]
   },
-  "frame": {
+  "miniapp": {
     "version": "1",
     "name": "Sendwise",
     "homeUrl": "https://www.sendwise.xyz",
@@ -28,6 +28,12 @@
     "ogImageUrl": "https://www.sendwise.xyz/image.png",
     "screenshotUrls": [
       "https://www.sendwise.xyz/image.png"
-    ]
+    ],
+    "canonicalDomain": "www.sendwise.xyz",
+    "requiredCapabilities": [
+      "actions.signIn",
+      "wallet.getEthereumProvider"
+    ],
+    "noindex": false
   }
 }

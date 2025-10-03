@@ -1,258 +1,1113 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-  
-  <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/icon.png" />
-    <link rel="shortcut icon" href="/icon.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-  
-  <!-- Meta Tags -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no, shrink-to-fit=no" />
-  <meta name="theme-color" content="#6366f1" />
-    <meta name="format-detection" content="telephone=no" />
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sendwise - Smart Batch Transfers</title>
 
-  <!-- Farcaster Mini App Meta Tags -->
-  <meta name="fc:miniapp" content='{
-    "version": "1",
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="icon.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Farcaster Mini App Meta Tags -->
+    <meta name="fc:miniapp" content='{
+        "version": "1",
       "imageUrl": "https://www.sendwise.xyz/image.png",
       "button": {
         "title": "💸 Start Batch Transfer",
         "action": {
-        "type": "launch_miniapp",
+                "type": "launch_miniapp",
           "name": "Sendwise",
-        "url": "https://www.sendwise.xyz",
+                "url": "https://www.sendwise.xyz",
           "splashImageUrl": "https://www.sendwise.xyz/splash.png",
           "splashBackgroundColor": "#6366f1"
         }
       }
     }' />
 
-  <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Sendwise - Smart Batch Transfers on Multi-Chain" />
-    <meta property="og:description" content="Revolutionary Farcaster Mini App for batch transfers. Send ETH & ERC20 tokens to multiple addresses in one transaction. Save 80% gas fees on Base, Optimism & Arbitrum!" />
-    <meta property="og:image" content="https://www.sendwise.xyz/image.png" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.sendwise.xyz" />
-    <meta property="og:site_name" content="Sendwise" />
-
-  <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Sendwise - Smart Batch Transfers" />
-    <meta name="twitter:description" content="Revolutionary batch transfer Mini App. Send to multiple addresses, save 80% gas fees. Base, Optimism & Arbitrum supported!" />
-    <meta name="twitter:image" content="https://www.sendwise.xyz/image.png" />
-
-  <!-- SEO Meta Tags -->
-    <meta name="description" content="Send ETH and ERC20 tokens to multiple addresses in a single transaction. Save gas, save time with smart batch transfers." />
-    <meta name="keywords" content="batch transfer, ethereum, defi, wallet, gas savings, airdrop, payroll, bulk payments, sendwise" />
-    <meta name="author" content="Sendwise Team" />
-    <meta name="robots" content="index, follow" />
-  
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Sendwise",
-    "description": "Smart Batch Transfers for ETH & ERC20 Tokens",
-    "url": "https://www.sendwise.xyz",
-    "applicationCategory": "FinanceApplication",
-    "operatingSystem": "Web Browser, Farcaster Mini App",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "creator": {
-      "@type": "Organization",
-      "name": "Sendwise Team"
-    }
-  }
-  </script>
-  
-  <!-- External Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/viem@2.23.15/dist/viem.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/wagmi@2.5.7/dist/wagmi.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-wagmi-connector@0.1.0/dist/index.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  
-  <!-- Fonts and Styles -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="main.css">
+    <!-- Open Graph -->
+    <meta property="og:title" content="Sendwise - Smart Batch Transfers">
+    <meta property="og:description" content="Send ETH & ERC20 tokens to multiple addresses in one transaction. Save 80% gas fees!">
+    <meta property="og:image" content="https://www.sendwise.xyz/image.png">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sendwise - Smart Batch Transfers">
+    <meta name="twitter:description" content="Send ETH & ERC20 tokens to multiple addresses in one transaction. Save 80% gas fees!">
+    <meta name="twitter:image" content="https://www.sendwise.xyz/image.png">
+    
+    <!-- Inline CSS for immediate loading -->
+    <style>
+        /* Modern CSS Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Root Variables */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(255, 255, 255, 0.2);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+        
+        /* Base Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1f2e 50%, var(--bg-primary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius);
+        }
+        
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+        
+        /* Network Selection */
+        .network-selector {
+        display: flex;
+            gap: 0.75rem;
+        justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        
+        .network-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .network-btn::before {
+            content: '';
+            position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .network-btn:hover::before,
+        .network-btn.active::before {
+            opacity: 0.1;
+        }
+        
+        .network-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .network-btn.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+        
+        /* Wallet Section */
+        .wallet-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .wallet-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+            border-radius: var(--radius-lg);
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-xl);
+        display: inline-flex;
+        align-items: center;
+            gap: 0.75rem;
+            min-width: 200px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wallet-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .wallet-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .wallet-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+        }
+        
+        .wallet-btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Share Buttons */
+        .share-section {
+          display: flex;
+            gap: 1rem;
+          justify-content: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+          font-weight: 600;
+            font-size: 0.875rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+          display: flex;
+          align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .share-btn:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .share-x {
+            border-color: #1a1a1a;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .share-x:hover {
+            border-color: #333;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .share-farcaster {
+            border-color: #8A63D2;
+            background: rgba(138, 99, 210, 0.1);
+        }
+        
+        .share-farcaster:hover {
+            border-color: #7C3AED;
+            background: rgba(124, 58, 237, 0.2);
+        }
+        
+        /* Main Form */
+        .main-form {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .form-select,
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-select:focus,
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Recipients Section */
+        .recipients-section {
+            margin: 2rem 0;
+        }
+        
+        .recipients-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .recipients-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .recipient-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            transition: all 0.3s ease;
+            align-items: center;
+        }
+        
+        .recipient-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-hover);
+        }
+        
+        .recipient-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+        }
+        
+        .add-btn {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .add-btn:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .remove-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .remove-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .remove-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        /* CSV Section */
+        .csv-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .csv-section h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .file-input-label:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        /* Share Section */
+        .share-section-bottom {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .share-section-bottom h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .share-section-bottom p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .share-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .share-button.green {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+        
+        /* Achievement Modal */
+        .achievement-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .achievement-content {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            padding: 3rem;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            border: 2px solid var(--primary);
+            box-shadow: var(--shadow-xl);
+            color: var(--text-primary);
+            position: relative;
+        }
+        
+        .achievement-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 0.6s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-8px); }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .close-modal:hover {
+            opacity: 1;
+        }
+        
+        /* Loading Screen */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: var(--text-primary);
+        }
+        
+        .loading-logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1rem;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .loading p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .loading-subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .main-form {
+                padding: 1.5rem;
+            }
+            
+            .recipient-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .recipient-actions {
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-form {
+                padding: 1rem;
+            }
+            
+            .form-input, .form-select {
+                padding: 0.875rem;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <div id="root">
     <!-- Loading Screen -->
     <div id="loading" class="loading" style="display: none;">
-      <div class="loading-content">
-        <div class="loading-logo">
-          <img src="https://www.sendwise.xyz/icon.png" alt="Sendwise Logo" />
+        <div class="loading-content">
+            <div class="loading-logo">
+                <img src="icon.png" alt="Sendwise Logo" />
+            </div>
+            <div class="loading-spinner"></div>
+            <h3>🚀 Sendwise</h3>
+            <p>Smart Batch Transfers</p>
+            <div class="loading-subtitle">Connecting to Farcaster...</div>
         </div>
-        <div class="loading-spinner"></div>
-        <h3>🚀 Sendwise</h3>
-        <p>Smart Batch Transfers</p>
-        <div class="loading-subtitle">Connecting to Farcaster...</div>
-      </div>
     </div>
 
     <div class="container">
-    <!-- Header -->
-    <div class="header fade-in">
-      <div class="logo">
-        <img src="https://www.sendwise.xyz/icon.png" alt="Sendwise Logo" />
-      </div>
-      <h1>Sendwise</h1>
-      <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
-        
-        <!-- Network Tags -->
-        <div class="supported-networks" id="networkTags">
-          <button class="network-tag" data-chain="8453">Base</button>
-          <button class="network-tag" data-chain="10">Optimism</button>
-          <button class="network-tag" data-chain="42161">Arbitrum</button>
-          <button class="network-tag" data-chain="1868">Soneium</button>
-          <button class="network-tag" data-chain="130">Unichain</button>
-          <button class="network-tag" data-chain="57073">Ink</button>
-      </div>
-      
-        <!-- Wallet Button -->
-        <div id="walletButtonContainer" class="wallet-container">
-          <button id="headerWalletBtn" onclick="window.openWalletModal()" class="wallet-btn">
-            <span class="wallet-icon">💳</span>
-          <span>Connect Wallet</span>
-        </button>
-      </div>
-
-        <!-- Share Buttons -->
-        <div id="shareButtonContainer" class="share-container">
-          <button id="shareXBtn" onclick="window.shareToX()" class="share-btn share-x">
-          <svg width="14" height="14" viewBox="0 0 1200 1227" fill="currentColor">
-            <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
-          </svg>
-          Share on X
-        </button>
-        
-          <button id="shareFarcasterBtn" onclick="window.shareToFarcaster()" class="share-btn share-farcaster">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-          </svg>
-          Share on Farcaster
-        </button>
-      </div>
-    </div>
-
-    <!-- Main Form -->
-    <div class="main-form slide-up">
-      <div class="form-group">
-        <label class="form-label">Transfer Type</label>
-        <select id="transferType" class="form-select">
-          <option value="eth">ETH Transfer</option>
-          <option value="erc20">ERC20 Token Transfer</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="tokenAddressRow" style="display:none;">
-        <label class="form-label">Token Contract Address</label>
-        <input type="text" id="tokenAddressInput" class="form-input" placeholder="0x..." />
-      </div>
-
-      <div id="tokenInfo" class="token-info" style="display:none;"></div>
-
-      <!-- Recipients Section -->
-      <div class="recipients-section">
-        <div class="recipients-header">
-          <h3 class="recipients-title">Recipients</h3>
-        </div>
-
-        <div id="inputContainer">
-          <div class="recipient-row">
-            <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
-            <input type="text" placeholder="Amount" class="form-input amount" />
-            <div class="recipient-actions">
-                <button onclick="addInput()" class="recipient-action-btn add-recipient-btn" title="Add Recipient">➕</button>
-                <button onclick="removeLast()" class="recipient-action-btn remove-recipient-btn" title="Remove Last" disabled>❌</button>
+        <!-- Header -->
+        <div class="header fade-in">
+            <div class="logo">
+                <img src="icon.png" alt="Sendwise Logo" />
             </div>
-          </div>
+            <h1>Sendwise</h1>
+            <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
+            
+            <!-- Network Selection -->
+            <div class="network-selector" id="networkTags">
+                <button class="network-btn active" data-chain="8453">Base</button>
+                <button class="network-btn" data-chain="10">Optimism</button>
+                <button class="network-btn" data-chain="42161">Arbitrum</button>
+                <button class="network-btn" data-chain="1868">Soneium</button>
+                <button class="network-btn" data-chain="130">Unichain</button>
+                <button class="network-btn" data-chain="57073">Ink</button>
+            </div>
+            
+            <!-- Wallet Button -->
+            <div class="wallet-section">
+                <button id="headerWalletBtn" onclick="window.openWalletModal()" class="wallet-btn">
+                    <span>💳</span>
+                    <span>Connect Wallet</span>
+                </button>
+            </div>
+
+            <!-- Share Buttons -->
+            <div class="share-section">
+                <button id="shareXBtn" onclick="window.shareToX()" class="share-btn share-x">
+                    <span>𝕏</span>
+                    <span>Share on X</span>
+                </button>
+                
+                <button id="shareFarcasterBtn" onclick="window.shareToFarcaster()" class="share-btn share-farcaster">
+                    <span>✓</span>
+                    <span>Share on Farcaster</span>
+                </button>
+            </div>
         </div>
-      </div>
 
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <button id="approveBtn" style="display:none;" onclick="approveToken()" class="btn btn-primary">
-          ✅ Approve Token
-        </button>
-        <button id="sendBtn" style="display:none;" onclick="sendBatch()" class="btn btn-primary">
-          🚀 Send Batch Transfer
-        </button>
-      </div>
+        <!-- Main Form -->
+        <div class="main-form slide-up">
+            <div class="form-group">
+                <label class="form-label">Transfer Type</label>
+                <select id="transferType" class="form-select">
+                    <option value="eth">ETH Transfer</option>
+                    <option value="erc20">ERC20 Token Transfer</option>
+                </select>
+            </div>
 
-      <div id="status" class="status" style="display:none;"></div>
-      
+            <div class="form-group" id="tokenAddressRow" style="display:none;">
+                <label class="form-label">Token Contract Address</label>
+                <input type="text" id="tokenAddressInput" class="form-input" placeholder="0x..." />
+            </div>
+
+            <div id="tokenInfo" class="token-info" style="display:none;"></div>
+
+            <!-- Recipients Section -->
+            <div class="recipients-section">
+                <div class="recipients-header">
+                    <h3 class="recipients-title">Recipients</h3>
+                </div>
+
+                <div id="inputContainer">
+                    <div class="recipient-row">
+                        <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
+                        <input type="text" placeholder="Amount" class="form-input amount" />
+                        <div class="recipient-actions">
+                            <button onclick="addInput()" class="action-btn add-btn" title="Add Recipient">➕</button>
+                            <button onclick="removeLast()" class="action-btn remove-btn" title="Remove Last" disabled>❌</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="approveBtn" style="display:none;" onclick="approveToken()" class="btn btn-primary">
+                    ✅ Approve Token
+                </button>
+                <button id="sendBtn" style="display:none;" onclick="sendBatch()" class="btn btn-primary">
+                    🚀 Send Batch Transfer
+                </button>
+            </div>
+
+            <div id="status" class="status" style="display:none;"></div>
+        </div>
+
+        <!-- CSV Import Section -->
+        <div class="csv-section slide-up">
+            <h3>📁 Import Wallets via CSV</h3>
+            <div class="file-input-wrapper">
+                <input type="file" id="walletCsvInput" accept=".csv" class="file-input" />
+                <label for="walletCsvInput" class="file-input-label">
+                    📄 Choose CSV File
+                </label>
+            </div>
+            <button onclick="importWallets()" class="btn btn-secondary">
+                ➕ Import Wallets
+            </button>
+        </div>
+
         <!-- Share Section -->
-      <div class="share-section">
-        <h3 style="margin-bottom: 15px; color: #6366f1;">📢 Share Sendwise</h3>
-        <p style="margin-bottom: 15px; font-size: 14px; opacity: 0.8;">
-          Help friends discover the smartest way to send crypto!
-        </p>
-        <button class="share-button" onclick="shareAppWithFriends()">
-          🚀 Share with Friends
-        </button>
-        <button class="share-button" onclick="showMultiChainAchievement()" style="background: linear-gradient(45deg, #10b981, #059669);">
-          🌐 Show Multi-Chain Power
-        </button>
-      </div>
+        <div class="share-section-bottom">
+            <h3>📢 Share Sendwise</h3>
+            <p>Help friends discover the smartest way to send crypto!</p>
+            <button class="share-button" onclick="shareAppWithFriends()">
+                🚀 Share with Friends
+            </button>
+            <button class="share-button green" onclick="showMultiChainAchievement()">
+                🌐 Show Multi-Chain Power
+            </button>
+        </div>
     </div>
 
-    <!-- CSV Import Section -->
-    <div class="csv-section slide-up">
-      <h3>📁 Import Wallets via CSV</h3>
-      <div class="file-input-wrapper">
-        <input type="file" id="walletCsvInput" accept=".csv" class="file-input" />
-        <label for="walletCsvInput" class="file-input-label">
-          📄 Choose CSV File
-        </label>
-      </div>
-      <button onclick="importWallets()" class="btn btn-secondary">
-        ➕ Import Wallets
-      </button>
+    <!-- Achievement Modal -->
+    <div id="achievementModal" class="achievement-modal" onclick="if(event.target === this) closeAchievementModal()">
+        <div class="achievement-content">
+            <button class="close-modal" onclick="closeAchievementModal()">×</button>
+            <div id="achievementIcon" class="achievement-icon">🎉</div>
+            <h3 id="achievementTitle">Achievement Unlocked!</h3>
+            <p id="achievementDescription">You did something awesome!</p>
+            <div style="margin-top: 1.5rem;">
+                <button class="share-button" onclick="shareCurrentAchievement()">
+                    📢 Share on Farcaster
+                </button>
+                <button class="share-button" onclick="closeAchievementModal()" style="background: rgba(255,255,255,0.1);">
+                    ✨ Continue Using
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-  <!-- Achievement Modal -->
-  <div id="achievementModal" class="achievement-modal" onclick="if(event.target === this) closeAchievementModal()">
-    <div class="achievement-content">
-      <button class="close-modal" onclick="closeAchievementModal()">×</button>
-      <div id="achievementIcon" class="achievement-icon">🎉</div>
-      <h3 id="achievementTitle">Achievement Unlocked!</h3>
-      <p id="achievementDescription">You did something awesome!</p>
-      <div style="margin-top: 20px;">
-        <button class="share-button" onclick="shareCurrentAchievement()">
-          📢 Share on Farcaster
-        </button>
-        <button class="share-button" onclick="closeAchievementModal()" style="background: rgba(255,255,255,0.2);">
-          ✨ Continue Using
-        </button>
-      </div>
-    </div>
-  </div>
+    <!-- JavaScript -->
+    <script>
+        // Global variables
+                          window.selectedChainId = 8453; // Default to Base
+        
+        // Network selection
+        function setupNetworkTags() {
+            const networkTags = document.querySelectorAll('.network-btn');
+                            
+                            function highlightSelected() {
+                networkTags.forEach(tag => {
+                                const isActive = Number(tag.dataset.chain) === Number(window.selectedChainId);
+                    tag.classList.toggle('active', isActive);
+                });
+            }
+            
+            networkTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    window.selectedChainId = Number(tag.dataset.chain);
+                                highlightSelected();
+                    console.log('Network selected:', window.selectedChainId);
+                              });
+                            });
+                            
+                            highlightSelected();
+        }
+        
+        // Basic functions
+        function addInput() {
+            const container = document.getElementById('inputContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'recipient-row slide-up';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
+                <input type="text" placeholder="Amount" class="form-input amount" />
+                <div class="recipient-actions">
+                    <button onclick="addInput()" class="action-btn add-btn" title="Add Recipient">➕</button>
+                    <button onclick="removeLast()" class="action-btn remove-btn" title="Remove Last">❌</button>
+                </div>
+            `;
+            container.appendChild(newRow);
+            updateRemoveButtons();
+        }
+        
+        function removeLast() {
+            const container = document.getElementById('inputContainer');
+            const rows = container.querySelectorAll('.recipient-row');
+            if (rows.length > 1) {
+                rows[rows.length - 1].remove();
+                updateRemoveButtons();
+            }
+        }
+        
+        function updateRemoveButtons() {
+            const container = document.getElementById('inputContainer');
+            const rows = container.querySelectorAll('.recipient-row');
+            const removeButtons = container.querySelectorAll('.remove-btn');
+            
+            removeButtons.forEach(btn => {
+                btn.disabled = rows.length <= 1;
+            });
+        }
+        
+        // Share functions
+        function shareToX() {
+            const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('🚀 Just discovered Sendwise - the smartest way to send crypto to multiple addresses! Try it: https://www.sendwise.xyz');
+            window.open(url, '_blank');
+        }
+        
+        function shareToFarcaster() {
+            const url = 'https://warpcast.com/~/compose?text=' + encodeURIComponent('🚀 Sendwise makes batch crypto transfers a breeze! Try it: https://www.sendwise.xyz');
+            window.open(url, '_blank');
+        }
+        
+        function shareAppWithFriends() {
+            showAchievementModal({
+                icon: '🚀',
+                title: 'Invite Friends to Sendwise!',
+                description: 'Share the smartest way to send crypto with your friends. Multi-chain batch transfers with 80% gas savings!'
+            });
+        }
+        
+        function showMultiChainAchievement() {
+            showAchievementModal({
+                icon: '🌐',
+                title: 'Multi-Chain DeFi Power!',
+                description: 'Sendwise supports Base, Optimism, and Arbitrum. One interface for all your batch transfer needs across chains!'
+            });
+        }
+        
+        function showAchievementModal(achievement) {
+      const modal = document.getElementById('achievementModal');
+      const icon = document.getElementById('achievementIcon');
+      const title = document.getElementById('achievementTitle');
+      const description = document.getElementById('achievementDescription');
+      
+            if (modal && icon && title && description) {
+      icon.textContent = achievement.icon || '🎉';
+      title.textContent = achievement.title || 'Achievement!';
+      description.textContent = achievement.description || '';
+      modal.style.display = 'flex';
+      window.currentAchievement = achievement;
+            }
+        }
+      
+        function closeAchievementModal() {
+      const modal = document.getElementById('achievementModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+      window.currentAchievement = null;
+        }
 
-  <!-- JavaScript Files -->
-  <script src="error-handler.js"></script>
-  <script src="config.js"></script>
-  <script src="farcaster.js"></script>
-  <script src="wallet.js"></script>
-  <script src="ui.js"></script>
-  <script src="blockchain.js"></script>
-  <script src="share.js"></script>
-  <script src="app.js"></script>
-  <script src="init.js"></script>
-  
-  <!-- Farcaster Mini App SDK -->
-  <script type="module" src="farcaster-sdk.js"></script>
+        function shareCurrentAchievement() {
+      if (window.currentAchievement) {
+          closeAchievementModal();
+        }
+      }
+        
+        // Placeholder functions
+        function openWalletModal() {
+            alert('Wallet connection will be implemented with proper wallet integration.');
+        }
+        
+        function approveToken() {
+            alert('Token approval will be implemented with smart contract integration.');
+        }
+        
+        function sendBatch() {
+            alert('Batch transfer will be implemented with smart contract integration.');
+        }
+        
+        function importWallets() {
+            alert('CSV import will be implemented with file processing.');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNetworkTags();
+            updateRemoveButtons();
+            
+            // Hide loading screen
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+        });
+  </script>
 </body>
 </html>

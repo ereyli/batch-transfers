@@ -12,29 +12,21 @@
   "frame": {
     "version": "1",
     "name": "Sendwise",
-    "iconUrl": "https://www.sendwise.xyz/icon.png",
-    "homeUrl": "https://www.sendwise.xyz",
-    "splashImageUrl": "https://www.sendwise.xyz/splash.png",
+    "iconUrl": "https://sendwise.xyz/icon.png",
+    "homeUrl": "https://sendwise.xyz",
+    "splashImageUrl": "https://sendwise.xyz/splash.png",
     "splashBackgroundColor": "#6366f1",
-    "webhookUrl": "https://www.sendwise.xyz/api/webhook",
+    "buttonTitle": "Start Batch Transfer",
     "subtitle": "Smart Batch Transfers",
-    "description": "Send ERC20 tokens to multiple addresses in one transaction",
+    "description": "Send ETH & ERC20 tokens to multiple addresses in one transaction. Multi-chain support for Base, Optimism, Arbitrum, Soneium, Unichain & Ink.",
     "primaryCategory": "finance",
-    "tags": ["base", "sendwise", "batchtransfer", "crypto", "tools"],
-    "heroImageUrl": "https://www.sendwise.xyz/image.png",
-    "imageUrl": "https://www.sendwise.xyz/image.png",
-    "tagline": "Multi-chain batch transfers",
-    "ogTitle": "Sendwise Batch Transfers",
-    "ogDescription": "Send crypto to multiple addresses",
-    "ogImageUrl": "https://www.sendwise.xyz/image.png",
+    "tags": ["base", "sendwise", "batchtransfer", "crypto", "tools", "defi"],
+    "imageUrl": "https://sendwise.xyz/image.png",
     "screenshotUrls": [
-      "https://www.sendwise.xyz/image.png"
+      "https://sendwise.xyz/image.png"
     ],
     "requiredCapabilities": [
-      "actions.signIn",
       "wallet.getEthereumProvider"
-    ],
-    "canonicalDomain": "sendwise.xyz",
-    "noindex": false
+    ]
   }
 }

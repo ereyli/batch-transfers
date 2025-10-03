@@ -15,32 +15,20 @@
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     
     <!-- Farcaster Mini App Meta Tags -->
-    <meta name="fc:miniapp" content='{
-        "version": "1",
-      "imageUrl": "https://www.sendwise.xyz/image.png",
-      "button": {
-        "title": "💸 Start Batch Transfer",
-        "action": {
-                "type": "launch_miniapp",
-          "name": "Sendwise",
-                "url": "https://www.sendwise.xyz",
-          "splashImageUrl": "https://www.sendwise.xyz/splash.png",
-          "splashBackgroundColor": "#6366f1"
-        }
-      }
-    }' />
+    <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://sendwise.xyz/image.png","button":{"title":"💸 Start Batch Transfer","action":{"type":"launch_miniapp","name":"Sendwise","url":"https://sendwise.xyz","splashImageUrl":"https://sendwise.xyz/splash.png","splashBackgroundColor":"#6366f1"}}}' />
 
     <!-- Open Graph -->
     <meta property="og:title" content="Sendwise - Smart Batch Transfers">
     <meta property="og:description" content="Send ETH & ERC20 tokens to multiple addresses in one transaction. Save 80% gas fees!">
-    <meta property="og:image" content="https://www.sendwise.xyz/image.png">
+    <meta property="og:image" content="https://sendwise.xyz/image.png">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sendwise.xyz">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Sendwise - Smart Batch Transfers">
     <meta name="twitter:description" content="Send ETH & ERC20 tokens to multiple addresses in one transaction. Save 80% gas fees!">
-    <meta name="twitter:image" content="https://www.sendwise.xyz/image.png">
+    <meta name="twitter:image" content="https://sendwise.xyz/image.png">
     
     <!-- Inline CSS for immediate loading -->
     <style>
@@ -821,12 +809,12 @@
         .modal-btn {
             flex: 1;
             padding: 0.65rem 0.85rem;
-            border: none;
+        border: none;
             border-radius: var(--radius);
-            font-weight: 600;
+        font-weight: 600;
             font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        cursor: pointer;
+        transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;

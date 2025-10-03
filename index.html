@@ -693,11 +693,11 @@
 
         .confirmation-content {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-            padding: 1.5rem;
-            border-radius: var(--radius-lg);
-            max-width: 380px;
+            padding: 1.25rem;
+            border-radius: var(--radius);
+            max-width: 340px;
             width: 90%;
-            max-height: 85vh;
+            max-height: 80vh;
             overflow-y: auto;
             border: 2px solid var(--primary);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
@@ -720,14 +720,14 @@
         .confirmation-header {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.25rem;
-            padding-bottom: 1rem;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
             border-bottom: 1px solid var(--border);
         }
 
         .confirmation-icon {
-            font-size: 2rem;
+            font-size: 1.75rem;
             animation: pulse 2s ease infinite;
         }
 
@@ -737,7 +737,7 @@
         }
 
         .confirmation-title {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
@@ -747,15 +747,15 @@
         }
 
         .confirmation-body {
-            margin-bottom: 1rem;
+            margin-bottom: 0.85rem;
         }
 
         .confirmation-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.65rem 0.75rem;
-            margin: 0.4rem 0;
+            padding: 0.5rem 0.65rem;
+            margin: 0.35rem 0;
             background: rgba(255, 255, 255, 0.03);
             border-radius: var(--radius);
             border: 1px solid var(--border);
@@ -770,18 +770,18 @@
         .confirmation-label {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
+            gap: 0.4rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             font-weight: 500;
         }
 
         .confirmation-label-icon {
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .confirmation-value {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -789,48 +789,48 @@
         .confirmation-divider {
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            margin: 0.75rem 0;
+            margin: 0.6rem 0;
         }
 
         .confirmation-total {
             background: rgba(99, 102, 241, 0.1);
             border: 2px solid var(--primary);
-            padding: 0.75rem;
+            padding: 0.65rem;
             border-radius: var(--radius);
-            margin: 0.75rem 0;
+            margin: 0.6rem 0;
         }
 
         .confirmation-total .confirmation-label {
             color: var(--primary);
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .confirmation-total .confirmation-value {
             color: var(--primary);
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 800;
         }
 
         .confirmation-actions {
             display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
+            gap: 0.6rem;
+            margin-top: 0.85rem;
         }
 
         .modal-btn {
             flex: 1;
-            padding: 0.75rem 1rem;
-        border: none;
+            padding: 0.65rem 0.85rem;
+            border: none;
             border-radius: var(--radius);
-        font-weight: 600;
-            font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.4rem;
+            gap: 0.35rem;
             position: relative;
             overflow: hidden;
         }
@@ -1306,12 +1306,12 @@
 
             <div class="confirmation-actions">
                 <button class="modal-btn modal-btn-cancel" onclick="closeConfirmationModal()">
-                    <span>❌</span>
-                    <span>İptal</span>
+                    <span>✕</span>
+                    <span>Cancel</span>
                 </button>
                 <button class="modal-btn modal-btn-confirm" id="confirmButton" onclick="executeBatchTransfer()">
-                    <span>✅</span>
-                    <span>Tamam</span>
+                    <span>✓</span>
+                    <span>Confirm</span>
                 </button>
             </div>
         </div>
@@ -1785,7 +1785,7 @@
                 const confirmBtn = document.getElementById('confirmButton');
                 if (confirmBtn) {
                     confirmBtn.disabled = true;
-                    confirmBtn.innerHTML = '<span>⏳</span><span>İşleniyor...</span>';
+                    confirmBtn.innerHTML = '<span>⏳</span><span>Processing...</span>';
                 }
                 
                 // Get provider (Farcaster or Web)

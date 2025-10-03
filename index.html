@@ -11,6 +11,19 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- RainbowKit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@rainbow-me/rainbowkit@2.0.0/styles.css">
+    
+    <!-- RainbowKit & Wagmi -->
+    <script src="https://cdn.jsdelivr.net/npm/@rainbow-me/rainbowkit@2.0.0/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/wagmi@2.5.7/dist/wagmi.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/viem@2.7.0/dist/viem.umd.js"></script>
+    
+    <!-- Farcaster Mini App SDK -->
+    <script type="module">
+      // Will be loaded in body
+    </script>
+    
     <!-- Farcaster Mini App Meta Tags -->
     <meta name="fc:miniapp" content='{
         "version": "1",
@@ -961,10 +974,54 @@
         </div>
     </div>
 
+    <!-- Farcaster Mini App SDK -->
+    <script type="module">
+        import { sdk } from 'https://esm.sh/@farcaster/frame-sdk@0.1.0';
+        
+        window.farcasterSDK = sdk;
+        window.isFarcasterMiniApp = false;
+        
+        // Initialize Farcaster SDK
+        (async () => {
+            try {
+                const context = await sdk.context;
+                if (context) {
+                    window.isFarcasterMiniApp = true;
+                    console.log('✅ Farcaster Mini App detected');
+                    
+                    // Auto-connect Farcaster wallet
+                    try {
+                        const provider = await sdk.wallet.ethProvider;
+                        if (provider) {
+                            const accounts = await provider.request({ method: 'eth_accounts' });
+                            if (accounts && accounts.length > 0) {
+                                window.connectedAddress = accounts[0];
+                                console.log('✅ Farcaster wallet auto-connected:', accounts[0]);
+                                
+                                // Update UI
+                                const walletBtn = document.getElementById('headerWalletBtn');
+                                if (walletBtn) {
+                                    const shortAddress = accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
+                                    walletBtn.innerHTML = '<span>🟣</span><span>' + shortAddress + '</span>';
+                                }
+                            }
+                        }
+                            } catch (error) {
+                        console.log('Farcaster wallet auto-connect failed:', error);
+                    }
+                }
+            } catch (error) {
+                console.log('Not in Farcaster context:', error);
+            }
+        })();
+    </script>
+
     <!-- JavaScript -->
     <script>
         // Global variables
                           window.selectedChainId = 8453; // Default to Base
+        window.connectedAddress = null;
+        window.isFarcasterMiniApp = window.isFarcasterMiniApp || false;
         
         // Network selection
         function setupNetworkTags() {
@@ -1080,9 +1137,67 @@
         }
       }
         
-        // Placeholder functions
+        // Wallet connection
         function openWalletModal() {
-            alert('Wallet connection will be implemented with proper wallet integration.');
+            // If in Farcaster, show message
+            if (window.isFarcasterMiniApp) {
+                alert('Your Farcaster wallet is already connected!');
+                return;
+            }
+            
+            // For web, use RainbowKit
+            if (typeof RainbowKit !== 'undefined' && RainbowKit.openConnectModal) {
+                RainbowKit.openConnectModal();
+            } else {
+                // Initialize RainbowKit if not already done
+                initRainbowKit();
+            }
+        }
+        
+        // Initialize RainbowKit
+        function initRainbowKit() {
+            if (window.isFarcasterMiniApp) {
+                return; // Don't initialize RainbowKit in Farcaster
+            }
+            
+            try {
+                const { createConfig, http } = window.wagmi;
+                const { base, optimism, arbitrum } = window.viem.chains;
+                const { injected, walletConnect, coinbaseWallet } = window.wagmi.connectors;
+                
+                // Create Wagmi config
+                const config = createConfig({
+                    chains: [base, optimism, arbitrum],
+                    transports: {
+                        [base.id]: http(),
+                        [optimism.id]: http(),
+                        [arbitrum.id]: http(),
+                    },
+                    connectors: [
+                        injected(),
+                        walletConnect({ projectId: 'YOUR_PROJECT_ID' }),
+                        coinbaseWallet({ appName: 'Sendwise' }),
+                    ],
+                });
+                
+                // Initialize RainbowKit
+                const { RainbowKitProvider, ConnectButton } = window.RainbowKit;
+                
+                // Create RainbowKit button container
+                const walletBtn = document.getElementById('headerWalletBtn');
+                if (walletBtn) {
+                    walletBtn.onclick = () => {
+                        if (typeof RainbowKit !== 'undefined') {
+                            RainbowKit.openConnectModal();
+                        }
+                    };
+                }
+                
+                console.log('✅ RainbowKit initialized for web');
+      } catch (error) {
+                console.error('Failed to initialize RainbowKit:', error);
+                alert('Please connect your wallet manually using MetaMask or WalletConnect');
+            }
         }
         
         function approveToken() {
@@ -1101,6 +1216,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             setupNetworkTags();
             updateRemoveButtons();
+            
+            // Initialize RainbowKit for web (not in Farcaster)
+            if (!window.isFarcasterMiniApp) {
+                setTimeout(() => {
+                    initRainbowKit();
+                }, 1000);
+            }
             
             // Hide loading screen
             const loading = document.getElementById('loading');

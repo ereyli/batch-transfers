@@ -966,7 +966,7 @@
   
   <!-- Farcaster Mini App SDK -->
     <script type="module">
-        import sdk from 'https://esm.sh/@farcaster/frame-sdk@0.2.0';
+        import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk@0.1.0';
         
         window.farcasterSDK = sdk;
           window.isFarcasterMiniApp = false;
@@ -974,34 +974,67 @@
         // Initialize Farcaster SDK
         (async () => {
             try {
+                // Check if we're in a Farcaster context
                 const context = await sdk.context;
-                if (context) {
+                
+                if (context && context.client) {
                     window.isFarcasterMiniApp = true;
-                    console.log('✅ Farcaster Mini App detected');
+                    console.log('✅ Farcaster Mini App context detected:', context.client.clientFid);
+                    
+                    // Call ready() to hide splash screen and show app
+                    await sdk.actions.ready();
+                    console.log('✅ SDK ready() called - app is visible');
                     
                     // Auto-connect Farcaster wallet
                     try {
                         const provider = await sdk.wallet.ethProvider;
+                        
                         if (provider) {
-                            const accounts = await provider.request({ method: 'eth_accounts' });
+                            // Request accounts from Farcaster wallet
+                            const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                            
                             if (accounts && accounts.length > 0) {
                                 window.connectedAddress = accounts[0];
-                                console.log('✅ Farcaster wallet auto-connected:', accounts[0]);
+                                console.log('✅ Farcaster wallet connected:', accounts[0]);
                                 
                                 // Update UI
                                 const walletBtn = document.getElementById('headerWalletBtn');
                                 if (walletBtn) {
                                     const shortAddress = accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
                                     walletBtn.innerHTML = '<span>🟣</span><span>' + shortAddress + '</span>';
+                                    walletBtn.onclick = null; // Disable clicking in Farcaster
                                 }
-                            }
+                                
+                                // Listen for account changes
+                                provider.on('accountsChanged', (newAccounts) => {
+                                    if (newAccounts && newAccounts.length > 0) {
+                                        window.connectedAddress = newAccounts[0];
+                                        const shortAddress = newAccounts[0].slice(0, 6) + '...' + newAccounts[0].slice(-4);
+                                        if (walletBtn) {
+                                            walletBtn.innerHTML = '<span>🟣</span><span>' + shortAddress + '</span>';
+                                        }
+                                        console.log('✅ Account changed:', newAccounts[0]);
+                                    }
+                                });
+                                
+                                // Listen for chain changes
+                                provider.on('chainChanged', (chainId) => {
+                                    console.log('⛓️ Chain changed:', chainId);
+                                    window.location.reload();
+                                });
+                }
+              } else {
+                            console.log('⚠️ No Ethereum provider available in Farcaster wallet');
               }
-            } catch (error) {
-                        console.log('Farcaster wallet auto-connect failed:', error);
-                    }
+                    } catch (walletError) {
+                        console.error('❌ Farcaster wallet connection failed:', walletError);
+            }
+        } else {
+                    console.log('ℹ️ Not in Farcaster context - running as web app');
                 }
       } catch (error) {
-                console.log('Not in Farcaster context:', error);
+                console.error('❌ Farcaster SDK initialization failed:', error);
+                window.isFarcasterMiniApp = false;
             }
         })();
     </script>
@@ -1129,19 +1162,18 @@
         
         // Wallet connection
         function openWalletModal() {
-            // If in Farcaster, show message
+            // If in Farcaster, prevent other wallet connections
             if (window.isFarcasterMiniApp) {
-                alert('Your Farcaster wallet is already connected!');
-        return;
-      }
-            
-            // For web, use RainbowKit
-            if (typeof RainbowKit !== 'undefined' && RainbowKit.openConnectModal) {
-                RainbowKit.openConnectModal();
+                if (window.connectedAddress) {
+                    alert('🟣 Farcaster Wallet is already connected!\n\nAddress: ' + window.connectedAddress);
           } else {
-                // Initialize RainbowKit if not already done
-                initRainbowKit();
+                    alert('🟣 Connecting to Farcaster Wallet...\n\nPlease allow wallet access in Farcaster.');
+                }
+                return;
             }
+            
+            // For web, use direct wallet connection
+            initRainbowKit();
         }
         
         // Initialize Web Wallet Connection

@@ -1550,9 +1550,18 @@
             // If in Farcaster, prevent other wallet connections
             if (window.isFarcasterMiniApp) {
                 if (window.connectedAddress) {
-                    alert('🟣 Farcaster Wallet is already connected!\n\nAddress: ' + window.connectedAddress);
+                    showResultModal(
+                        true,
+                        'Farcaster Wallet is already connected!',
+                        null,
+                        null,
+                        null
+                    );
           } else {
-                    alert('🟣 Connecting to Farcaster Wallet...\n\nPlease allow wallet access in Farcaster.');
+                    showResultModal(
+                        false,
+                        'Connecting to Farcaster Wallet... Please allow wallet access in Farcaster.'
+                    );
                 }
                 return;
             }
@@ -1609,27 +1618,40 @@
                         
                         if (isMobile) {
                             // Try WalletConnect or deep links
-                            alert('Please use a Web3 wallet browser like MetaMask mobile, Rainbow, or Coinbase Wallet.');
+                            showResultModal(
+                                false,
+                                'Please use a Web3 wallet browser like MetaMask mobile, Rainbow, or Coinbase Wallet to connect.'
+                            );
         } else {
                             // Desktop - suggest installing MetaMask
-                            const installMetaMask = confirm(
-                                'No Web3 wallet detected!\n\n' +
-                                'Would you like to install MetaMask?\n\n' +
-                                'MetaMask is a secure crypto wallet that lets you interact with blockchain apps.'
+                            showResultModal(
+                                false, 
+                                'No Web3 wallet detected! Please install MetaMask or another Web3 wallet to continue.',
+                                null,
+                                null,
+                                null
                             );
                             
-                            if (installMetaMask) {
-                                window.open('https://metamask.io/download/', '_blank');
-                            }
-                }
+                            // Add install button
+                            setTimeout(() => {
+                                const explorerBtn = document.getElementById('resultExplorerBtn');
+                                if (explorerBtn) {
+                                    explorerBtn.style.display = 'inline-flex';
+                                    explorerBtn.textContent = '📥 Install MetaMask';
+                                    explorerBtn.onclick = () => {
+                                        window.open('https://metamask.io/download/', '_blank');
+                                    };
+                                }
+                            }, 100);
+                        }
               }
-                            } catch (error) {
+            } catch (error) {
                     if (error.code === 4001) {
                         // User rejected the request
-                        alert('Wallet connection cancelled. Please try again.');
+                        showResultModal(false, 'Wallet connection cancelled. Please try again.');
         } else {
                         console.error('Wallet connection failed:', error);
-                        alert('Failed to connect wallet. Please try again.');
+                        showResultModal(false, 'Failed to connect wallet. Please try again.');
                     }
                 }
             };
@@ -1638,7 +1660,7 @@
         }
         
         function approveToken() {
-            alert('Token approval will be implemented with smart contract integration.');
+            showResultModal(false, 'Token approval will be implemented with smart contract integration. Coming soon!');
         }
         
         // Global transfer data
@@ -1949,7 +1971,7 @@
         }
         
         function importWallets() {
-            alert('CSV import will be implemented with file processing.');
+            showResultModal(false, 'CSV import will be implemented with file processing. Coming soon!');
         }
         
         // Initialize

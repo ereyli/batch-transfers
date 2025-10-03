@@ -22,9 +22,6 @@
     "primaryCategory": "finance",
     "tags": ["base", "sendwise", "batchtransfer", "crypto", "tools", "defi"],
     "imageUrl": "https://sendwise.xyz/image.png",
-    "screenshotUrls": [
-      "https://sendwise.xyz/image.png"
-    ],
     "requiredCapabilities": [
       "wallet.getEthereumProvider"
     ]

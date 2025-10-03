@@ -1,4 +1,6 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/.well-known/farcaster.json",
@@ -25,6 +27,12 @@
           "value": "*"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/.well-known/farcaster.json",
+      "destination": "/farcaster.json"
     }
   ]
 }

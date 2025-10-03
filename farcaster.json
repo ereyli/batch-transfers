@@ -1,0 +1,33 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI1MTYxOSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDk3Njc1RjAzRDY1RkFCNzM3MWZhMkJlQjNkYkY5YzY4NDJjOGQ1MjUifQ",
+    "payload": "eyJkb21haW4iOiJzZW5kd2lzZS54eXoifQ",
+    "signature": "CYSG7k83/8rsQOzENEGddNJm74qImwGBoB3VQw8BqPtesgKtaNeijY+SpjmI4sObO8q24PanKxOIAQk5UHYqbRs="
+  },
+  "baseBuilder": {
+    "allowedAddresses": [
+      "0xcF1B5d6CD8e0bfd6B1a8B2c2ceAb0bc165EEE5B3"
+    ]
+  },
+  "frame": {
+    "version": "1",
+    "name": "Sendwise",
+    "homeUrl": "https://sendwise.xyz",
+    "iconUrl": "https://sendwise.xyz/icon.png",
+    "splashImageUrl": "https://sendwise.xyz/splash.png",
+    "splashBackgroundColor": "#6366f1",
+    "subtitle": "Smart Batch Transfers",
+    "description": "Send ETH & ERC20 tokens to multiple addresses in one transaction. Multi-chain support for Base, Optimism, Arbitrum, Soneium, Unichain & Ink.",
+    "primaryCategory": "finance",
+    "tags": ["base", "sendwise", "batchtransfer", "crypto", "defi"],
+    "imageUrl": "https://sendwise.xyz/image.png",
+    "heroImageUrl": "https://sendwise.xyz/image.png",
+    "tagline": "Multi-chain batch transfers",
+    "ogTitle": "Sendwise - Smart Batch Transfers",
+    "ogDescription": "Send crypto to multiple addresses in one transaction. Save gas fees!",
+    "ogImageUrl": "https://sendwise.xyz/image.png",
+    "screenshotUrls": [
+      "https://sendwise.xyz/image.png"
+    ]
+  }
+}

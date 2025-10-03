@@ -1,8 +1,8 @@
 {
   "accountAssociation": {
-    "header": "eyJmaWQiOjI1MTYxOSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDk3Njc1RjAzRDY1RkFCNzM3MWZhMkJlQjNkYkY5YzY4NDJjOGQ1MjUifQ",
-    "payload": "eyJkb21haW4iOiJzZW5kd2lzZS54eXoifQ",
-    "signature": "CYSG7k83/8rsQOzENEGddNJm74qImwGBoB3VQw8BqPtesgKtaNeijY+SpjmI4sObO8q24PanKxOIAQk5UHYqbRs="
+    "header": "eyJmaWQiOjI1MTYxOSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweEMwNjM0OTQ1NjU5QzZCNzc5NkYzQ0Q2RTM1MzU5MTk3YzQ2YWVGNzUifQ",
+    "payload": "eyJkb21haW4iOiJ3d3cuc2VuZHdpc2UueHl6In0",
+    "signature": "MHhlY2YyNmIwMThkZTA0MmYxOWE0MjNhNzY5MTZiZDZiY2NiZTNhYTllNDJlNDczMWQ4YzhiYjAzZjhhZjBhYTRjMWFmMDNhMzU0YWFiZGQ0MGFkMGFkMDBiNWZiYjIzMjc3NTgxY2U4OTY2YTFmMDMyMjc5OWQxODliYWY2M2IxOTFi"
   },
   "baseBuilder": {
     "allowedAddresses": [
@@ -12,22 +12,22 @@
   "frame": {
     "version": "1",
     "name": "Sendwise",
-    "homeUrl": "https://sendwise.xyz",
-    "iconUrl": "https://sendwise.xyz/icon.png",
-    "splashImageUrl": "https://sendwise.xyz/splash.png",
+    "homeUrl": "https://www.sendwise.xyz",
+    "iconUrl": "https://www.sendwise.xyz/icon.png",
+    "splashImageUrl": "https://www.sendwise.xyz/splash.png",
     "splashBackgroundColor": "#6366f1",
     "subtitle": "Smart Batch Transfers",
     "description": "Send ETH & ERC20 tokens to multiple addresses in one transaction. Multi-chain support for Base, Optimism, Arbitrum, Soneium, Unichain & Ink.",
     "primaryCategory": "finance",
     "tags": ["base", "sendwise", "batchtransfer", "crypto", "defi"],
-    "imageUrl": "https://sendwise.xyz/image.png",
-    "heroImageUrl": "https://sendwise.xyz/image.png",
+    "imageUrl": "https://www.sendwise.xyz/image.png",
+    "heroImageUrl": "https://www.sendwise.xyz/image.png",
     "tagline": "Multi-chain batch transfers",
     "ogTitle": "Sendwise - Smart Batch Transfers",
     "ogDescription": "Send crypto to multiple addresses in one transaction. Save gas fees!",
-    "ogImageUrl": "https://sendwise.xyz/image.png",
+    "ogImageUrl": "https://www.sendwise.xyz/image.png",
     "screenshotUrls": [
-      "https://sendwise.xyz/image.png"
+      "https://www.sendwise.xyz/image.png"
     ]
   }
 }

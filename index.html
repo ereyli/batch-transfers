@@ -675,6 +675,293 @@
         opacity: 1;
       }
 
+        /* Confirmation Modal */
+        .confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            backdrop-filter: blur(12px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .confirmation-content {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            padding: 2.5rem;
+            border-radius: var(--radius-xl);
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid var(--primary);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            position: relative;
+            animation: slideUpModal 0.4s ease;
+        }
+
+        @keyframes slideUpModal {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .confirmation-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .confirmation-icon {
+            font-size: 3rem;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .confirmation-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+
+        .confirmation-body {
+            margin-bottom: 2rem;
+        }
+
+        .confirmation-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .confirmation-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-hover);
+            transform: translateX(5px);
+        }
+
+        .confirmation-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .confirmation-label-icon {
+            font-size: 1.25rem;
+        }
+
+        .confirmation-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .confirmation-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            margin: 1.5rem 0;
+        }
+
+        .confirmation-total {
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px solid var(--primary);
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            margin: 1.5rem 0;
+        }
+
+        .confirmation-total .confirmation-label {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .confirmation-total .confirmation-value {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 1rem 1.5rem;
+        border: none;
+            border-radius: var(--radius-lg);
+        font-weight: 600;
+            font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .modal-btn-confirm:hover {
+        transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .modal-btn-confirm:active {
+            transform: translateY(0);
+        }
+
+        .modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .modal-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--error);
+            color: var(--error);
+            transform: translateY(-2px);
+        }
+
+        .modal-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Success/Error Modal */
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10002;
+            backdrop-filter: blur(12px);
+        }
+
+        .result-content {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            padding: 3rem;
+            border-radius: var(--radius-xl);
+        text-align: center;
+            max-width: 450px;
+            width: 90%;
+            border: 2px solid var(--success);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            animation: slideUpModal 0.4s ease;
+        }
+
+        .result-content.error {
+            border-color: var(--error);
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: bounce 0.6s ease;
+        }
+
+        .result-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--success);
+        }
+
+        .result-content.error .result-title {
+            color: var(--error);
+        }
+
+        .result-message {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .result-hash {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-lg);
+        }
+
+        .result-stat {
+            text-align: center;
+        }
+
+        .result-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .result-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
         /* Loading Screen */
         .loading {
             position: fixed;
@@ -963,6 +1250,104 @@
             </div>
         </div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <div class="confirmation-header">
+                <div class="confirmation-icon">🚀</div>
+                <h2 class="confirmation-title">Batch Transfer</h2>
+            </div>
+            
+            <div class="confirmation-body">
+                <div class="confirmation-row">
+                    <div class="confirmation-label">
+                        <span class="confirmation-label-icon">📊</span>
+                        <span>Network</span>
+                    </div>
+                    <div class="confirmation-value" id="confirmNetwork">Base</div>
+                </div>
+
+                <div class="confirmation-row">
+                    <div class="confirmation-label">
+                        <span class="confirmation-label-icon">👥</span>
+                        <span>Recipients</span>
+                    </div>
+                    <div class="confirmation-value" id="confirmRecipients">0</div>
+                </div>
+
+                <div class="confirmation-row">
+                    <div class="confirmation-label">
+                        <span class="confirmation-label-icon">💰</span>
+                        <span>Transfer Amount</span>
+                    </div>
+                    <div class="confirmation-value" id="confirmAmount">0.000000 ETH</div>
+                </div>
+
+                <div class="confirmation-row">
+                    <div class="confirmation-label">
+                        <span class="confirmation-label-icon">💳</span>
+                        <span>Contract Fee</span>
+                    </div>
+                    <div class="confirmation-value" id="confirmFee">0.001 ETH</div>
+                </div>
+
+                <div class="confirmation-divider"></div>
+
+                <div class="confirmation-total confirmation-row">
+                    <div class="confirmation-label">
+                        <span class="confirmation-label-icon">💸</span>
+                        <span>Total Cost</span>
+                    </div>
+                    <div class="confirmation-value" id="confirmTotal">0.000000 ETH</div>
+                </div>
+            </div>
+
+            <div class="confirmation-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeConfirmationModal()">
+                    <span>❌</span>
+                    <span>İptal</span>
+                </button>
+                <button class="modal-btn modal-btn-confirm" id="confirmButton" onclick="executeBatchTransfer()">
+                    <span>✅</span>
+                    <span>Tamam</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="resultModal" class="result-modal">
+        <div class="result-content" id="resultContent">
+            <div class="result-icon" id="resultIcon">✅</div>
+            <h2 class="result-title" id="resultTitle">Success!</h2>
+            <p class="result-message" id="resultMessage">Transaction completed successfully</p>
+            
+            <div id="resultHashContainer" style="display:none;">
+                <div class="result-hash" id="resultHash"></div>
+            </div>
+
+            <div id="resultStatsContainer" class="result-stats" style="display:none;">
+                <div class="result-stat">
+                    <span class="result-stat-value" id="resultStatRecipients">0</span>
+                    <span class="result-stat-label">Recipients</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-stat-value" id="resultStatAmount">0</span>
+                    <span class="result-stat-label">Total ETH</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <button class="share-button" id="resultExplorerBtn" style="display:none;">
+                    🔍 View on Explorer
+                </button>
+                <button class="share-button" onclick="closeResultModal()">
+                    ✨ Continue
+                </button>
+            </div>
+        </div>
+    </div>
   
   <!-- Farcaster Mini App SDK -->
     <script type="module">
@@ -1218,7 +1603,7 @@
                                 window.location.reload();
                             });
                                 }
-                              } else {
+        } else {
                         // Show wallet options for mobile or no wallet installed
                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                         
@@ -1242,7 +1627,7 @@
                     if (error.code === 4001) {
                         // User rejected the request
                         alert('Wallet connection cancelled. Please try again.');
-                          } else {
+        } else {
                         console.error('Wallet connection failed:', error);
                         alert('Failed to connect wallet. Please try again.');
                     }
@@ -1256,16 +1641,19 @@
             alert('Token approval will be implemented with smart contract integration.');
         }
         
+        // Global transfer data
+        window.batchTransferData = null;
+
         async function sendBatch() {
             try {
                 // Check if wallet is connected
                 if (!window.connectedAddress) {
-                    alert('❌ Please connect your wallet first!');
+                    showResultModal(false, 'Please connect your wallet first!');
                     return;
                 }
                 
                 // Get all recipient rows
-                const recipientRows = document.querySelectorAll('.recipient-row');
+                              const recipientRows = document.querySelectorAll('.recipient-row');
                 const recipients = [];
                 const amounts = [];
                 
@@ -1283,23 +1671,23 @@
                     
                     // Validate address
                     if (!address.startsWith('0x') || address.length !== 42) {
-                        alert('❌ Invalid address: ' + address);
-                        return;
-                    }
-                    
+                        showResultModal(false, 'Invalid address format: ' + address);
+                                return;
+                              }
+                              
                     // Validate amount
                     if (isNaN(amount) || parseFloat(amount) <= 0) {
-                        alert('❌ Invalid amount: ' + amount);
-                        return;
-                    }
-                    
+                        showResultModal(false, 'Invalid amount: ' + amount);
+                                return;
+                              }
+                              
                     recipients.push(address);
                     amounts.push(amount);
                 }
                 
                 // Check if we have any recipients
                               if (recipients.length === 0) {
-                    alert('❌ Please add at least one recipient!');
+                    showResultModal(false, 'Please add at least one recipient!');
                                 return;
                               }
                               
@@ -1319,38 +1707,75 @@
                 };
                 const networkName = networkNames[window.selectedChainId] || 'Unknown Network';
                 
+                // Store data for execution
+                window.batchTransferData = {
+                    recipients,
+                    amounts,
+                    totalAmount,
+                    contractFee,
+                    totalWithFee,
+                    networkName
+                };
+                
                 // Show confirmation modal
-                const confirmed = confirm(
-                    '🚀 Batch Transfer Confirmation\n\n' +
-                    '═══════════════════════════\n' +
-                    '📊 Network: ' + networkName + '\n' +
-                    '👥 Recipients: ' + recipients.length + '\n' +
-                    '💰 Transfer Amount: ' + totalAmount.toFixed(6) + ' ETH\n' +
-                    '💳 Contract Fee: ' + contractFee + ' ETH\n' +
-                    '═══════════════════════════\n' +
-                    '💸 Total Cost: ' + totalWithFee.toFixed(6) + ' ETH\n\n' +
-                    'Do you want to proceed?'
-                );
-                              
-                              if (!confirmed) {
-                    console.log('❌ User cancelled transaction');
+                showConfirmationModal(networkName, recipients.length, totalAmount, contractFee, totalWithFee);
+                
+            } catch (error) {
+                console.error('❌ Batch transfer preparation failed:', error);
+                showResultModal(false, 'Failed to prepare transfer: ' + (error.message || error));
+            }
+        }
+
+        // Show confirmation modal
+        function showConfirmationModal(networkName, recipientCount, transferAmount, fee, total) {
+            document.getElementById('confirmNetwork').textContent = networkName;
+            document.getElementById('confirmRecipients').textContent = recipientCount;
+            document.getElementById('confirmAmount').textContent = transferAmount.toFixed(6) + ' ETH';
+            document.getElementById('confirmFee').textContent = fee.toFixed(3) + ' ETH';
+            document.getElementById('confirmTotal').textContent = total.toFixed(6) + ' ETH';
+            
+            const modal = document.getElementById('confirmationModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        // Close confirmation modal
+        function closeConfirmationModal() {
+            const modal = document.getElementById('confirmationModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            window.batchTransferData = null;
+        }
+
+        // Execute batch transfer (called when user clicks "Tamam")
+        async function executeBatchTransfer() {
+            if (!window.batchTransferData) {
                                 return;
                               }
                               
+            const { recipients, amounts, totalAmount, contractFee, totalWithFee, networkName } = window.batchTransferData;
+
+            try {
+                // Disable button
+                const confirmBtn = document.getElementById('confirmButton');
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.innerHTML = '<span>⏳</span><span>İşleniyor...</span>';
+                }
+                
                 // Get provider (Farcaster or Web)
                 let provider;
                 
                 if (window.isFarcasterMiniApp && window.farcasterSDK) {
-                    // Use Farcaster wallet provider
                     provider = await window.farcasterSDK.wallet.ethProvider;
                     console.log('✅ Using Farcaster wallet provider');
                 } else if (window.ethereum) {
-                    // Use Web3 wallet provider
                     provider = window.ethereum;
                     console.log('✅ Using Web3 wallet provider');
                 } else {
-                    alert('❌ No wallet provider available!');
-                    return;
+                    throw new Error('No wallet provider available!');
                 }
                 
                 // Check current chain
@@ -1359,39 +1784,31 @@
                 
                 // Switch chain if needed
                 if (currentChainDecimal !== window.selectedChainId) {
-                                  try {
                                     await provider.request({
                                       method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x' + window.selectedChainId.toString(16) }]
-                                    });
-                        console.log('✅ Switched to network:', window.selectedChainId);
-                                  } catch (switchError) {
-                        alert('❌ Please switch to ' + networkName + ' network in your wallet!');
-                        return;
-                    }
+                        params: [{ chainId: '0x' + window.selectedChainId.toString(16) }]
+                    });
+                    console.log('✅ Switched to network:', window.selectedChainId);
                 }
                 
-                // Batch contract addresses for each network
+                // Batch contract addresses
                                   const contractAddresses = {
-                    8453: '0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784',   // Base
-                    10: '0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9',     // Optimism
-                    42161: '0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9',   // Arbitrum
-                    1868: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0',   // Soneium
-                    130: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0',    // Unichain
-                    57073: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0'   // Ink
+                    8453: '0x74a2c6466d98253ca932fe6a6ccb811d4d7d5784',
+                    10: '0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9',
+                    42161: '0x5e86e9cd50e7f64b692b90fae1487d2f6ed1aba9',
+                    1868: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0',
+                    130: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0',
+                    57073: '0x84e4dd821c8f848470fc49def3b14fc870fa97f0'
                 };
                 
                 const contractAddress = contractAddresses[window.selectedChainId];
-                
                                   if (!contractAddress) {
-                    alert('❌ Batch contract not available for ' + networkName);
-                    return;
+                    throw new Error('Batch contract not available for ' + networkName);
                 }
                 
-                // Use ethers.js to encode the transaction
+                // Check ethers.js
                 if (typeof ethers === 'undefined') {
-                    alert('❌ Ethers library not loaded. Please refresh the page.');
-                    return;
+                    throw new Error('Ethers library not loaded. Please refresh the page.');
                 }
                 
                 // Convert amounts to wei
@@ -1413,11 +1830,6 @@
                 
                 // Send transaction
                 console.log('📤 Sending batch transfer transaction...');
-                console.log('Contract:', contractAddress);
-                console.log('Recipients:', recipients);
-                console.log('Amounts (ETH):', amounts);
-                console.log('Total value:', totalWithFeeWei.toString());
-                
                 const txHash = await provider.request({
                     method: 'eth_sendTransaction',
                     params: [{
@@ -1425,22 +1837,19 @@
                         to: contractAddress,
                         value: totalWithFeeWei.toHexString(),
                         data: data,
-                        gas: '0x7A120' // 500,000 gas limit
+                        gas: '0x7A120'
                     }]
                 });
                 
                 console.log('✅ Transaction sent! Hash:', txHash);
                 
-                // Show success message
-                alert(
-                    '✅ Batch Transfer Successful!\n\n' +
-                    'Transaction Hash:\n' + txHash + '\n\n' +
-                    '📊 ' + recipients.length + ' transfers completed\n' +
-                    '💰 Total: ' + totalWithFee.toFixed(6) + ' ETH\n\n' +
-                    'View on Explorer: https://basescan.org/tx/' + txHash
-                );
+                // Close confirmation modal
+                closeConfirmationModal();
                 
-                // Clear inputs after success
+                // Show success modal
+                showResultModal(true, 'Your batch transfer was successful!', txHash, recipients.length, totalWithFee.toFixed(6));
+                
+                // Clear inputs
                 const container = document.getElementById('inputContainer');
                 if (container) {
                     container.innerHTML = `
@@ -1458,14 +1867,85 @@
             } catch (error) {
                 console.error('❌ Batch transfer failed:', error);
                 
+                // Close confirmation modal
+                closeConfirmationModal();
+                
+                // Show error modal
+                let errorMessage = 'Transaction failed';
                 if (error.code === 4001) {
-                    alert('❌ Transaction cancelled by user');
+                    errorMessage = 'Transaction cancelled by user';
                 } else if (error.code === -32603) {
-                    alert('❌ Transaction failed: Insufficient funds or gas');
-              } else {
-                    alert('❌ Transaction failed: ' + (error.message || error));
+                    errorMessage = 'Transaction failed: Insufficient funds or gas';
+                } else if (error.message) {
+                    errorMessage = error.message;
                 }
+                
+                showResultModal(false, errorMessage);
             }
+        }
+
+        // Show result modal (success/error)
+        function showResultModal(success, message, txHash = null, recipients = null, amount = null) {
+            const modal = document.getElementById('resultModal');
+            const content = document.getElementById('resultContent');
+            const icon = document.getElementById('resultIcon');
+            const title = document.getElementById('resultTitle');
+            const messageEl = document.getElementById('resultMessage');
+            const hashContainer = document.getElementById('resultHashContainer');
+            const hashEl = document.getElementById('resultHash');
+            const statsContainer = document.getElementById('resultStatsContainer');
+            const explorerBtn = document.getElementById('resultExplorerBtn');
+            
+            if (success) {
+                content.classList.remove('error');
+                icon.textContent = '✅';
+                title.textContent = 'Transfer Successful!';
+                title.style.color = 'var(--success)';
+                
+                if (txHash) {
+                    hashContainer.style.display = 'block';
+                    hashEl.textContent = txHash;
+                    
+                    explorerBtn.style.display = 'inline-flex';
+                    explorerBtn.onclick = () => {
+                        const explorers = {
+                            8453: 'https://basescan.org/tx/',
+                            10: 'https://optimistic.etherscan.io/tx/',
+                            42161: 'https://arbiscan.io/tx/',
+                            1868: 'https://soneium.blockscout.com/tx/',
+                            130: 'https://unichain-sepolia.blockscout.com/tx/',
+                            57073: 'https://explorer.inkonchain.com/tx/'
+                        };
+                        const explorerUrl = explorers[window.selectedChainId] || 'https://etherscan.io/tx/';
+                        window.open(explorerUrl + txHash, '_blank');
+                    };
+                }
+                
+                if (recipients && amount) {
+                    statsContainer.style.display = 'flex';
+                    document.getElementById('resultStatRecipients').textContent = recipients;
+                    document.getElementById('resultStatAmount').textContent = amount;
+                }
+        } else {
+                content.classList.add('error');
+                icon.textContent = '❌';
+                title.textContent = 'Transfer Failed';
+                title.style.color = 'var(--error)';
+                hashContainer.style.display = 'none';
+                statsContainer.style.display = 'none';
+                explorerBtn.style.display = 'none';
+            }
+            
+            messageEl.textContent = message;
+            modal.style.display = 'flex';
+        }
+
+        // Close result modal
+        function closeResultModal() {
+            const modal = document.getElementById('resultModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
         }
         
         function importWallets() {

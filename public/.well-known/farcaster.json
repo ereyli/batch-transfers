@@ -9,13 +9,14 @@
       "0xcF1B5d6CD8e0bfd6B1a8B2c2ceAb0bc165EEE5B3"
     ]
   },
-  "miniapp": {
+  "frame": {
     "version": "1",
     "name": "Sendwise",
     "homeUrl": "https://www.sendwise.xyz",
     "iconUrl": "https://www.sendwise.xyz/icon.png",
     "splashImageUrl": "https://www.sendwise.xyz/splash.png",
     "splashBackgroundColor": "#6366f1",
+    "buttonTitle": "Open Sendwise",
     "subtitle": "Smart Batch Transfers",
     "description": "Send ETH and ERC20 tokens to multiple addresses in one transaction. Multi-chain support for Base, Optimism, Arbitrum, Soneium, Unichain and Ink.",
     "primaryCategory": "finance",
@@ -30,10 +31,7 @@
       "https://www.sendwise.xyz/image.png"
     ],
     "canonicalDomain": "www.sendwise.xyz",
-    "requiredCapabilities": [
-      "actions.signIn",
-      "wallet.getEthereumProvider"
-    ],
+    "webhookUrl": "https://www.sendwise.xyz/api/webhook",
     "noindex": false
   }
 }

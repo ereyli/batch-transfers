@@ -11,14 +11,8 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- RainbowKit CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@rainbow-me/rainbowkit@2.0.0/styles.css">
-    
-    <!-- Web3 Libraries for RainbowKit -->
-    <script src="https://unpkg.com/@wagmi/core@2.6.5/dist/index.umd.js"></script>
-    <script src="https://unpkg.com/@wagmi/connectors@4.1.14/dist/index.umd.js"></script>
-    <script src="https://unpkg.com/viem@2.7.13/dist/viem.umd.js"></script>
-    <script src="https://unpkg.com/@rainbow-me/rainbowkit@2.0.2/dist/index.umd.js"></script>
+    <!-- Web3Modal CSS (Simpler alternative to RainbowKit) -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     
     <!-- Farcaster Mini App Meta Tags -->
     <meta name="fc:miniapp" content='{
@@ -396,7 +390,7 @@
         }
         
         .recipients-header {
-            display: flex;
+        display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
@@ -444,7 +438,7 @@
             font-weight: 600;
             display: flex;
             align-items: center;
-            justify-content: center;
+        justify-content: center;
             min-width: 40px;
             height: 40px;
         }
@@ -495,7 +489,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             display: inline-flex;
-            align-items: center;
+        align-items: center;
             gap: 0.5rem;
             text-decoration: none;
             position: relative;
@@ -625,62 +619,62 @@
         }
         
         /* Achievement Modal */
-        .achievement-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+      .achievement-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
             background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
+        display: none;
+        align-items: center;
+        justify-content: center;
             z-index: 10000;
             backdrop-filter: blur(10px);
-        }
-        
-        .achievement-content {
+      }
+
+      .achievement-content {
             background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
             padding: 3rem;
             border-radius: var(--radius-xl);
-            text-align: center;
+        text-align: center;
             max-width: 400px;
             width: 90%;
             border: 2px solid var(--primary);
             box-shadow: var(--shadow-xl);
             color: var(--text-primary);
             position: relative;
-        }
-        
-        .achievement-icon {
+      }
+
+      .achievement-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
-            animation: bounce 0.6s ease;
-        }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        animation: bounce 0.6s ease;
+      }
+
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-15px); }
             60% { transform: translateY(-8px); }
-        }
-        
-        .close-modal {
-            position: absolute;
+      }
+
+      .close-modal {
+        position: absolute;
             top: 1rem;
             right: 1rem;
-            background: none;
-            border: none;
+        background: none;
+        border: none;
             color: var(--text-primary);
             font-size: 1.5rem;
-            cursor: pointer;
+        cursor: pointer;
             opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        
-        .close-modal:hover {
-            opacity: 1;
-        }
-        
+        transition: opacity 0.2s;
+      }
+      
+      .close-modal:hover {
+        opacity: 1;
+      }
+
         /* Loading Screen */
         .loading {
             position: fixed;
@@ -690,7 +684,7 @@
             height: 100%;
             background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
             display: flex;
-            align-items: center;
+        align-items: center;
             justify-content: center;
             z-index: 9999;
         }
@@ -825,25 +819,25 @@
 <body>
     <!-- Loading Screen -->
     <div id="loading" class="loading" style="display: none;">
-        <div class="loading-content">
-            <div class="loading-logo">
+      <div class="loading-content">
+        <div class="loading-logo">
                 <img src="icon.png" alt="Sendwise Logo" />
-            </div>
-            <div class="loading-spinner"></div>
-            <h3>🚀 Sendwise</h3>
-            <p>Smart Batch Transfers</p>
-            <div class="loading-subtitle">Connecting to Farcaster...</div>
         </div>
+        <div class="loading-spinner"></div>
+        <h3>🚀 Sendwise</h3>
+        <p>Smart Batch Transfers</p>
+        <div class="loading-subtitle">Connecting to Farcaster...</div>
+      </div>
     </div>
 
     <div class="container">
-        <!-- Header -->
-        <div class="header fade-in">
-            <div class="logo">
+    <!-- Header -->
+    <div class="header fade-in">
+      <div class="logo">
                 <img src="icon.png" alt="Sendwise Logo" />
-            </div>
-            <h1>Sendwise</h1>
-            <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
+      </div>
+      <h1>Sendwise</h1>
+      <p class="subtitle">Smart Batch Transfers for ETH & ERC20 Tokens</p>
             
             <!-- Network Selection -->
             <div class="network-selector" id="networkTags">
@@ -853,91 +847,91 @@
                 <button class="network-btn" data-chain="1868">Soneium</button>
                 <button class="network-btn" data-chain="130">Unichain</button>
                 <button class="network-btn" data-chain="57073">Ink</button>
-            </div>
-            
+      </div>
+      
             <!-- Wallet Button -->
             <div class="wallet-section">
                 <button id="headerWalletBtn" onclick="window.openWalletModal()" class="wallet-btn">
                     <span>💳</span>
-                    <span>Connect Wallet</span>
-                </button>
-            </div>
+          <span>Connect Wallet</span>
+        </button>
+      </div>
 
             <!-- Share Buttons -->
             <div class="share-section">
                 <button id="shareXBtn" onclick="window.shareToX()" class="share-btn share-x">
                     <span>𝕏</span>
                     <span>Share on X</span>
-                </button>
-                
+        </button>
+        
                 <button id="shareFarcasterBtn" onclick="window.shareToFarcaster()" class="share-btn share-farcaster">
                     <span>✓</span>
                     <span>Share on Farcaster</span>
-                </button>
-            </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Form -->
+    <div class="main-form slide-up">
+      <div class="form-group">
+        <label class="form-label">Transfer Type</label>
+        <select id="transferType" class="form-select">
+          <option value="eth">ETH Transfer</option>
+          <option value="erc20">ERC20 Token Transfer</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="tokenAddressRow" style="display:none;">
+        <label class="form-label">Token Contract Address</label>
+        <input type="text" id="tokenAddressInput" class="form-input" placeholder="0x..." />
+      </div>
+
+      <div id="tokenInfo" class="token-info" style="display:none;"></div>
+
+      <!-- Recipients Section -->
+      <div class="recipients-section">
+        <div class="recipients-header">
+          <h3 class="recipients-title">Recipients</h3>
         </div>
 
-        <!-- Main Form -->
-        <div class="main-form slide-up">
-            <div class="form-group">
-                <label class="form-label">Transfer Type</label>
-                <select id="transferType" class="form-select">
-                    <option value="eth">ETH Transfer</option>
-                    <option value="erc20">ERC20 Token Transfer</option>
-                </select>
-            </div>
-
-            <div class="form-group" id="tokenAddressRow" style="display:none;">
-                <label class="form-label">Token Contract Address</label>
-                <input type="text" id="tokenAddressInput" class="form-input" placeholder="0x..." />
-            </div>
-
-            <div id="tokenInfo" class="token-info" style="display:none;"></div>
-
-            <!-- Recipients Section -->
-            <div class="recipients-section">
-                <div class="recipients-header">
-                    <h3 class="recipients-title">Recipients</h3>
-                </div>
-
-                <div id="inputContainer">
-                    <div class="recipient-row">
-                        <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
-                        <input type="text" placeholder="Amount" class="form-input amount" />
-                        <div class="recipient-actions">
+        <div id="inputContainer">
+          <div class="recipient-row">
+            <input type="text" placeholder="Recipient Address (0x...)" class="form-input address" />
+            <input type="text" placeholder="Amount" class="form-input amount" />
+            <div class="recipient-actions">
                             <button onclick="addInput()" class="action-btn add-btn" title="Add Recipient">➕</button>
                             <button onclick="removeLast()" class="action-btn remove-btn" title="Remove Last" disabled>❌</button>
-                        </div>
-                    </div>
-                </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button id="approveBtn" style="display:none;" onclick="approveToken()" class="btn btn-primary">
-                    ✅ Approve Token
-                </button>
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button id="approveBtn" style="display:none;" onclick="approveToken()" class="btn btn-primary">
+          ✅ Approve Token
+        </button>
                 <button id="sendBtn" onclick="sendBatch()" class="btn btn-primary">
-                    🚀 Send Batch Transfer
-                </button>
-            </div>
+          🚀 Send Batch Transfer
+        </button>
+      </div>
 
-            <div id="status" class="status" style="display:none;"></div>
-        </div>
+      <div id="status" class="status" style="display:none;"></div>
+    </div>
 
-        <!-- CSV Import Section -->
-        <div class="csv-section slide-up">
-            <h3>📁 Import Wallets via CSV</h3>
-            <div class="file-input-wrapper">
-                <input type="file" id="walletCsvInput" accept=".csv" class="file-input" />
-                <label for="walletCsvInput" class="file-input-label">
-                    📄 Choose CSV File
-                </label>
-            </div>
-            <button onclick="importWallets()" class="btn btn-secondary">
-                ➕ Import Wallets
-            </button>
-        </div>
+    <!-- CSV Import Section -->
+    <div class="csv-section slide-up">
+      <h3>📁 Import Wallets via CSV</h3>
+      <div class="file-input-wrapper">
+        <input type="file" id="walletCsvInput" accept=".csv" class="file-input" />
+        <label for="walletCsvInput" class="file-input-label">
+          📄 Choose CSV File
+        </label>
+      </div>
+      <button onclick="importWallets()" class="btn btn-secondary">
+        ➕ Import Wallets
+      </button>
+    </div>
 
         <!-- Share Section -->
         <div class="share-section-bottom">
@@ -949,8 +943,8 @@
             <button class="share-button green" onclick="showMultiChainAchievement()">
                 🌐 Show Multi-Chain Power
             </button>
-        </div>
-    </div>
+  </div>
+</div>
 
     <!-- Achievement Modal -->
     <div id="achievementModal" class="achievement-modal" onclick="if(event.target === this) closeAchievementModal()">
@@ -969,13 +963,13 @@
             </div>
         </div>
     </div>
-
-    <!-- Farcaster Mini App SDK -->
+  
+  <!-- Farcaster Mini App SDK -->
     <script type="module">
         import sdk from 'https://esm.sh/@farcaster/frame-sdk@0.2.0';
         
         window.farcasterSDK = sdk;
-        window.isFarcasterMiniApp = false;
+          window.isFarcasterMiniApp = false;
         
         // Initialize Farcaster SDK
         (async () => {
@@ -1001,12 +995,12 @@
                                     walletBtn.innerHTML = '<span>🟣</span><span>' + shortAddress + '</span>';
                                 }
                             }
-                        }
-                            } catch (error) {
+              }
+            } catch (error) {
                         console.log('Farcaster wallet auto-connect failed:', error);
                     }
                 }
-            } catch (error) {
+      } catch (error) {
                 console.log('Not in Farcaster context:', error);
             }
         })();
@@ -1020,12 +1014,12 @@
         window.isFarcasterMiniApp = window.isFarcasterMiniApp || false;
         
         // Network selection
-        function setupNetworkTags() {
+    function setupNetworkTags() {
             const networkTags = document.querySelectorAll('.network-btn');
-                            
-                            function highlightSelected() {
+
+      function highlightSelected() {
                 networkTags.forEach(tag => {
-                                const isActive = Number(tag.dataset.chain) === Number(window.selectedChainId);
+          const isActive = Number(tag.dataset.chain) === Number(window.selectedChainId);
                     tag.classList.toggle('active', isActive);
                 });
             }
@@ -1033,14 +1027,14 @@
             networkTags.forEach(tag => {
                 tag.addEventListener('click', () => {
                     window.selectedChainId = Number(tag.dataset.chain);
-                                highlightSelected();
+          highlightSelected();
                     console.log('Network selected:', window.selectedChainId);
-                              });
-                            });
-                            
-                            highlightSelected();
-        }
-        
+        });
+      });
+
+      highlightSelected();
+    }
+
         // Basic functions
         function addInput() {
             const container = document.getElementById('inputContainer');
@@ -1069,7 +1063,7 @@
         
         function updateRemoveButtons() {
             const container = document.getElementById('inputContainer');
-            const rows = container.querySelectorAll('.recipient-row');
+                    const rows = container.querySelectorAll('.recipient-row');
             const removeButtons = container.querySelectorAll('.remove-btn');
             
             removeButtons.forEach(btn => {
@@ -1138,62 +1132,92 @@
             // If in Farcaster, show message
             if (window.isFarcasterMiniApp) {
                 alert('Your Farcaster wallet is already connected!');
-                return;
-            }
+        return;
+      }
             
             // For web, use RainbowKit
             if (typeof RainbowKit !== 'undefined' && RainbowKit.openConnectModal) {
                 RainbowKit.openConnectModal();
-            } else {
+          } else {
                 // Initialize RainbowKit if not already done
                 initRainbowKit();
             }
         }
         
-        // Initialize RainbowKit
+        // Initialize Web Wallet Connection
         async function initRainbowKit() {
             if (window.isFarcasterMiniApp) {
-                return; // Don't initialize RainbowKit in Farcaster
+                return; // Don't initialize for Farcaster
             }
             
-            try {
-                // Check if libraries are loaded
-                if (typeof window.wagmi === 'undefined' || typeof window.viem === 'undefined') {
-                    console.log('⏳ Waiting for Web3 libraries to load...');
-                    setTimeout(initRainbowKit, 500);
-                    return;
-                }
-                
-                // Simple MetaMask connection for now
-                const walletBtn = document.getElementById('headerWalletBtn');
-                if (walletBtn) {
-                    walletBtn.onclick = async () => {
-                        try {
-                            if (typeof window.ethereum !== 'undefined') {
-                                const accounts = await window.ethereum.request({ 
-                                    method: 'eth_requestAccounts' 
-                                });
-                                
-                                if (accounts && accounts.length > 0) {
-                                    window.connectedAddress = accounts[0];
-                                    const shortAddress = accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
-                                    walletBtn.innerHTML = '<span>💳</span><span>' + shortAddress + '</span>';
-                                    console.log('✅ Wallet connected:', accounts[0]);
+                    const walletBtn = document.getElementById('headerWalletBtn');
+            if (!walletBtn) return;
+            
+            // Setup wallet connection handler
+            walletBtn.onclick = async () => {
+                try {
+                    // Check for Web3 wallet
+                    if (typeof window.ethereum !== 'undefined') {
+                        // Request account access
+                        const accounts = await window.ethereum.request({ 
+                            method: 'eth_requestAccounts' 
+                        });
+                        
+                  if (accounts && accounts.length > 0) {
+                            window.connectedAddress = accounts[0];
+                        const shortAddress = accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
+                            walletBtn.innerHTML = '<span>💳</span><span>' + shortAddress + '</span>';
+                            console.log('✅ Wallet connected:', accounts[0]);
+                            
+                            // Listen for account changes
+                            window.ethereum.on('accountsChanged', (newAccounts) => {
+                                if (newAccounts.length > 0) {
+                                    window.connectedAddress = newAccounts[0];
+                                    const newShortAddress = newAccounts[0].slice(0, 6) + '...' + newAccounts[0].slice(-4);
+                                    walletBtn.innerHTML = '<span>💳</span><span>' + newShortAddress + '</span>';
+                          } else {
+                                    window.connectedAddress = null;
+                                    walletBtn.innerHTML = '<span>💳</span><span>Connect Wallet</span>';
                                 }
-        } else {
-                                alert('Please install MetaMask or another Web3 wallet!');
-        }
-      } catch (error) {
-                            console.error('Wallet connection failed:', error);
-                            alert('Failed to connect wallet. Please try again.');
-                        }
-                    };
+                            });
+                            
+                            // Listen for chain changes
+                            window.ethereum.on('chainChanged', () => {
+                                window.location.reload();
+                            });
+                                }
+                              } else {
+                        // Show wallet options for mobile or no wallet installed
+                        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                        
+                        if (isMobile) {
+                            // Try WalletConnect or deep links
+                            alert('Please use a Web3 wallet browser like MetaMask mobile, Rainbow, or Coinbase Wallet.');
+                          } else {
+                            // Desktop - suggest installing MetaMask
+                            const installMetaMask = confirm(
+                                'No Web3 wallet detected!\n\n' +
+                                'Would you like to install MetaMask?\n\n' +
+                                'MetaMask is a secure crypto wallet that lets you interact with blockchain apps.'
+                            );
+                            
+                            if (installMetaMask) {
+                                window.open('https://metamask.io/download/', '_blank');
+                            }
                 }
-                
-                console.log('✅ Wallet connection initialized for web');
+              }
             } catch (error) {
-                console.error('Failed to initialize wallet connection:', error);
-            }
+                    if (error.code === 4001) {
+                        // User rejected the request
+                        alert('Wallet connection cancelled. Please try again.');
+              } else {
+                        console.error('Wallet connection failed:', error);
+                        alert('Failed to connect wallet. Please try again.');
+                    }
+                }
+            };
+            
+            console.log('✅ Web wallet connection initialized');
         }
         
         function approveToken() {
@@ -1213,11 +1237,9 @@
             setupNetworkTags();
             updateRemoveButtons();
             
-            // Initialize RainbowKit for web (not in Farcaster)
+            // Initialize wallet connection for web (not in Farcaster)
             if (!window.isFarcasterMiniApp) {
-                setTimeout(() => {
-                    initRainbowKit();
-                }, 1000);
+                initRainbowKit();
             }
             
             // Hide loading screen
